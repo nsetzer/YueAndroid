@@ -1,0 +1,85 @@
+#include "PlaylistModel.h"
+
+
+namespace yue {
+namespace qtcommon {
+
+int PlaylistModel::SongIdRole = Qt::UserRole+1;
+int PlaylistModel::IndexRole = Qt::UserRole+2;
+int PlaylistModel::ArtistRole = Qt::UserRole+3;
+int PlaylistModel::AlbumRole = Qt::UserRole+4;
+int PlaylistModel::TitleRole = Qt::UserRole+5;
+int PlaylistModel::LengthRole = Qt::UserRole+6;
+
+PlaylistModel::PlaylistModel()
+{
+
+}
+
+void PlaylistModel::refresh()
+{
+    LOG_FUNCTION_TIME();
+
+    QSqlQuery query = m_playlist->select();
+    query.exec();
+    if (query.lastError().isValid())
+        qWarning() << query.lastError();
+    setQuery( query );
+}
+
+QVariant PlaylistModel::data(const QModelIndex &index, int role/* = Qt::DisplayRole*/) const
+{
+
+    QVariant value;
+
+    if(role < Qt::UserRole)
+    {
+        value = QSqlQueryModel::data(index, role);
+    }
+    else
+    {
+        int columnIdx = role - Qt::UserRole - 1;
+        QModelIndex modelIndex = this->index(index.row(), columnIdx);
+        value = QSqlQueryModel::data(modelIndex, Qt::DisplayRole);
+    }
+
+    return value;
+
+}
+
+QHash<int, QByteArray> PlaylistModel::roleNames() const
+{
+
+    QHash<int, QByteArray> roles(QAbstractItemModel::roleNames());
+
+    roles[PlaylistModel::SongIdRole] = "song_uid";
+    roles[PlaylistModel::IndexRole] = "playlist_index";
+    roles[PlaylistModel::ArtistRole] = "artist";
+    roles[PlaylistModel::AlbumRole] = "album";
+    roles[PlaylistModel::TitleRole] = "title";
+    roles[PlaylistModel::LengthRole] = "duration";
+
+    return roles;
+}
+
+bool PlaylistModel::move(int sourceRow, int destinationRow)
+{
+    if (sourceRow == destinationRow)
+        return false;
+    beginMoveRows(QModelIndex(),sourceRow,sourceRow,QModelIndex(),destinationRow);
+    m_playlist->move(sourceRow,destinationRow);
+    endMoveRows();
+    return true;
+}
+
+bool PlaylistModel::removeItem(int row)
+{
+    beginRemoveRows(QModelIndex(),row,row);
+    m_playlist->remove(row);
+    endRemoveRows();
+
+    return true;
+}
+
+} // qtcommon
+} // yue
