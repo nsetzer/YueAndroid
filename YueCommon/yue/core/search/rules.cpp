@@ -105,7 +105,7 @@ PartialStringSearchRule::check(const std::map<std::string, std::string> &elem,
 
 std::string
 PartialStringSearchRule::toSql(QueryValues &values) const {
-    values.push_back( util::Variant::create<std::string>(m_sValue) );
+    values.push_back( util::Variant::create<std::string>("%" + m_sValue + "%") );
     return m_sColumn + " LIKE ?";
 }
 
@@ -119,7 +119,7 @@ InvertedPartialStringSearchRule::check(
 
 std::string
 InvertedPartialStringSearchRule::toSql(QueryValues &values) const {
-    values.push_back( util::Variant::create<std::string>(m_sValue) );
+    values.push_back( util::Variant::create<std::string>("%"+m_sValue+"%") );
     return m_sColumn + " NOT LIKE ?";
 }
 

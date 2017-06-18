@@ -40,6 +40,9 @@ PageBase {
         anchors.left: parent.left;
         anchors.right: parent.right;
         height: 50
+        onAccepted: {
+            treeModel.search( searchInput.text );
+        }
     }
 
     ListView {
@@ -48,6 +51,7 @@ PageBase {
         anchors.bottom: parent.bottom
         anchors.left: parent.left;
         anchors.right: parent.right;
+        visible: treeModel.lastError == ""
         model: treeModel
         cacheBuffer: 100
         clip: true
@@ -161,6 +165,17 @@ PageBase {
         }
 
         ScrollBar.vertical: ScrollBar { }
+    }
+
+    Text {
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.verticalCenter: parent.verticalCenter
+        visible: treeModel.lastError != ""
+        text: treeModel.lastError
+        font.pointSize: device.font.pointSize - 1
+        width: 0.9 * parent.width;
+        wrapMode: Text.WordWrap
+        color: "orangered"
     }
 
     Item {

@@ -11,9 +11,7 @@ LibraryTreeListModel::LibraryTreeListModel(QObject *parent)
     : TreeListModelBase(parent)
 {
 
-    QList<yue::bell::LibraryTreeNode*> forest = yue::bell::Library::instance()->queryToForest("");
-    setNewData(forest);
-
+    search("");
 }
 
 /**
@@ -44,6 +42,25 @@ bool LibraryTreeListModel::createPlaylist()
     return true;
 }
 
+void LibraryTreeListModel::search(QString query)
+{
+    try {
+        QList<yue::bell::LibraryTreeNode*> forest = yue::bell::Library::instance()->queryToForest(query);
+        setNewData(forest);
+        m_lastError = "";
+    } catch (yue::core::ParseError& e) {
+        m_lastError = e.what();
+        qWarning() << m_lastError;
+
+    } catch (...) {
+        m_lastError = "Unhandled exception";
+        qWarning() << m_lastError;
+
+    }
+
+    // error status changes wheter an error occured or not.
+    emit errorStatusChanged();
+}
 
 void LibraryTreeListModel::collectSelectedSongs(QMap<yue::bell::Database::uid_t, QString>& groups, yue::bell::LibraryTreeNode* node )
 {

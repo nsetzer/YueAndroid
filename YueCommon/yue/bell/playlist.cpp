@@ -81,23 +81,23 @@ void Playlist::set(QList<Database::uid_t> lst) {
     q.exec("BEGIN");
 
     q.prepare("DELETE FROM playlist_songs WHERE uid=?");
-    q.addBindValue(m_plid);
+    q.addBindValue(toQVariant(m_plid));
     q.exec();
 
     size_t idx = 0;
     q.prepare("INSERT into playlist_songs (uid, idx, song_id) VALUES (?,?,?)");
     for (Database::uid_t song_id : lst) {
 
-        q.addBindValue(m_plid);
-        q.addBindValue(idx);
-        q.addBindValue(song_id);
+        q.addBindValue(toQVariant(m_plid));
+        q.addBindValue(toQVariant(idx));
+        q.addBindValue(toQVariant(song_id));
         q.exec();
         idx++;
     }
 
     q.prepare("UPDATE playlists SET size=? WHERE uid=?");
     q.addBindValue(lst.size());
-    q.addBindValue(m_plid);
+    q.addBindValue(toQVariant(m_plid));
     q.exec();
 
     q.exec("END");
@@ -110,11 +110,11 @@ void Playlist::clear()
 
     QSqlQuery q(m_db->db());
     q.prepare("DELETE FROM playlist_songs WHERE uid=?");
-    q.addBindValue(m_plid);
+    q.addBindValue(toQVariant(m_plid));
     q.exec();
 
     q.prepare("UPDATE playlists SET size=0 WHERE uid=?");
-    q.addBindValue(m_plid);
+    q.addBindValue(toQVariant(m_plid));
     q.exec();
 }
 
@@ -122,7 +122,7 @@ size_t Playlist::size() {
 
     QSqlQuery q(m_db->db());
     q.prepare("SELECT size FROM playlists WHERE uid=?");
-    q.addBindValue(m_plid);
+    q.addBindValue(toQVariant(m_plid));
     q.exec();
 
     if (!q.first())
@@ -138,7 +138,7 @@ Database::uid_t Playlist::get(int idx)
     QSqlQuery q(m_db->db());
 
     q.prepare("SELECT song_id FROM playlist_songs WHERE uid=? AND idx=?");
-    q.addBindValue(m_plid);
+    q.addBindValue(toQVariant(m_plid));
     q.addBindValue(idx);
     q.exec();
     q.first();
@@ -178,18 +178,18 @@ bool Playlist::_insert_uid(int idx, Database::uid_t uid)
 {
     QSqlQuery q(m_db->db());
     q.prepare("UPDATE playlist_songs SET idx=idx+1 WHERE uid=? and idx>=?");
-    q.addBindValue(m_plid);
+    q.addBindValue(toQVariant(m_plid));
     q.addBindValue(idx);
     q.exec();
 
     q.prepare("INSERT into playlist_songs (uid,idx,song_id) VALUES (?,?,?)");
-    q.addBindValue(m_plid);
-    q.addBindValue(idx);
-    q.addBindValue(uid);
+    q.addBindValue(toQVariant(m_plid));
+    q.addBindValue(toQVariant(idx));
+    q.addBindValue(toQVariant(uid));
     q.exec();
 
     q.prepare("UPDATE playlists SET size=size+1 WHERE uid=?");
-    q.addBindValue(m_plid);
+    q.addBindValue(toQVariant(m_plid));
     q.exec();
     return true;
 }
@@ -226,17 +226,17 @@ bool Playlist::_remove_one(int idx)
     QSqlQuery q(m_db->db());
 
     q.prepare("DELETE FROM playlist_songs WHERE uid=? AND idx=?");
-    q.addBindValue(m_plid);
+    q.addBindValue(toQVariant(m_plid));
     q.addBindValue(idx);
     q.exec();
 
     q.prepare("UPDATE playlist_songs SET idx=idx-1 WHERE uid=? and idx>=?");
-    q.addBindValue(m_plid);
+    q.addBindValue(toQVariant(m_plid));
     q.addBindValue(idx);
     q.exec();
 
     q.prepare("UPDATE playlists SET size=size-1 WHERE uid=?");
-    q.addBindValue(m_plid);
+    q.addBindValue(toQVariant(m_plid));
     q.exec();
     return true;
 }
@@ -280,7 +280,7 @@ bool Playlist::_move_one(int src, int tgt)
     QSqlQuery q(m_db->db());
 
     q.prepare("SELECT song_id FROM playlist_songs WHERE uid=? AND idx=?");
-    q.addBindValue(m_plid);
+    q.addBindValue(toQVariant(m_plid));
     q.addBindValue(src);
     q.exec();
     q.first();
@@ -289,37 +289,37 @@ bool Playlist::_move_one(int src, int tgt)
     if (src < tgt) {
 
         q.prepare("DELETE FROM playlist_songs WHERE uid=? AND idx=?");
-        q.addBindValue(m_plid);
+        q.addBindValue(toQVariant(m_plid));
         q.addBindValue(src);
         q.exec();
 
         q.prepare("UPDATE playlist_songs SET idx=idx-1 WHERE (uid=? AND (idx>? AND idx<?))");
-        q.addBindValue(m_plid);
+        q.addBindValue(toQVariant(m_plid));
         q.addBindValue(src);
         q.addBindValue(tgt);
         q.exec();
 
         q.prepare("INSERT into playlist_songs (uid,idx,song_id) VALUES (?,?,?)");
-        q.addBindValue(m_plid);
+        q.addBindValue(toQVariant(m_plid));
         q.addBindValue(tgt-1);
-        q.addBindValue(song_id);
+        q.addBindValue(toQVariant(song_id));
         q.exec();
     } else {
         q.prepare("DELETE FROM playlist_songs WHERE uid=? AND idx=?");
-        q.addBindValue(m_plid);
+        q.addBindValue(toQVariant(m_plid));
         q.addBindValue(src);
         q.exec();
 
         q.prepare("UPDATE playlist_songs SET idx=idx+1 WHERE (uid=? AND (idx>=? AND idx<?))");
-        q.addBindValue(m_plid);
+        q.addBindValue(toQVariant(m_plid));
         q.addBindValue(tgt);
         q.addBindValue(src);
         q.exec();
 
         q.prepare("INSERT into playlist_songs (uid,idx,song_id) VALUES (?,?,?)");
-        q.addBindValue(m_plid);
+        q.addBindValue(toQVariant(m_plid));
         q.addBindValue(tgt);
-        q.addBindValue(song_id);
+        q.addBindValue(toQVariant(song_id));
         q.exec();
     }
 
@@ -340,7 +340,7 @@ QSqlQuery Playlist::select() {
             "WHERE (p.uid=?) "
             "ORDER BY p.idx";
     q.prepare(s);
-    q.addBindValue(m_plid);
+    q.addBindValue(toQVariant(m_plid));
     return q;
 
 }

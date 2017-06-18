@@ -23,6 +23,16 @@ if (!db.open()) {
 namespace yue {
 namespace bell {
 
+QVariant toQVariant(size_t value)
+{
+    // value can not be implicitly constucted on all linux platforms
+    QVariant v;
+    v.setValue(value);
+    return v;
+}
+
+
+
 Database* Database::m_instance = nullptr;
 
 Database::Database(QObject *parent/*=nullptr*/)

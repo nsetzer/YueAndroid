@@ -91,8 +91,10 @@ Page {
                     id: txtTitle
                     anchors.top: parent.top
                     anchors.left: delegateIcon.right
+                    anchors.right: parent.right
                     anchors.bottom: parent.verticalCenter
                     text: title
+                    elide: Text.ElideRight
                     verticalAlignment: Text.AlignBottom
                     font.pointSize: fontMetrics.font.pointSize + 1
                 }

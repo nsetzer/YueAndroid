@@ -14,12 +14,14 @@
 namespace yue {
 namespace core {
 
-template<typename elem>
-struct element_t {
-    const elem* item;
-    float score;
-    int   index;
-};
+namespace shuffle_util {
+    template<typename elem>
+    struct element_t {
+        const elem* item;
+        float score;
+        int   index;
+    };
+}
 
 /**
  * @brief randomly shuffle elements in a vector
@@ -76,6 +78,11 @@ template<class container, class elem, class T>
 container
 shuffle(const container& data, std::function<const T (const elem&)> key)
 {
+    typedef struct shuffle_util::element_t<elem> elem_t;
+
+    if (data.size()==0) {
+        return container();
+    }
 
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -84,15 +91,20 @@ shuffle(const container& data, std::function<const T (const elem&)> key)
     std::map<T,int> groups;
     std::map<T,float> group_offset;
 
-    std::vector<struct element_t<elem>> items;
+    std::vector<elem_t> items;
     items.reserve(data.size());
 
+    //
+
     // first copy the items over to a new array
+    // this is done before group assignments so
+    // that the data can be shuffled first.
     for (auto& e : data) {
         items.push_back({&e,0,0});
     }
+
     // shuffle this array, to randomize the order of the sub groups.
-    fisher_yates<struct element_t<elem>>(items);
+    fisher_yates<elem_t>(items);
 
     // O(N)
     // determine the groups in the data.
@@ -121,15 +133,19 @@ shuffle(const container& data, std::function<const T (const elem&)> key)
     // the group offset
     for (auto& item : items) {
         const T k = key(*item.item);
-        int h = ((float)items.size()) / groups[k] / 2.0;
-        float o = h*dis(gen) - h/2.0 + group_offset[k];
-        item.score = o + (items.size() * (((float)item.index) / groups[k]));
+        // determine the index for this element between 0 and N
+        float i = (items.size() * (static_cast<float>(item.index) / groups[k]));
+        // determine average delta between two points
+        float d = ((float)items.size()) / groups[k] / 2.0;
+        //
+        float o = d*dis(gen) - d/2.0 + group_offset[k];
+        item.score = o + i;
     }
 
     // O(NLOGN)
     // sort all elements by their score - "randomizing the order"
     std::sort(items.begin(), items.end(),
-        [](const struct element_t<elem> &e1, const struct element_t<elem> &e2){
+        [](const elem_t &e1, const elem_t &e2){
             return e1.score < e2.score;});
 
     // unpack the shuffled elements

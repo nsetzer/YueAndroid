@@ -21,10 +21,17 @@ int main(int argc, char *argv[])
     yue::qtcommon::registerQmlTypes();
     yue::bell::Database* db = yue::bell::Database::create();
 
+    // http://www.helloandroid.com/tutorials/musicdroid-audio-player-part-ii
 #ifdef Q_OS_ANDROID
     db->connect("/mnt/sdcard/Music/library.db");
+
+#else
+
+#ifdef Q_OS_LINUX
+    db->connect("/home/nsetzer/projects/android/YueMusicPlayer/yue.db");
 #else
     db->connect("D:/git/YueMusicPlayer/yue.db");
+#endif
 #endif
 
     yue::bell::Library::create();

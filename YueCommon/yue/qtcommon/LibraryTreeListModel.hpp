@@ -13,14 +13,22 @@ namespace qtcommon {
 class YUECOMMON_EXPORT LibraryTreeListModel : public TreeListModelBase
 {
     Q_OBJECT
+    Q_PROPERTY(QString lastError READ lastError NOTIFY errorStatusChanged)
 
 public:
 
     explicit LibraryTreeListModel(QObject *parent = nullptr);
 
     Q_INVOKABLE bool createPlaylist();
+    Q_INVOKABLE void search(QString query);
+
+    QString lastError() {return m_lastError;}
+
+signals:
+    void errorStatusChanged();
 
 private:
+    QString m_lastError;
     void collectSelectedSongs(QMap<yue::bell::Database::uid_t, QString>& groups, yue::bell::LibraryTreeNode* node );
 
 };

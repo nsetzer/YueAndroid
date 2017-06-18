@@ -74,8 +74,11 @@ QVariant TreeListModelBase::data(const QModelIndex &index, int role/* = Qt::Disp
     if (role == TreeListModelBase::DepthRole)
         return m_tabledata[index.row()]->getDepth();
 
-    if (role == TreeListModelBase::ChildCountRole)
-        return m_tabledata[index.row()]->numChildren();
+    if (role == TreeListModelBase::ChildCountRole) {
+        QVariant v;
+        v.setValue(m_tabledata[index.row()]->numChildren());
+        return v;
+    }
 
     if (role == Qt::DisplayRole)
         return m_tabledata[index.row()]->text();

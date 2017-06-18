@@ -6,6 +6,7 @@
 #include "yue/core/search/grammar.hpp"
 #include "yue/core/shuffle.hpp"
 
+
 namespace yue {
 namespace bell {
 
@@ -86,7 +87,7 @@ bool Library::_insert(QMap<QString,QVariant> data, Database::uid_t& uid)
 
     QSqlQuery q(m_db->db());
     q.prepare("UPDATE artists SET count=count+1 WHERE uid=?");
-    q.addBindValue(iArtistId);
+    q.addBindValue(toQVariant(iArtistId));
     if(!q.exec()) {
         m_db->db().rollback();
         throw std::runtime_error("failed to increment artist count");
@@ -94,7 +95,7 @@ bool Library::_insert(QMap<QString,QVariant> data, Database::uid_t& uid)
     q.finish();
 
     q.prepare("UPDATE albums SET count=count+1 WHERE uid=?");
-    q.addBindValue(iAlbumId);
+    q.addBindValue(toQVariant(iAlbumId));
     if(!q.exec()) {
         m_db->db().rollback();
         throw std::runtime_error("failed to increment album count");
@@ -106,7 +107,7 @@ bool Library::_insert(QMap<QString,QVariant> data, Database::uid_t& uid)
     QStringList lsttmp;
 
     lstkeys << "artist" << "album";
-    lstvals << iArtistId << iAlbumId;
+    lstvals << toQVariant(iArtistId) << toQVariant(iAlbumId);
     lsttmp << "?" << "?";
 
     for (const char* key : yue::core::Song::StringKeys) {
@@ -185,7 +186,7 @@ bool Library::_update(Database::uid_t uid, QMap<QString,QVariant> data)
 
     QSqlQuery q(m_db->db());
     q.prepare("SELECT artist,album FROM songs WHERE uid=?");
-    q.addBindValue(uid);
+    q.addBindValue(toQVariant(uid));
     result = q.exec();
     if (q.lastError().isValid())
         qWarning() << q.lastError();
@@ -202,7 +203,7 @@ bool Library::_update(Database::uid_t uid, QMap<QString,QVariant> data)
         new_artist_id = _get_or_create_artist_id(artist,artist);
 
         q.prepare("UPDATE artists SET count=count+1 WHERE uid=?");
-        q.addBindValue(new_artist_id);
+        q.addBindValue(toQVariant(new_artist_id));
         result = q.exec();
         if (!result) {
             m_db->db().rollback();
@@ -210,7 +211,7 @@ bool Library::_update(Database::uid_t uid, QMap<QString,QVariant> data)
         }
 
         q.prepare("UPDATE artists SET count=count-1 WHERE uid=?");
-        q.addBindValue(old_artist_id);
+        q.addBindValue(toQVariant(old_artist_id));
         result = q.exec();
         if (!result) {
             m_db->db().rollback();
@@ -220,7 +221,7 @@ bool Library::_update(Database::uid_t uid, QMap<QString,QVariant> data)
         if (!data.contains(yue::core::Song::album)) {
             QSqlQuery q(m_db->db());
             q.prepare("SELECT album FROM albums WHERE uid=?");
-            q.addBindValue(old_album_id);
+            q.addBindValue(toQVariant(old_album_id));
             result = q.exec();
             if (!result || !q.first()) {
                 m_db->db().rollback();
@@ -239,7 +240,7 @@ bool Library::_update(Database::uid_t uid, QMap<QString,QVariant> data)
         new_album_id = _get_or_create_album_id(old_artist_id,album);
 
         q.prepare("UPDATE albums SET count=count+1 WHERE uid=?");
-        q.addBindValue(new_album_id);
+        q.addBindValue(toQVariant(new_album_id));
         result = q.exec();
         if (!result) {
             m_db->db().rollback();
@@ -247,7 +248,7 @@ bool Library::_update(Database::uid_t uid, QMap<QString,QVariant> data)
         }
 
         q.prepare("UPDATE albums SET count=count-1 WHERE uid=?");
-        q.addBindValue(old_album_id);
+        q.addBindValue(toQVariant(old_album_id));
         result = q.exec();
         if (!result) {
             m_db->db().rollback();
@@ -264,12 +265,12 @@ bool Library::_update(Database::uid_t uid, QMap<QString,QVariant> data)
 
     if (artist_updated) {
         lstkeys << QString(yue::core::Song::artist) + "=?";;
-        lstvals << old_artist_id;
+        lstvals << toQVariant(old_artist_id);
     }
 
     if (album_updated) {
         lstkeys << QString(yue::core::Song::album) + "=?";;
-        lstvals << old_album_id;
+        lstvals << toQVariant(old_album_id);
     }
 
     for (const char* key : yue::core::Song::StringKeys) {
@@ -291,7 +292,7 @@ bool Library::_update(Database::uid_t uid, QMap<QString,QVariant> data)
     q.prepare("UPDATE songs SET " + skeys+ " WHERE uid=?");
     for (QVariant& v : lstvals)
         q.addBindValue( v );
-    q.addBindValue(uid);
+    q.addBindValue(toQVariant(uid));
 
     result = q.exec();
     return result;
@@ -304,7 +305,7 @@ void Library::incrementPlaycount(Database::uid_t uid)
 
     QSqlQuery q(m_db->db());
     q.prepare("UPDATE songs SET playcount=playcount+1 WHERE uid=?");
-    q.addBindValue(uid);
+    q.addBindValue(toQVariant(uid));
 
     q.exec();
     return;
@@ -324,13 +325,33 @@ QList<LibraryTreeNode*> Library::queryToForest(QString querystr)
 {
     LOG_FUNCTION_TIME();
 
+    typedef yue::core::Song Song;
+    QSqlQuery query = m_grammar.buildQuery(QStringList() << Song::artist
+                          << Song::album
+                          << Song::title
+                          << Song::uid
+                          << Song::artist_key
+                          << Song::album_index,
+                          querystr,
+                          "artist_key COLLATE NOCASE, "
+                          "album COLLATE NOCASE, "
+                          "album_index, "
+                          "title COLLATE NOCASE ASC");
+    /*
     QString s = "SELECT artist, album, title, uid, artist_key, album_index "
                 "FROM library "
                 "ORDER BY artist_key COLLATE NOCASE, "
                 "album COLLATE NOCASE, "
                 "album_index, "
                 "title COLLATE NOCASE ASC";
-    QSqlQuery query(s,m_db->db());
+    */
+
+    //QSqlQuery query(s,m_db->db());
+    if (!query.exec());
+        qWarning() << "error executing query";
+    if (query.lastError().isValid())
+        qWarning() << query.lastError();
+    qDebug() << query.executedQuery();
 
     QList<yue::bell::LibraryTreeNode*> forest;
     yue::bell::LibraryTreeNode* nd_art = nullptr;
@@ -446,7 +467,7 @@ Database::uid_t Library::_get_or_create_album_id(Database::uid_t artist, QString
     bool result;
     QSqlQuery q(m_db->db());
     q.prepare("SELECT uid from albums where (artist=? AND album=?)");
-    q.addBindValue(artist);
+    q.addBindValue(toQVariant(artist));
     q.addBindValue(name);
     result = q.exec();
     if (q.lastError().isValid())
@@ -457,7 +478,7 @@ Database::uid_t Library::_get_or_create_album_id(Database::uid_t artist, QString
     q.finish();
 
     q.prepare("INSERT into albums (artist, album, sortkey, count) VALUES (?,?,?,?)");
-    q.addBindValue(artist);
+    q.addBindValue(toQVariant(artist));
     q.addBindValue(name);
     q.addBindValue(name);
     q.addBindValue(0);

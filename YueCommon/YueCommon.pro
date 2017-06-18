@@ -40,7 +40,8 @@ SOURCES += \
     yue/device.cpp \
     yue/bell/playlist.cpp \
     yue/qtcommon/PlaylistModel.cpp \
-    yue/bell/LibrarySearchGrammar.cpp
+    yue/bell/LibrarySearchGrammar.cpp \
+    yue/bell/SongList.cpp
 
 HEADERS += yue/global.h\
     yue/alien/utf8/utf8.h \
@@ -64,7 +65,8 @@ HEADERS += yue/global.h\
     yue/qtcommon/PlaylistModel.h \
     yue/util/logging.hpp \
     yue/core/shuffle.hpp \
-    yue/bell/LibrarySearchGrammar.hpp
+    yue/bell/LibrarySearchGrammar.hpp \
+    yue/bell/SongList.h
 
 
 

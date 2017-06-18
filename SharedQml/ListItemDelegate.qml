@@ -59,6 +59,7 @@ Rectangle {
           anchors.leftMargin: root.width * 0.01
           id: delegateText
           text: root.text
+          elide: Text.ElideMiddle
           color: root.textColor
       }
 

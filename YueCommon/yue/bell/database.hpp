@@ -59,6 +59,9 @@ private:
 
 };
 
+QVariant toQVariant(size_t value);
+
+
 
 
 } // namespace bell
