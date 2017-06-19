@@ -7,6 +7,8 @@
         <file>images/00_folder.svg</file>
         <file>images/00_hamburger.svg</file>
         <file>images/00_info.svg</file>
+        <file>images/00_song_next.svg</file>
+        <file>images/00_song_prev.svg</file>
         <file>images/01_now_playing_a.svg</file>
         <file>images/02_playlist_a.svg</file>
         <file>images/02_playlist_b.svg</file>
@@ -40,5 +42,6 @@
         <file>MenuHeader.qml</file>
         <file>LineInput.qml</file>
         <file>PagePlaylist.qml</file>
+        <file>MediaBar.qml</file>
     </qresource>
 </RCC>

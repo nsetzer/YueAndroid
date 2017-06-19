@@ -7,6 +7,7 @@
 #include <QString>
 #include <QDebug>
 #include <QTime>
+#include <QtGlobal>
 
 #if defined(YUECOMMON_LIBRARY)
 #  define YUECOMMON_EXPORT Q_DECL_EXPORT

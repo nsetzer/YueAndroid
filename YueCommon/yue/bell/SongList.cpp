@@ -28,7 +28,7 @@ void SongList::insert(int idx, Database::uid_t)
 
 void SongList::push_back(Database::uid_t uid)
 {
-    m_songs.push_back(uid)
+    m_songs.push_back(uid);
 }
 
 // TODO: these two need unit tests for assing/access
@@ -39,7 +39,7 @@ Database::uid_t& SongList::operator[](size_t idx)
 
 const Database::uid_t& SongList::operator[](size_t idx) const
 {
-    return m_songs[idx]
+    return m_songs[idx];
 }
 
 } // bell

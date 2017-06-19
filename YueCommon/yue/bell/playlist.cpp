@@ -147,6 +147,31 @@ Database::uid_t Playlist::get(int idx)
     return uid;
 }
 
+ QPair<Database::uid_t,size_t> Playlist::current()
+{
+     Database::uid_t uid;
+     size_t index;
+     QSqlQuery q(m_db->db());
+
+     q.exec("begin");
+     q.prepare("SELECT idx FROM playlists WHERE uid=?");
+     q.addBindValue(toQVariant(m_plid));
+     q.exec();
+     q.first();
+     index = q.value(0).toULongLong();
+
+     q.prepare("SELECT song_id FROM playlist_songs WHERE (uid=? AND idx=?)");
+     q.addBindValue(toQVariant(m_plid));
+     q.addBindValue(index);
+     q.exec();
+     q.first();
+     uid = q.value(0).toULongLong();
+
+     q.exec("end");
+
+     return  QPair<Database::uid_t,size_t>(uid,index);
+}
+
 void Playlist::insert(int idx, Database::uid_t uid)
 {
     LOG_FUNCTION_TIME();

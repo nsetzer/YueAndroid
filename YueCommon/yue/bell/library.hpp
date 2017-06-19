@@ -63,6 +63,8 @@ public:
 
     }
 
+    QString getPath(Database::uid_t uid);
+
 private:
     bool _insert(QMap<QString,QVariant> data, Database::uid_t& uid);
     bool _update(Database::uid_t uid, QMap<QString,QVariant> data);

@@ -347,7 +347,7 @@ QList<LibraryTreeNode*> Library::queryToForest(QString querystr)
     */
 
     //QSqlQuery query(s,m_db->db());
-    if (!query.exec());
+    if (!query.exec())
         qWarning() << "error executing query";
     if (query.lastError().isValid())
         qWarning() << query.lastError();
@@ -432,6 +432,21 @@ QList<Database::uid_t> Library::createPlaylist(QString query, size_t size/* = 0*
     }
     return lst;
 }
+
+QString Library::getPath(Database::uid_t uid)
+{
+    QSqlQuery q(m_db->db());
+    q.prepare("SELECT path FROM library WHERE uid=?");
+    q.addBindValue( toQVariant(uid) );
+    bool result = q.exec();
+    if (q.lastError().isValid())
+        qWarning() << q.lastError();
+    if (result && q.first()) {
+        return q.value(0).toString();
+    }
+    throw std::runtime_error("failed to find uid");
+}
+
 
 Database::uid_t Library::_get_or_create_artist_id(QString name, QString sortkey)
 {

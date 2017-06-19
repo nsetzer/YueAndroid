@@ -1,10 +1,13 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
+#include <QQmlContext>
 #include <QDebug>
 
 #include "yue/bell/database.hpp"
 #include "yue/bell/library.hpp"
 #include "yue/bell/playlist.hpp"
+#include "yue/bell/MediaCtrlBase.h"
+#include "yue/bell/MediaCtrlLocal.h"
 #include "yue/qtcommon/qtcommon.hpp"
 
 #ifdef Q_OS_ANDROID
@@ -46,6 +49,12 @@ int main(int argc, char *argv[])
     }
 
 
+    QSharedPointer<yue::bell::MediaCtrlBase> mplayer(new yue::bell::MediaCtrlLocal());
+    engine.rootContext()->setContextProperty("MediaPlayer", mplayer.data());
+
+    //mplayer->load("D:\\Music\\Discography\\Discography - Beast\\[2009] Beast\\01-beast-devil-crn.mp3");
+    mplayer->load();
+    //mplayer->playpause();
 
     engine.addImportPath(QStringLiteral("qrc:/"));
     //engine.addImportPath(QStringLiteral("qrc:/shared"));

@@ -2,13 +2,14 @@
 #define SONGLIST_H
 
 #include <QObject>
-#inculde <QList>
+#include <QList>
+#include "yue/global.h"
 #include "yue/bell/database.hpp"
 
 namespace yue {
 namespace bell {
 
-class SongList : public QObject
+class YUECOMMON_EXPORT SongList : public QObject
 {
     Q_OBJECT
 public:

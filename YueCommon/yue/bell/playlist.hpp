@@ -5,6 +5,7 @@
 #include <QObject>
 #include <QString>
 #include <QList>
+#include <QPair>
 #include <QSharedPointer>
 #include "yue/bell/database.hpp"
 #include "yue/bell/library.hpp"
@@ -67,11 +68,14 @@ public:
     size_t size();
 
     Database::uid_t get(int idx);
+    QPair<Database::uid_t,size_t> current();
     void insert(int idx, Database::uid_t uid);
     void remove(int idx);
     void move(int src, int tgt);
 
     QSqlQuery select();
+
+
 
 private:
     bool _insert_uid(int idx, Database::uid_t uid);

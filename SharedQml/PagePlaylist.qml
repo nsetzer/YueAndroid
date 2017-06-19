@@ -130,7 +130,7 @@ Page {
     ListView {
         id: myList
         anchors.top: parent.top
-        anchors.bottom: parent.bottom
+        anchors.bottom: mediaBar.top
         anchors.left: parent.left;
         anchors.right: parent.right;
         clip: true
@@ -148,5 +148,27 @@ Page {
         }
     } //listview
 
+
+    MediaBar {
+        id: mediaBar
+        anchors.left : parent.left
+        anchors.right : parent.right
+        anchors.bottom : parent.bottom
+        height: device.textHeight * 2 + margin
+        margin: device.textHeight/4
+
+        onPrevClicked: {
+            console.log("prev")
+        }
+
+        onNextClicked: {
+            console.log("next")
+        }
+
+        onPlayPauseClicked: {
+            console.log("playpause")
+            MediaPlayer.playpause();
+        }
+    }
 
 }
