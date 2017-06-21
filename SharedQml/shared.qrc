@@ -43,5 +43,6 @@
         <file>LineInput.qml</file>
         <file>PagePlaylist.qml</file>
         <file>MediaBar.qml</file>
+        <file>SwipeListDemo.qml</file>
     </qresource>
 </RCC>

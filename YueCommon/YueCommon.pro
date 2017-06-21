@@ -45,7 +45,8 @@ SOURCES += \
     yue/bell/MediaCtrlBase.cpp \
     yue/bell/MediaCtrlLocal.cpp \
     yue/bell/MediaPlayerBase.cpp \
-    yue/bell/MediaPlayerQt.cpp
+    yue/bell/MediaPlayerQt.cpp \
+    yue/bell/MediaCtrlBackend.cpp
 
 HEADERS += yue/global.h\
     yue/alien/utf8/utf8.h \
@@ -74,7 +75,8 @@ HEADERS += yue/global.h\
     yue/bell/MediaCtrlBase.h \
     yue/bell/MediaCtrlLocal.h \
     yue/bell/MediaPlayerBase.h \
-    yue/bell/MediaPlayerQt.h
+    yue/bell/MediaPlayerQt.h \
+    yue/bell/MediaCtrlBackend.h
 
 
 

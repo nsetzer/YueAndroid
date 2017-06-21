@@ -248,7 +248,7 @@ ApplicationWindow {
 
     Component.onCompleted: {
         console.log("load complete " + device.dp)
-        currentPage = "qrc:/shared/PagePlaylist.qml"
+        currentPage = "qrc:/shared/SwipeListDemo.qml"
         mainMenu.currentItem = 0
     }
 }

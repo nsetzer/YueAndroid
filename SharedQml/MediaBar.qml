@@ -22,9 +22,23 @@ Rectangle {
         onProgressChanged: {
             mediaBar.fprogress = progress
         }
+        onCurrentIndexChanged: {
+            console.log(MediaPlayer.currentIndex)
+        }
     }
 
     color: "pink"
+
+    Rectangle {
+        id: progressBarShadow
+        anchors.left : parent.left
+        anchors.top : parent.top
+
+        height: margin
+        width: parent.width
+        color: "#888888"
+
+    }
 
     Rectangle {
         id: progressBar

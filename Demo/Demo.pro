@@ -1,6 +1,6 @@
 TEMPLATE = app
 
-QT += core qml quick webview multimedia svg sql
+QT += core gui qml quick webview multimedia svg sql
 android{
     QT += androidextras
 }

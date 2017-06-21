@@ -31,6 +31,11 @@ Item {
             page: "qrc:/shared/SimpleListDemo.qml"
         }
         ListElement {
+            item: "Playlists"
+            icon: "qrc:/shared/images/02_playlist_e.svg"
+            page: "qrc:/shared/SwipeListDemo.qml"
+        }
+        ListElement {
             item: "File System"
             icon: "qrc:/shared/images/00_folder.svg"
             page: "qrc:/shared/PageExplorer.qml"

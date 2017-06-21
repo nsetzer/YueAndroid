@@ -46,6 +46,11 @@ Page {
 
     }
 
+    TextMetrics {
+        id: textMetricsIndex
+        text: "000."
+    }
+
     Component {
             id: delegate
             Item {
@@ -61,6 +66,8 @@ Page {
                     anchors.verticalCenter: parent.verticalCenter
                     id: txtIndex
                     text: (index+1) + "."
+                    width: textMetricsIndex.width
+                    horizontalAlignment: Text.AlignRight
                     font.pointSize: fontMetrics.font.pointSize - 1
                 }
 
@@ -91,12 +98,13 @@ Page {
                     id: txtTitle
                     anchors.top: parent.top
                     anchors.left: delegateIcon.right
-                    anchors.right: parent.right
+                    anchors.right: contextMenuIcon.left
                     anchors.bottom: parent.verticalCenter
                     text: title
                     elide: Text.ElideRight
                     verticalAlignment: Text.AlignBottom
                     font.pointSize: fontMetrics.font.pointSize + 1
+                    color: (index == MediaPlayer.currentIndex) ? "red": "black"
                 }
 
                 Text {
@@ -105,17 +113,38 @@ Page {
                     anchors.top: parent.verticalCenter
                     id: txtArtist
                     text: artist
+                    color: (index == MediaPlayer.currentIndex) ? "red": "black"
                     verticalAlignment: Text.AlignTop
                     font.pointSize: fontMetrics.font.pointSize - 1
                 }
 
                 Text {
                     anchors.top: parent.verticalCenter
-                    anchors.right: parent.right
+                    anchors.right: contextMenuIcon.left
                     anchors.rightMargin: 20
                     text: formatDuration(duration)
+                    color: (index == MediaPlayer.currentIndex) ? "red": "black"
                     font.pointSize: fontMetrics.font.pointSize - 1
                 }
+
+                Image {
+                    id: contextMenuIcon
+                    height: parent.height
+                    width: parent.height
+                    anchors.right : parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    source: "qrc:/shared/images/04_dynamic_a.svg"
+                    asynchronous: true
+                    sourceSize.height: parent.height
+                    MouseArea {
+                        anchors.fill: parent;
+                        onClicked: {
+                            console.log("context: " + index )
+                            MediaPlayer.playIndex( index );
+                        }
+                    }
+                }
+
 
                 Rectangle {
                     anchors.bottom: parent.bottom;
@@ -159,9 +188,11 @@ Page {
 
         onPrevClicked: {
             console.log("prev")
+            MediaPlayer.setProgress(0.99)
         }
 
         onNextClicked: {
+            MediaPlayer.next();
             console.log("next")
         }
 

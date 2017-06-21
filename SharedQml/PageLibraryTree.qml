@@ -48,7 +48,7 @@ PageBase {
     ListView {
         id: view
         anchors.top: searchInput.bottom
-        anchors.bottom: parent.bottom
+        anchors.bottom: buttonBar.top
         anchors.left: parent.left;
         anchors.right: parent.right;
         visible: treeModel.lastError == ""
@@ -86,7 +86,6 @@ PageBase {
                 width: height
 
                 onClicked: {
-                    console.log("scroll: " + view.maximumFlickVelocity )
                     treeModel.toggleExpandItem( index )
                 }
             }

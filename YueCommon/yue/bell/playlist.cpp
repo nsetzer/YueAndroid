@@ -95,7 +95,7 @@ void Playlist::set(QList<Database::uid_t> lst) {
         idx++;
     }
 
-    q.prepare("UPDATE playlists SET size=? WHERE uid=?");
+    q.prepare("UPDATE playlists SET idx=0,size=? WHERE uid=?");
     q.addBindValue(lst.size());
     q.addBindValue(toQVariant(m_plid));
     q.exec();
@@ -146,8 +146,31 @@ Database::uid_t Playlist::get(int idx)
 
     return uid;
 }
+Database::uid_t Playlist::setCurrent(int idx)
+{
+    Database::uid_t uid;
+    QSqlQuery q(m_db->db());
 
- QPair<Database::uid_t,size_t> Playlist::current()
+    q.exec("begin");
+
+    q.prepare("UPDATE playlists SET idx=? WHERE uid=?");
+    q.addBindValue(idx);
+    q.addBindValue(toQVariant(m_plid));
+    q.exec();
+
+    q.prepare("SELECT song_id FROM playlist_songs WHERE uid=? AND idx=?");
+    q.addBindValue(toQVariant(m_plid));
+    q.addBindValue(idx);
+    q.exec();
+    q.first();
+    uid = q.value(0).toULongLong();
+
+    q.exec("end");
+    return uid;
+}
+
+
+QPair<Database::uid_t,size_t> Playlist::current()
 {
      Database::uid_t uid;
      size_t index;
@@ -171,6 +194,79 @@ Database::uid_t Playlist::get(int idx)
 
      return  QPair<Database::uid_t,size_t>(uid,index);
 }
+
+ QPair<Database::uid_t,size_t> Playlist::next()
+ {
+     Database::uid_t uid;
+     size_t index,size;
+     QSqlQuery q(m_db->db());
+
+     q.exec("begin");
+     q.prepare("SELECT idx,size FROM playlists WHERE uid=?");
+     q.addBindValue(toQVariant(m_plid));
+     q.exec();
+     q.first();
+     index = q.value(0).toULongLong();
+     size  = q.value(1).toULongLong();
+
+     if (size==0 || index == size-1) {
+         throw std::runtime_error("no next song");
+     }
+
+     q.prepare("UPDATE playlists SET idx=idx+1 WHERE uid=?");
+     q.addBindValue(toQVariant(m_plid));
+     q.exec();
+
+     // get the previous song
+     index++;
+     q.prepare("SELECT song_id FROM playlist_songs WHERE (uid=? AND idx=?)");
+     q.addBindValue(toQVariant(m_plid));
+     q.addBindValue(index);
+     q.exec();
+     q.first();
+     uid = q.value(0).toULongLong();
+
+     q.exec("end");
+     qDebug() << "index" << index << "uid" << uid;
+
+     return  QPair<Database::uid_t,size_t>(uid,index);
+ }
+
+ QPair<Database::uid_t,size_t> Playlist::prev()
+ {
+     Database::uid_t uid;
+     size_t index,size;
+     QSqlQuery q(m_db->db());
+
+     q.exec("begin");
+     q.prepare("SELECT idx,size FROM playlists WHERE uid=?");
+     q.addBindValue(toQVariant(m_plid));
+     q.exec();
+     q.first();
+     index = q.value(0).toULongLong();
+     size  = q.value(1).toULongLong();
+
+     if (index == 0) {
+         throw std::runtime_error("no prev song");
+     }
+
+     q.prepare("UPDATE playlists SET idx=idx-1 WHERE uid=?");
+     q.addBindValue(toQVariant(m_plid));
+     q.exec();
+
+     // get the previous song
+     index--;
+     q.prepare("SELECT song_id FROM playlist_songs WHERE (uid=? AND idx=?)");
+     q.addBindValue(toQVariant(m_plid));
+     q.addBindValue(index);
+     q.exec();
+     q.first();
+     uid = q.value(0).toULongLong();
+
+     q.exec("end");
+
+     return  QPair<Database::uid_t,size_t>(uid,index);
+ }
 
 void Playlist::insert(int idx, Database::uid_t uid)
 {

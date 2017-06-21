@@ -320,6 +320,8 @@ void Library::incrementPlaycount(Database::uid_t uid)
  * the forest sorted by the artist_key. Each artist node will
  * have an album node. The leaves will be titles of the song
  * @return a list of LibraryTreeNode
+ *
+ * @todo memory leak, create Forest type which auto deletes pointers...
  */
 QList<LibraryTreeNode*> Library::queryToForest(QString querystr)
 {
@@ -337,21 +339,11 @@ QList<LibraryTreeNode*> Library::queryToForest(QString querystr)
                           "album COLLATE NOCASE, "
                           "album_index, "
                           "title COLLATE NOCASE ASC");
-    /*
-    QString s = "SELECT artist, album, title, uid, artist_key, album_index "
-                "FROM library "
-                "ORDER BY artist_key COLLATE NOCASE, "
-                "album COLLATE NOCASE, "
-                "album_index, "
-                "title COLLATE NOCASE ASC";
-    */
 
-    //QSqlQuery query(s,m_db->db());
     if (!query.exec())
         qWarning() << "error executing query";
     if (query.lastError().isValid())
         qWarning() << query.lastError();
-    qDebug() << query.executedQuery();
 
     QList<yue::bell::LibraryTreeNode*> forest;
     yue::bell::LibraryTreeNode* nd_art = nullptr;

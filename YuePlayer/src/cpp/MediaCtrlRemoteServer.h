@@ -1,24 +1,20 @@
-#ifndef YUE_BELL_MEDIACTRLLOCAL_H
-#define YUE_BELL_MEDIACTRLLOCAL_H
+#ifndef MEDIACONTROLBACKEND_H
+#define MEDIACONTROLBACKEND_H
 
-
-#include "yue/global.h"
-#include "yue/bell/MediaCtrlBase.h"
-#include "yue/bell/MediaCtrlBackend.h"
+#include <QScopedPointer>
+#include "rep_MediaControl_source.h"
 #include "yue/bell/database.hpp"
 #include "yue/bell/library.hpp"
 #include "yue/bell/playlist.hpp"
-
-namespace yue {
-namespace bell {
+#include "yue/bell/MediaCtrlBackend.h"
 
 
-class YUECOMMON_EXPORT MediaCtrlLocal : public MediaCtrlBase
+class MediaCtrlRemoteServer : public MediaControlSource
 {
 
 public:
-    MediaCtrlLocal(QObject *parent = nullptr);
-    virtual ~MediaCtrlLocal() = default;
+    MediaCtrlRemoteServer();
+    virtual ~MediaCtrlRemoteServer() = default;
 
 signals:
     //void progressChanged(float progress);
@@ -40,10 +36,8 @@ private slots:
     void onCurrentIndexChanged(int index) { emit currentIndexChanged(index); }
 
 private:
-    QScopedPointer<MediaCtrlBackend> m_pBackend;
+    QScopedPointer<yue::bell::MediaCtrlBackend> m_pBackend;
+
 };
 
-} // bell
-} // yue
-
-#endif // MEDIACTRLLOCAL_H
+#endif // MEDIACONTROLBACKEND_H

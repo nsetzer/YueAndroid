@@ -68,7 +68,10 @@ public:
     size_t size();
 
     Database::uid_t get(int idx);
+    Database::uid_t setCurrent(int idx);
     QPair<Database::uid_t,size_t> current();
+    QPair<Database::uid_t,size_t> next();
+    QPair<Database::uid_t,size_t> prev();
     void insert(int idx, Database::uid_t uid);
     void remove(int idx);
     void move(int src, int tgt);

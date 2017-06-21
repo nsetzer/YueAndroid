@@ -23,21 +23,29 @@ class MediaPlayerQt : public MediaPlayerBase
 public:
     explicit MediaPlayerQt(QObject *parent = nullptr);
 
+    virtual float duration() const override { return m_duration; }
+    virtual float position() const override { return m_player.position()/1000.0; }
+    virtual void setPosition(float seconds) override { m_player.setPosition(seconds*1000.0); }
+
 signals:
 
     //void progressChanged(float progress); // as float, 0.0 to 1.0
 
 public slots:
 
-    virtual void load(QString path);
-    virtual void playpause();
+    virtual void load(QString path) override;
+    virtual void play() override;
+    virtual void pause() override;
+    virtual void playpause() override;
     //virtual void next();
     //virtual void prev();
-    virtual void setVolume(float volume);
+    virtual void setVolume(float volume) override;
 
 private slots:
     void onDurationChanged(qint64 duration);
     void onPositionChanged(qint64 position);
+    void onStatusChanged(QMediaPlayer::MediaStatus status);
+    void onStateChanged(QMediaPlayer::State status);
 
 };
 
