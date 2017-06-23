@@ -16,6 +16,12 @@ MediaCtrlLocal::MediaCtrlLocal(QObject *parent/* = nullptr*/)
     connect(m_pBackend.data(),&MediaCtrlBackend::currentIndexChanged,
             this,&MediaCtrlLocal::onCurrentIndexChanged);
 
+    connect(m_pBackend.data(),&MediaCtrlBackend::stateChanged,
+            this,&MediaCtrlLocal::onStateChanged);
+
+    connect(m_pBackend.data(),&MediaCtrlBackend::statusChanged,
+            this,&MediaCtrlLocal::onStatusChanged);
+
     m_pBackend->load();
 }
 

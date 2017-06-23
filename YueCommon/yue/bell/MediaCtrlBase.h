@@ -2,11 +2,12 @@
 #define YUE_BELL_MEDIACTRLBASE_H
 
 #include <QObject>
+#include <QSharedPointer>
 #include "yue/global.h"
 #include "yue/bell/database.hpp"
 #include "yue/bell/library.hpp"
 #include "yue/bell/playlist.hpp"
-
+#include "yue/bell/MediaPlayerBase.h"
 
 namespace yue {
 namespace bell {
@@ -16,8 +17,17 @@ class YUECOMMON_EXPORT MediaCtrlBase : public QObject
     Q_OBJECT
     Q_PROPERTY(int currentIndex READ currentIndex  NOTIFY currentIndexChanged)
 
+    static QSharedPointer<yue::bell::MediaCtrlBase> m_instance;
 public:
     explicit MediaCtrlBase(QObject *parent = nullptr);
+
+    static void registerInstance(QSharedPointer<MediaCtrlBase> instance) {
+        m_instance = instance;
+    }
+
+    static QSharedPointer<MediaCtrlBase> instance() {
+        return m_instance;
+    }
 
     size_t currentIndex();
 signals:
@@ -25,6 +35,8 @@ signals:
 
     void progressChanged(float progress);
     void currentIndexChanged(int index);
+    void statusChanged(MediaPlayerBase::Status status);
+    void stateChanged(MediaPlayerBase::State state);
 
 public slots:
     // functions to call (and implement) on the server

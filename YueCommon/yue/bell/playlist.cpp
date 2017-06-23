@@ -365,7 +365,6 @@ bool Playlist::_remove_one(int idx)
 void Playlist::move(int src, int tgt)
 {
     LOG_FUNCTION_TIME();
-    qDebug("move %d->%d",src,tgt);
 
     m_db->db().transaction();
     bool result;
@@ -392,11 +391,13 @@ void Playlist::move(int src, int tgt)
 
 bool Playlist::_move_one(int src, int tgt)
 {
+    LOG_FUNCTION_TIME();
 
     if (src == tgt) {
         return true;
     }
 
+    size_t current_index;
     Database::uid_t song_id;
     QSqlQuery q(m_db->db());
 
@@ -406,6 +407,13 @@ bool Playlist::_move_one(int src, int tgt)
     q.exec();
     q.first();
     song_id = q.value(0).toULongLong();
+
+    q.prepare("SELECT idx FROM playlists WHERE (uid=?)");
+    q.addBindValue(toQVariant(m_plid));
+    q.exec();
+    q.first();
+    current_index = q.value(0).toULongLong();
+    //qDebug() << src << tgt << current_index;
 
     if (src < tgt) {
 
@@ -425,6 +433,17 @@ bool Playlist::_move_one(int src, int tgt)
         q.addBindValue(tgt-1);
         q.addBindValue(toQVariant(song_id));
         q.exec();
+
+        if (src==current_index) {
+            q.prepare("UPDATE playlists SET idx=? WHERE (uid=?)");
+            q.addBindValue(toQVariant(tgt)); // ! something is not right
+            q.addBindValue(toQVariant(m_plid));
+            q.exec();
+        } else {
+            q.prepare("UPDATE playlists SET idx=idx-1 WHERE (uid=?)");
+            q.addBindValue(toQVariant(m_plid));
+            q.exec();
+        }
     } else {
         q.prepare("DELETE FROM playlist_songs WHERE uid=? AND idx=?");
         q.addBindValue(toQVariant(m_plid));
@@ -442,6 +461,17 @@ bool Playlist::_move_one(int src, int tgt)
         q.addBindValue(tgt);
         q.addBindValue(toQVariant(song_id));
         q.exec();
+
+        if (src==current_index) {
+            q.prepare("UPDATE playlists SET idx=? WHERE (uid=?)");
+            q.addBindValue(toQVariant(tgt));
+            q.addBindValue(toQVariant(m_plid));
+            q.exec();
+        } else {
+            q.prepare("UPDATE playlists SET idx=idx+1 WHERE (uid=?)");
+            q.addBindValue(toQVariant(m_plid));
+            q.exec();
+        }
     }
 
     return true;

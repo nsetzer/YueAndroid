@@ -119,9 +119,9 @@ void TreeListModelBase::setNewData(QList<yue::bell::LibraryTreeNode*> lst)
     //TODO memory leaks
     // use custom node list that delets pointers ?
     m_tabledata = QList<yue::bell::LibraryTreeNode*>(lst);
-    m_tabledata.push_back(new yue::bell::LibraryTreeNode(0,"",0,NULL));
-    m_tabledata.push_back(new yue::bell::LibraryTreeNode(0,"",0,NULL));
-    m_tabledata.push_back(new yue::bell::LibraryTreeNode(0,"",0,NULL));
+    m_tabledata.push_back(new yue::bell::LibraryTreeNode(-1,"",0,NULL));
+    m_tabledata.push_back(new yue::bell::LibraryTreeNode(-1,"",0,NULL));
+    m_tabledata.push_back(new yue::bell::LibraryTreeNode(-1,"",0,NULL));
     emit endResetModel();
 }
 

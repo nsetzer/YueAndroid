@@ -10,13 +10,17 @@ namespace yue {
 namespace qtcommon {
 
 
-
+/**
+ * @brief The PlaylistModel class
+ *
+ * in practice this tends to be very slow
+ */
 class YUECOMMON_EXPORT PlaylistModel : public QSqlQueryModel
 {
     Q_OBJECT
     Q_PROPERTY(QString playlistName READ playlistName WRITE setPlaylistName NOTIFY playlistChanged)
 
-    QSharedPointer<yue::bell::Playlist> m_playlist;
+
 
 public:
     static int SongIdRole;
@@ -63,6 +67,7 @@ signals:
 
 private:
     QString m_playlistName;
+    QSharedPointer<yue::bell::Playlist> m_playlist;
 
 };
 

@@ -71,6 +71,7 @@ int main(int argc, char *argv[])
         mccli = QSharedPointer<yue::bell::MediaCtrlBase>(new yue::bell::MediaCtrlLocal());
 #endif
         engine.rootContext()->setContextProperty("MediaPlayer", mccli.data());
+        yue::bell::MediaCtrlBase::registerInstance( mccli );
 
         engine.addImportPath(QStringLiteral("qrc:/"));
         engine.load(QUrl(QStringLiteral("qrc:/src/qml/main.qml")));

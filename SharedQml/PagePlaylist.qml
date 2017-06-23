@@ -6,7 +6,7 @@ import com.yue.common 1.0
 
 import "qrc:/shared" as SharedQml
 
-Page {
+PageBase {
     id: explorer
 
     title: "Current Playlist"

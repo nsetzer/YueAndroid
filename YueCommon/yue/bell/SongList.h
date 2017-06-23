@@ -1,5 +1,5 @@
-#ifndef SONGLIST_H
-#define SONGLIST_H
+#ifndef YUE_BELL_SONGLIST_H
+#define YUE_BELL_SONGLIST_H
 
 #include <QObject>
 #include <QList>
@@ -9,31 +9,78 @@
 namespace yue {
 namespace bell {
 
-class YUECOMMON_EXPORT SongList : public QObject
+template<typename T>
+class YUECOMMON_EXPORT SongList
 {
-    Q_OBJECT
 public:
-    explicit SongList(QObject *parent = nullptr);
+    SongList(int index=0)
+        : m_songs()
+        , m_current_index(index)
+    {}
+    SongList(const QList<T>& lst, int index=0)
+        : m_songs()
+        , m_current_index(index)
+    {
+        m_songs = lst;
+    }
 
-    void move(int src, int tgt);
-    void remove(int src);
-    void insert(int idx, Database::uid_t);
-    void push_back(Database::uid_t);
+    void move(int src, int tgt) {
+        m_songs.move(src,tgt);
+        if (src == m_current_index) {
+            m_current_index = tgt;
+        } else if (src < m_current_index && tgt >= m_current_index) {
+            m_current_index--;
+        } else if (src > m_current_index && tgt <= m_current_index) {
+            m_current_index++;
+        }
+    }
 
-    size_t size() const { return m_songs.size(); }
+    void remove(int idx) {
+        m_songs.removeAt(idx);
 
-    Database::uid_t& operator[](size_t idx);
-    const Database::uid_t& operator[](size_t idx) const;
-signals:
+        if (idx < m_current_index) {
+            m_current_index--;
+        } else if (m_current_index > m_songs.size()-1) {
+            m_current_index = m_songs.size()-1;
+        }
+    }
 
-public slots:
+    void clear() {
+        m_songs.clear();
+        m_current_index = 0;
+    }
+
+    void insert(int idx, T elem) {
+        m_songs.insert(idx, elem);
+        if (idx <= m_current_index) {
+            m_current_index++;
+        }
+    }
+
+    void push_back(T elem) {
+        m_songs.push_back(elem);
+    }
+
+    int size() const { return m_songs.size(); }
+
+    const QList<T>& elems() const { return m_songs; }
+
+    T& operator[](int idx) {
+        return m_songs[idx];
+    }
+    const T& operator[](int idx) const {
+        return m_songs[idx];
+    }
+
+    int currentIndex() const { return m_current_index; }
+    void setCurrentIndex(int idx ) { m_current_index = idx; }
 
 private:
-    QList<Database::uid_t> m_songs;
-    size_t m_current_index;
+    QList<T> m_songs;
+    int m_current_index;
 };
 
 } // bell
 } // yue
 
-#endif // SONGLIST_H
+#endif // YUE_BELL_SONGLIST_H

@@ -43,8 +43,27 @@ PageBase {
         id: swipeComponent
     SwipeDelegate {
         id: swipeDelegate
-        text: title
         width: parent.width
+
+        Rectangle {
+            id: swipeContent
+            anchors.fill: parent
+            z: -1
+            Text {
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                anchors.left: parent.left
+                anchors.right: parent.horizontalCenter
+                text: title
+            }
+            Text {
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                anchors.right: parent.right
+                anchors.left: parent.horizontalCenter
+                text: title
+            }
+        }
 
         ListView.onRemove: SequentialAnimation {
             PropertyAction {

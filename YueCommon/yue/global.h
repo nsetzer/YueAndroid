@@ -10,6 +10,10 @@
 #include <QtGlobal>
 #include <QScopedPointer>
 #include <QSharedPointer>
+#include <QThread>
+#include <QMutex>
+#include <QWaitCondition>
+#include <QMutexLocker>
 
 #if defined(YUECOMMON_LIBRARY)
 #  define YUECOMMON_EXPORT Q_DECL_EXPORT

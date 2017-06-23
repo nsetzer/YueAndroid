@@ -371,12 +371,12 @@ QList<LibraryTreeNode*> Library::queryToForest(QString querystr)
 
     return forest;
 }
-
+/*
 struct pl_elem_t {
     Database::uid_t uid;
     std::string str;
 };
-
+*/
 /**
  * @brief createPlaylist
  * @param query

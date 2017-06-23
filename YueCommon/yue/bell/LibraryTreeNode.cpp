@@ -5,6 +5,8 @@ namespace bell {
 
 void LibraryTreeNode::setCheckState(Qt::CheckState state)
 {
+    if (m_uid==-1) // null / dummy node
+        return;
     // setting true/false must toggle parent states as well
     m_checkstate = state;
 

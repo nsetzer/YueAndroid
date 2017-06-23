@@ -5,7 +5,7 @@
 
 #include <QObject>
 #include <QString>
-#include <QTime>
+#include <QElapsedTimer>
 #include "yue/global.h"
 
 namespace yue {
@@ -16,7 +16,7 @@ class YUECOMMON_EXPORT RaiiCallLoggerTimer : public QObject
     Q_OBJECT
 
     QString m_msg;
-    QTime m_timer;
+    QElapsedTimer m_timer;
 public:
     RaiiCallLoggerTimer(QString msg)
         : QObject()
@@ -26,7 +26,8 @@ public:
         m_timer.start();
     }
     ~RaiiCallLoggerTimer() {
-        QString elapsed = QString::number(m_timer.elapsed()/1000.0, 'f', 3);
+        //QString elapsed = QString::number(m_timer.elapsed()/1000.0, 'f', 7);
+        QString elapsed = QString::number(m_timer.elapsed());
         qDebug().noquote() << (m_msg + ": completed in " + elapsed + " seconds");
     }
 };

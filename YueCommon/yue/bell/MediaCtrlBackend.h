@@ -23,6 +23,8 @@ public:
 signals:
     void progressChanged(float progress);
     void currentIndexChanged(int index);
+    void statusChanged(yue::bell::MediaPlayerBase::Status status);
+    void stateChanged(yue::bell::MediaPlayerBase::State state);
 
 public slots:
 
@@ -40,6 +42,8 @@ private slots:
     void onCurrentIndexChanged(int index);
 
     void onStatusChanged(MediaPlayerBase::Status status);
+    void onStateChanged(MediaPlayerBase::State state);
+
     void onSongEnded();
 
     void load(Database::uid_t uid);

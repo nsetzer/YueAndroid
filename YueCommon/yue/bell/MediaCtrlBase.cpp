@@ -3,6 +3,7 @@
 namespace yue {
 namespace bell {
 
+QSharedPointer<yue::bell::MediaCtrlBase> MediaCtrlBase::m_instance = nullptr;
 
 MediaCtrlBase::MediaCtrlBase(QObject *parent) : QObject(parent)
 {

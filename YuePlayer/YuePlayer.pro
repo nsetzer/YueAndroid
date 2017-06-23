@@ -22,7 +22,7 @@ RESOURCES += qml.qrc \
     ../SharedQml/shared.qrc
 
 # Default rules for deployment.
-include(deployment.pri)
+#include(deployment.pri)
 
 DISTFILES += \
     android/AndroidManifest.xml \
@@ -44,8 +44,6 @@ android {
     ANDROID_JAVA_SOURCES.files = $$files($$PWD/src/java/*.java)
     INSTALLS += ANDROID_JAVA_SOURCES
 }
-
-
 
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../YueCommon/ -lYueCommon
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../YueCommon/ -lYueCommond

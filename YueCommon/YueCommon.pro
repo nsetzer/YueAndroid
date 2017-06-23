@@ -41,12 +41,12 @@ SOURCES += \
     yue/bell/playlist.cpp \
     yue/qtcommon/PlaylistModel.cpp \
     yue/bell/LibrarySearchGrammar.cpp \
-    yue/bell/SongList.cpp \
     yue/bell/MediaCtrlBase.cpp \
     yue/bell/MediaCtrlLocal.cpp \
     yue/bell/MediaPlayerBase.cpp \
     yue/bell/MediaPlayerQt.cpp \
-    yue/bell/MediaCtrlBackend.cpp
+    yue/bell/MediaCtrlBackend.cpp \
+    yue/qtcommon/SongListModel.cpp
 
 HEADERS += yue/global.h\
     yue/alien/utf8/utf8.h \
@@ -76,7 +76,8 @@ HEADERS += yue/global.h\
     yue/bell/MediaCtrlLocal.h \
     yue/bell/MediaPlayerBase.h \
     yue/bell/MediaPlayerQt.h \
-    yue/bell/MediaCtrlBackend.h
+    yue/bell/MediaCtrlBackend.h \
+    yue/qtcommon/SongListModel.h
 
 
 

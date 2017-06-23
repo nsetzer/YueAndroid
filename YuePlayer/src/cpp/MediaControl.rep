@@ -10,5 +10,7 @@ class MediaControl {
 
     SIGNAL(progressChanged(float progress));
     SIGNAL(currentIndexChanged(int index));
+    SIGNAL(statusChanged(int status));
+    SIGNAL(stateChanged(int state));
 
 }

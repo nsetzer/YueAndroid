@@ -42,16 +42,16 @@ int main(int argc, char *argv[])
 
     {
         auto pl = yue::bell::PlaylistManager::instance()->openCurrent();
-        if (pl->size()==0) {
+        //if (pl->size()==0) {
             pl->set( yue::bell::Library::instance()->createPlaylist("", 100) );
-        }
+        //}
         qDebug() << "playlist size " << pl->size();
     }
 
 
     QSharedPointer<yue::bell::MediaCtrlBase> mplayer(new yue::bell::MediaCtrlLocal());
     engine.rootContext()->setContextProperty("MediaPlayer", mplayer.data());
-
+    yue::bell::MediaCtrlBase::registerInstance( mplayer );
     //mplayer->load("D:\\Music\\Discography\\Discography - Beast\\[2009] Beast\\01-beast-devil-crn.mp3");
     mplayer->load();
     //mplayer->playpause();

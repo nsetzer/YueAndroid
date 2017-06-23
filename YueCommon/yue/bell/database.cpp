@@ -146,7 +146,7 @@ void Database::create_v1_0( void )
              "uid integer PRIMARY KEY AUTOINCREMENT, "
              "name text UNIQUE, "
              "size integer, "
-             "idx integer"
+             "idx integer" // poorly named should be "current_index"
              ")");
     if (q.lastError().isValid())
         qWarning() << q.lastError();

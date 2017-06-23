@@ -9,6 +9,9 @@ MediaCtrlRemoteClient::MediaCtrlRemoteClient()
     connect(m_rep.data(),&MediaControlReplica::progressChanged,this,&MediaCtrlRemoteClient::onServiceProgressChanged);
     connect(m_rep.data(),&MediaControlReplica::currentIndexChanged,this,&MediaCtrlRemoteClient::onServiceCurrentIndexChanged);
 
+    connect(m_rep.data(),&MediaControlReplica::stateChanged,this,&MediaCtrlRemoteClient::onServiceStatusChanged);
+    connect(m_rep.data(),&MediaControlReplica::statusChanged,this,&MediaCtrlRemoteClient::onServiceStateChanged);
+
     qDebug() << "waiting for RPC source";
     bool res = m_rep->waitForSource();
     Q_ASSERT(res);
@@ -65,4 +68,13 @@ void MediaCtrlRemoteClient::onServiceCurrentIndexChanged(int index)
     emit currentIndexChanged(index);
 }
 
+void MediaCtrlRemoteClient::onServiceStatusChanged(int status)
+{
+    emit statusChanged(static_cast<yue::bell::MediaPlayerBase::Status>(status));
+}
+
+void MediaCtrlRemoteClient::onServiceStateChanged(int state)
+{
+    emit stateChanged(static_cast<yue::bell::MediaPlayerBase::State>(state));
+}
 

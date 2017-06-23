@@ -16,14 +16,33 @@ Rectangle {
     property int margin: 2
     property real fprogress: 0
 
-
+    property int playerState: 0
+    property int playerStatus: 0
     Connections {
         target : MediaPlayer
         onProgressChanged: {
             mediaBar.fprogress = progress
         }
-        onCurrentIndexChanged: {
+        /*onCurrentIndexChanged: {
             console.log(MediaPlayer.currentIndex)
+        }*/
+        onStatusChanged: {
+            playerStatus = status
+
+            if (status == 1/*error*/) {
+                imgSongPlayPause.source = "qrc:/shared/images/00_song_error_a.svg"
+            }
+        }
+
+        onStateChanged: {
+            playerState = state
+            if (playerStatus == 1/*error*/) {
+                imgSongPlayPause.source = "qrc:/shared/images/00_song_error_a.svg"
+            } else if (state==1/*playing*/) {
+                imgSongPlayPause.source = "qrc:/shared/images/00_song_pause.svg"
+            } else {
+                imgSongPlayPause.source = "qrc:/shared/images/00_song_play.svg"
+            }
         }
     }
 
@@ -106,7 +125,7 @@ Rectangle {
         anchors.horizontalCenter: parent.horizontalCenter
         height: parent.height
         width: height
-        source: "qrc:/shared/images/00_song_next.svg"
+        source: "qrc:/shared/images/00_song_play.svg"
         asynchronous: true
         sourceSize.height: parent.height
 

@@ -15,6 +15,8 @@ public:
 signals:
     //void progressChanged(float progress);
     //void currentIndexChanged(int index);
+    //void statusChanged(Status status);
+    //void stateChanged(State state);
 
 public slots:
 
@@ -29,6 +31,8 @@ public slots:
 private slots:
     void onServiceProgressChanged(float progress);
     void onServiceCurrentIndexChanged(int index);
+    void onServiceStatusChanged(int index);
+    void onServiceStateChanged(int index);
 private:
     QRemoteObjectNode m_repNode;
     QSharedPointer<MediaControlReplica> m_rep;

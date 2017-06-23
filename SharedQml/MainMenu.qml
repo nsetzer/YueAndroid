@@ -18,7 +18,7 @@ Item {
         ListElement {
             item: "Current Playlist"
             icon: "qrc:/shared/images/02_playlist_a.svg"
-            page: "qrc:/shared/PagePlaylist.qml"
+            page: "qrc:/shared/PageReorderablePlayList.qml"
         }
         ListElement {
             item: "Library"

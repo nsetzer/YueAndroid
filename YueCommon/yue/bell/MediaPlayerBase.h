@@ -16,17 +16,17 @@ public:
     // after loading move to ready state
     // pausing the media will return to ready state
     enum class Status {
-        Unknown,
-        Error,    // error is preventing playback
-        Loading,  // media is not ready to play
-        Ready,    // play() will begin playback
-        Ended,    // media has finished playing
+        Unknown=0,
+        Error=1,    // error is preventing playback
+        Loading=2,  // media is not ready to play
+        Ready=3,    // play() will begin playback
+        Ended=4,    // media has finished playing
     };
 
     enum class State {
-        Unknown,
-        Playing,
-        Paused,
+        Unknown=0,
+        Playing=1,
+        Paused=2,
     };
 
 
@@ -58,7 +58,13 @@ protected:
 
 };
 
+
+
 } // bell
 } // yue
+
+// declare outside the namespace, so that it will build on linux
+Q_DECLARE_METATYPE(yue::bell::MediaPlayerBase::State)
+Q_DECLARE_METATYPE(yue::bell::MediaPlayerBase::Status)
 
 #endif // MEDIAPLAYER_H

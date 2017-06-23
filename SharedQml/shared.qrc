@@ -7,8 +7,14 @@
         <file>images/00_folder.svg</file>
         <file>images/00_hamburger.svg</file>
         <file>images/00_info.svg</file>
+        <file>images/00_menu_a.svg</file>
+        <file>images/00_menu_b.svg</file>
+        <file>images/00_song_art.svg</file>
+        <file>images/00_song_play.svg</file>
+        <file>images/00_song_pause.svg</file>
         <file>images/00_song_next.svg</file>
         <file>images/00_song_prev.svg</file>
+        <file>images/00_song_error_a.svg</file>
         <file>images/01_now_playing_a.svg</file>
         <file>images/02_playlist_a.svg</file>
         <file>images/02_playlist_b.svg</file>
@@ -44,5 +50,7 @@
         <file>PagePlaylist.qml</file>
         <file>MediaBar.qml</file>
         <file>SwipeListDemo.qml</file>
+        <file>PlaylistItemDelegate.qml</file>
+        <file>PageReorderablePlayList.qml</file>
     </qresource>
 </RCC>

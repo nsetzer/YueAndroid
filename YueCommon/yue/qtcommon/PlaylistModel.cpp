@@ -62,12 +62,16 @@ QHash<int, QByteArray> PlaylistModel::roleNames() const
     return roles;
 }
 
-bool PlaylistModel::move(int sourceRow, int destinationRow)
+bool PlaylistModel::move(int src, int tgt)
 {
-    if (sourceRow == destinationRow)
+    if (src==tgt)
         return false;
-    beginMoveRows(QModelIndex(),sourceRow,sourceRow,QModelIndex(),destinationRow);
-    m_playlist->move(sourceRow,destinationRow);
+    if (src < tgt)
+        beginMoveRows(QModelIndex(),src,src,QModelIndex(),tgt+1);
+    else
+        beginMoveRows(QModelIndex(),src,src,QModelIndex(),tgt);
+
+    m_playlist->move(src,tgt);
     endMoveRows();
     return true;
 }

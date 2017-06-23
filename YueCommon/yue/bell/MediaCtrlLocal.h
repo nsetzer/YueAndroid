@@ -23,6 +23,8 @@ public:
 signals:
     //void progressChanged(float progress);
     //void currentIndexChanged(int index);
+    //void statusChanged(Status status);
+    //void stateChanged(State state);
 
 public slots:
 
@@ -38,6 +40,8 @@ public slots:
 private slots:
     void onProgressChanged(float progress) { emit progressChanged(progress); }
     void onCurrentIndexChanged(int index) { emit currentIndexChanged(index); }
+    void onStatusChanged(MediaPlayerBase::Status status) { emit statusChanged(status); }
+    void onStateChanged(yue::bell::MediaPlayerBase::State state) { emit stateChanged(state); }
 
 private:
     QScopedPointer<MediaCtrlBackend> m_pBackend;

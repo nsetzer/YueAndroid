@@ -15,6 +15,9 @@ MediaCtrlBackend::MediaCtrlBackend(QObject *parent/* = nullptr*/)
     connect(m_pPlayer.data(),&MediaPlayerBase::statusChanged,
             this,&MediaCtrlBackend::onStatusChanged);
 
+    connect(m_pPlayer.data(),&MediaPlayerBase::stateChanged,
+            this,&MediaCtrlBackend::onStateChanged);
+
 }
 
 void MediaCtrlBackend::loadIndex(int index)
@@ -108,6 +111,13 @@ void MediaCtrlBackend::onStatusChanged(MediaPlayerBase::Status status)
     default:
         break;
     }
+
+    emit statusChanged(status);
+}
+
+void MediaCtrlBackend::onStateChanged(yue::bell::MediaPlayerBase::State state)
+{
+    emit stateChanged(state);
 }
 
 void MediaCtrlBackend::onSongEnded()
