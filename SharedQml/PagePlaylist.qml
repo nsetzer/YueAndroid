@@ -16,7 +16,9 @@ PageBase {
         //plmodel.playlistName = ":current:"
     }
 
-    Device {id:device}
+    function titleClicked() {
+        console.log("Title Clicked on page" + title)
+    }
 
     function formatDuration(s) {
 
@@ -56,7 +58,7 @@ PageBase {
             Item {
                 id: delegateItem
                 width: parent.width
-                height: device.textHeight * 3
+                height: gDevice.textHeight * 3
 
                 anchors.leftMargin: 20
                 anchors.rightMargin: 20
@@ -163,7 +165,7 @@ PageBase {
         anchors.left: parent.left;
         anchors.right: parent.right;
         clip: true
-        maximumFlickVelocity: 4000*device.dp
+        maximumFlickVelocity: 4000*gDevice.dp
 
         model: plmodel
         delegate: delegate
@@ -183,8 +185,8 @@ PageBase {
         anchors.left : parent.left
         anchors.right : parent.right
         anchors.bottom : parent.bottom
-        height: device.textHeight * 2 + margin
-        margin: device.textHeight/4
+        height: gDevice.textHeight * 2 + margin
+        margin: gDevice.textHeight/4
 
         onPrevClicked: {
             console.log("prev")

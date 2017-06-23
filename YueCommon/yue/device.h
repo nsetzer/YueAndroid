@@ -12,6 +12,9 @@
 #endif
 #include "yue/global.h"
 
+namespace yue {
+namespace qtcommon {
+
 class YUECOMMON_EXPORT Device : public QObject
 {
     Q_OBJECT
@@ -21,9 +24,19 @@ class YUECOMMON_EXPORT Device : public QObject
     Q_PROPERTY(qreal textHeight READ textHeight NOTIFY textHeightChanged)
     Q_PROPERTY(QFont font READ font NOTIFY fontChanged)
 
+    static Device* m_instance;
 public:
     explicit Device(QObject *parent = 0);
     ~Device();
+
+    static Device* create() {
+        m_instance = new Device();
+        return m_instance;
+    }
+
+    static Device* instance() {
+        return m_instance;
+    }
 
     Q_INVOKABLE qreal dp( int value ) { return m_dp*value; }
 
@@ -49,5 +62,9 @@ private:
     qreal m_textHeight;
     QFont m_font;
 };
+
+
+} // qtcommon
+} // yue
 
 #endif // YUE_DEVICE_H

@@ -23,11 +23,18 @@ int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
     QQmlApplicationEngine engine;
+
+    qRegisterMetaType<yue::bell::MediaPlayerBase::State>("MediaPlayerBase::State");
+    qRegisterMetaType<yue::bell::MediaPlayerBase::Status>("MediaPlayerBase::Status");
+
     QSharedPointer<QRemoteObjectHost> srcNode;
     QSharedPointer<MediaCtrlRemoteServer> mcsvc;
     QSharedPointer<yue::bell::MediaCtrlBase> mccli;
 
     yue::bell::Database* db = yue::bell::Database::create();
+
+    // all runtime cross thread signal/slots
+
 
 #ifdef Q_OS_ANDROID
     db->connect("/mnt/sdcard/Music/library.db");
@@ -71,6 +78,7 @@ int main(int argc, char *argv[])
         mccli = QSharedPointer<yue::bell::MediaCtrlBase>(new yue::bell::MediaCtrlLocal());
 #endif
         engine.rootContext()->setContextProperty("MediaPlayer", mccli.data());
+        engine.rootContext()->setContextProperty("gDevice", yue::qtcommon::Device::instance());
         yue::bell::MediaCtrlBase::registerInstance( mccli );
 
         engine.addImportPath(QStringLiteral("qrc:/"));

@@ -8,6 +8,7 @@
 #include "yue/bell/playlist.hpp"
 #include "yue/bell/MediaCtrlBase.h"
 #include "yue/bell/MediaCtrlLocal.h"
+#include "yue/device.h"
 #include "yue/qtcommon/qtcommon.hpp"
 
 #ifdef Q_OS_ANDROID
@@ -21,7 +22,12 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
     QQmlApplicationEngine engine;
 
+    qRegisterMetaType<yue::bell::MediaPlayerBase::State>("MediaPlayerBase::State");
+    qRegisterMetaType<yue::bell::MediaPlayerBase::Status>("MediaPlayerBase::Status");
+
+
     yue::qtcommon::registerQmlTypes();
+    yue::qtcommon::Device::create();
     yue::bell::Database* db = yue::bell::Database::create();
 
     // http://www.helloandroid.com/tutorials/musicdroid-audio-player-part-ii
@@ -52,9 +58,7 @@ int main(int argc, char *argv[])
     QSharedPointer<yue::bell::MediaCtrlBase> mplayer(new yue::bell::MediaCtrlLocal());
     engine.rootContext()->setContextProperty("MediaPlayer", mplayer.data());
     yue::bell::MediaCtrlBase::registerInstance( mplayer );
-    //mplayer->load("D:\\Music\\Discography\\Discography - Beast\\[2009] Beast\\01-beast-devil-crn.mp3");
-    mplayer->load();
-    //mplayer->playpause();
+    engine.rootContext()->setContextProperty("gDevice", yue::qtcommon::Device::instance());
 
     engine.addImportPath(QStringLiteral("qrc:/"));
     //engine.addImportPath(QStringLiteral("qrc:/shared"));

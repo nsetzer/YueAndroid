@@ -39,7 +39,7 @@ PageBase {
         anchors.top: parent.top;
         anchors.left: parent.left;
         anchors.right: parent.right;
-        height: 50
+        height: gDevice.textHeight * 1.5
         onAccepted: {
             treeModel.search( searchInput.text );
         }
@@ -56,12 +56,11 @@ PageBase {
         cacheBuffer: 100
         clip: true
 
-        Device {id: device}
         // default is 2500 on windows, with a device dp of 0.6
         // on android, dp is 2.625 for my nexus 5x
         // assume a linear scale, and a fudge factor.
         // this value approximates a good setting on all devices.
-        maximumFlickVelocity: 4000*device.dp
+        maximumFlickVelocity: 4000*gDevice.dp
 
         delegate:  Rectangle {
             id: delegateItem
@@ -69,7 +68,7 @@ PageBase {
             anchors.left: parent.left
             anchors.right: parent.right
 
-            readonly property int targetHeight: device.textHeight * 2.25//delegateText.implicitHeight * 3
+            readonly property int targetHeight: gDevice.textHeight * 2.25//delegateText.implicitHeight * 3
 
             ExpanderButton {
                 id: delegateButton
@@ -171,7 +170,7 @@ PageBase {
         anchors.verticalCenter: parent.verticalCenter
         visible: treeModel.lastError != ""
         text: treeModel.lastError
-        font.pointSize: device.font.pointSize - 1
+        font.pointSize: gDevice.font.pointSize - 1
         width: 0.9 * parent.width;
         wrapMode: Text.WordWrap
         color: "orangered"
@@ -183,14 +182,14 @@ PageBase {
         anchors.bottom: parent.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        height: device.textHeight*2
+        height: gDevice.textHeight*2
 
 
         Button {
             id: btnCheckAll
             anchors.left: parent.left
             anchors.right: parent.horizontalCenter
-            height: device.textHeight*2
+            height: gDevice.textHeight*2
             text: treeModel.anySelected ? "Unselect All" : "Select All";
 
             onClicked: treeModel.checkAll( !treeModel.anySelected )
@@ -200,7 +199,7 @@ PageBase {
             id: btnCreatePlaylist
             anchors.left: parent.horizontalCenter
             anchors.right: parent.right
-            height: device.textHeight*2
+            height: gDevice.textHeight*2
             text: "Create Playlist"
 
             onClicked: {

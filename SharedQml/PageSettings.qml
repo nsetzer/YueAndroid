@@ -13,6 +13,10 @@ PageBase {
         console.log("opening page: " + title);
     }
 
+    function titleClicked() {
+        console.log("Title Clicked on page" + title)
+    }
+
     Label {
         anchors.centerIn: parent
         text: qsTr("Settings")

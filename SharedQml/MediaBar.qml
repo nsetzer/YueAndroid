@@ -28,7 +28,6 @@ Rectangle {
         }*/
         onStatusChanged: {
             playerStatus = status
-
             if (status == 1/*error*/) {
                 imgSongPlayPause.source = "qrc:/shared/images/00_song_error_a.svg"
             }

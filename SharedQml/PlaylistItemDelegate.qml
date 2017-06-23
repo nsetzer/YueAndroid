@@ -8,8 +8,6 @@ import "qrc:/shared" as SharedQml
 
 Item {
 
-    Device {id: device}
-
     property real indexWidth: 0
     property int  currentIndex: -1
 
@@ -33,7 +31,7 @@ Item {
 
     id: delegateItem
     width: parent.width
-    height: device.textHeight * 3
+    height: gDevice.textHeight * 3
 
     anchors.leftMargin: 20
     anchors.rightMargin: 20
@@ -45,7 +43,7 @@ Item {
         text: (index+1) + "."
         width: indexWidth
         horizontalAlignment: Text.AlignRight
-        font.pointSize: device.font.pointSize - 1
+        font.pointSize: gDevice.font.pointSize - 1
     }
 
     Image {
@@ -80,7 +78,7 @@ Item {
         text: title
         elide: Text.ElideRight
         verticalAlignment: Text.AlignBottom
-        font.pointSize: device.font.pointSize + 1
+        font.pointSize: gDevice.font.pointSize + 1
         color: (index == currentIndex) ? "red": "black"
     }
 
@@ -92,7 +90,7 @@ Item {
         text: artist
         color: (index == currentIndex) ? "red": "black"
         verticalAlignment: Text.AlignTop
-        font.pointSize: device.font.pointSize - 1
+        font.pointSize: gDevice.font.pointSize - 1
     }
 
     Text {
@@ -101,7 +99,7 @@ Item {
         anchors.rightMargin: 20
         text: formatDuration(duration)
         color: (index == currentIndex) ? "red": "black"
-        font.pointSize: device.font.pointSize - 1
+        font.pointSize: gDevice.font.pointSize - 1
     }
 
     Image {

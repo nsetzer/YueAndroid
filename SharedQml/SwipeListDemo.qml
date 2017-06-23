@@ -15,8 +15,6 @@ PageBase {
         //plmodel.playlistName = ":current:"
     }
 
-    Device {id:device}
-
     ListModel {
         id: listModel
 
@@ -107,7 +105,7 @@ PageBase {
         id: myList
         anchors.fill: parent
         clip: true
-        maximumFlickVelocity: 4000*device.dp
+        maximumFlickVelocity: 4000*gDevice.dp
 
         model: listModel
         delegate: swipeComponent

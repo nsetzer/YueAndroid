@@ -12,6 +12,10 @@ Rectangle {
         console.log("opening page: " + title);
     }
 
+    function titleClicked() {
+        console.log("Title Clicked on page" + title)
+    }
+
     Rectangle {
         id: curtain
         color: "black"

@@ -25,7 +25,7 @@ YUECOMMON_EXPORT void registerQmlTypes()
     qmlRegisterType<PlaylistModel>("com.yue.common", 1, 0, "PlaylistModel");
     qmlRegisterType<SongListModel>("com.yue.common", 1, 0, "SongListModel");
 
-    qmlRegisterType<Device>("com.yue.common", 1, 0, "Device");
+    //qmlRegisterType<Device>("com.yue.common", 1, 0, "Device");
 }
 
 } // qtcommon

@@ -14,8 +14,7 @@ Item {
 
     visible: true
 
-    Device { id: device }
-    property alias dp: device.dp
+    property alias dp: gDevice.dp
 
     QtObject {
         id: palette
@@ -53,8 +52,8 @@ Item {
     property alias currentPage: loader.source
 
     property int durationOfMenuAnimation: 500
-    property int menuWidth: app.orientation == app.orientationLandscape ? 300*app.dp : app.width*0.85
-    property int widthOfSeizure: 15*app.dp
+    property int menuWidth: app.orientation == app.orientationLandscape ? 300*gDevice.dp : app.width*0.85
+    property int widthOfSeizure: 15*gDevice.dp
     property bool menuIsShown: Math.abs(menuView.x) < (menuWidth*0.5) ? true : false
     property real menuProgressOpening
 
@@ -75,7 +74,7 @@ Item {
             anchors.top: parent.top
             anchors.topMargin: 0
             width: parent.width
-            height: app.orientation == app.orientationLandscape ? 40*app.dp : 50*app.dp
+            height: app.orientation == app.orientationLandscape ? 40*gDevice.dp : 50*gDevice.dp
             color: palette.darkPrimary
             Rectangle {
                 id: menuButton
@@ -115,7 +114,7 @@ Item {
             anchors.top: parent.top
             anchors.topMargin: 0
             width: parent.width
-            height: app.orientation == app.orientationLandscape ? 40*app.dp : 50*app.dp
+            height: app.orientation == app.orientationLandscape ? 40*gDevice.dp : 50*gDevice.dp
             title: appTitle
             color: palette.darkPrimary
         }
@@ -125,7 +124,7 @@ Item {
             anchors.top: menuBar.bottom
             anchors.left: parent.left
             anchors.right: parent.right
-            height: 6*app.dp
+            height: 6*gDevice.dp
             z: 4
             source: "qrc:/shared/images/shadow_title.png"
         }
@@ -182,7 +181,7 @@ Item {
             anchors.top: menuBar.bottom
             anchors.bottom: menuView.bottom
             anchors.left: menuView.right
-            width: 6*app.dp
+            width: 6*gDevice.dp
             z: 5
             source: "qrc:/shared/images/shadow_long.png"
             visible: menuView.x != -menuWidth
@@ -242,7 +241,6 @@ Item {
     }
 
     Component.onCompleted: {
-        console.log("load complete " + device.dp)
         currentPage = "qrc:/shared/PageReorderablePlayList.qml"
         mainMenu.currentItem = 0
     }

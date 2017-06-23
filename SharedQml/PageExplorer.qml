@@ -15,8 +15,11 @@ PageBase {
         console.log("opening page: " + title);
     }
 
+    function titleClicked() {
+        console.log("Title Clicked on page" + title)
+    }
+
     DirectoryListModel { id: dirModel}
-    Device {id: device}
 
     SimpleHeader {
         id: header
@@ -53,7 +56,7 @@ PageBase {
         anchors.verticalCenter: parent.verticalCenter
         visible: dirModel.count==0
         text: "Empty Directory"
-        font.pointSize: device.font.pointSize + 3
+        font.pointSize: gDevice.font.pointSize + 3
     }
 
     Keys.onReleased: {

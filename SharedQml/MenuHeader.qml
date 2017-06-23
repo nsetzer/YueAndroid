@@ -7,6 +7,16 @@ Rectangle {
     id: root
     property string title: ""
 
+    signal clicked();
+
+    MouseArea {
+        anchors.fill: parent
+
+        onClicked: {
+            root.clicked();
+        }
+    }
+
     Rectangle {
         id: menuButton
         anchors.left: parent.left
@@ -37,4 +47,6 @@ Rectangle {
         font.pixelSize: 0.35*parent.height
         color: palette.text
     }
+
+
 }

@@ -2,6 +2,11 @@
 #include "yue/device.h"
 #include <QFontMetricsF>
 
+namespace yue {
+namespace qtcommon {
+
+Device* Device::m_instance=nullptr;
+
 Device::Device(QObject *parent) : QObject(parent)
 {
     m_screen = qApp->primaryScreen();
@@ -55,4 +60,5 @@ Device::~Device()
 }
 
 
-
+} // qtcommon
+} // yue

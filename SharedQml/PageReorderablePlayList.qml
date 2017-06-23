@@ -33,6 +33,17 @@ import com.yue.common 1.0
 PageBase {
     id: root
 
+    title: "Current Playlist"
+
+    function openPage() {
+        console.log("opening page: " + title);
+    }
+
+    function titleClicked() {
+        // jump the list view to center on the current item
+        view.positionViewAtIndex(MediaPlayer.currentIndex,ListView.Center);
+    }
+
     width: 300; height: 400
 
     SongListModel {
@@ -44,8 +55,6 @@ PageBase {
         id: textMetricsIndex
         text: "000."
     }
-
-    Device {id:device}
 
     Component {
         id: dragDelegate
@@ -73,7 +82,8 @@ PageBase {
             signal swipeUp(int distance)
             signal swipeDown(int distance)
 
-            anchors { left: parent.left; right: parent.right }
+            anchors.left: parent.left
+            anchors.right: parent.right
             height: content.height
 
             drag.target: held ? content : undefined
@@ -154,7 +164,7 @@ PageBase {
                 }
 
                 width: dragArea.width;
-                height: device.textHeight * 3
+                height: gDevice.textHeight * 3
 
                 border.width: 1
                 border.color: "lightsteelblue"
@@ -221,7 +231,7 @@ PageBase {
         model: listModel
         delegate: dragDelegate
 
-        maximumFlickVelocity: 4000*device.dp
+        maximumFlickVelocity: 4000*gDevice.dp
 
 
         spacing: 4
@@ -246,7 +256,7 @@ PageBase {
             anchors.top: view.top
             anchors.left: view.left
             anchors.right: view.right
-            height: Device.textHeight * 2
+            height: gDevice.textHeight * 2
 
             Rectangle {
                 anchors.fill: parent
@@ -266,8 +276,8 @@ PageBase {
         anchors.left : parent.left
         anchors.right : parent.right
         anchors.bottom : parent.bottom
-        height: device.textHeight * 2 + margin
-        margin: device.textHeight/4
+        height: gDevice.textHeight * 2 + margin
+        margin: gDevice.textHeight/4
 
         onPrevClicked: {
             MediaPlayer.prev();

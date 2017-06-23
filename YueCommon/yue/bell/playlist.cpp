@@ -8,7 +8,7 @@ const QString PlaylistManager::current_playlist_name = ":current:";
 PlaylistManager* PlaylistManager::m_instance = nullptr;
 
 PlaylistManager::PlaylistManager(Library* library)
-    : QObject(library)
+    : QObject()
     , m_library(library)
 {
 

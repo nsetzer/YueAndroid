@@ -73,7 +73,7 @@ Item {
         anchors.top: logoWtapper.bottom
         anchors.left: parent.left
         anchors.right: parent.right
-        height: 10*app.dp
+        height: 10*gDevice.dp
         z: 4
         source: "images/shadow_title.png"
     }
@@ -93,7 +93,7 @@ Item {
 
         Rectangle {
             id: wrapperItem
-            height: 60*app.dp
+            height: 60*gDevice.dp
             width: parent.width
             color: wrapperItem.ListView.isCurrentItem || ma.pressed ? palette.currentHighlightItem : "transparent"
             Image {
