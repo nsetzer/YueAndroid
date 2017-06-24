@@ -110,7 +110,7 @@ Item {
         anchors.verticalCenter: parent.verticalCenter
         source: "qrc:/shared/images/00_menu_a.svg"
         asynchronous: true
-        sourceSize.height: parent.height
+        sourceSize.height: height
         MouseArea {
             anchors.fill: parent;
             onClicked: {
@@ -120,12 +120,13 @@ Item {
         }
     }
 
-
+/*
     Rectangle {
         anchors.bottom: parent.bottom;
         height: 2
         width: parent.width
         color: "#33777777"
     }
+    */
 
 } // end item

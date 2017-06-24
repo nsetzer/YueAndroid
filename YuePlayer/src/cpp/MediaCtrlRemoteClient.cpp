@@ -13,10 +13,12 @@ MediaCtrlRemoteClient::MediaCtrlRemoteClient()
     connect(m_rep.data(),&MediaControlReplica::statusChanged,this,&MediaCtrlRemoteClient::onServiceStatusChanged);
 
     qDebug() << "waiting for RPC source";
-    bool res = m_rep->waitForSource();
-    if (!res) {
+
+    if (m_rep->waitForSource()) {
+        qDebug() << "RPC source ready";
+    } else {
         qCritical() << "failed to create RPC source";
-        m_rep.clear();
+        //m_rep.clear();
     }
 }
 

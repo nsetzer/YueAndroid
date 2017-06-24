@@ -58,7 +58,7 @@ Item {
         clip: true
         Image {
             id: imgLogo
-            source: "images/background.jpg"
+            source: "images/background2.jpg"
             height: parent.height
             width: parent.width
             antialiasing: true

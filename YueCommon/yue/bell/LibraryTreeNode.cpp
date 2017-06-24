@@ -3,6 +3,27 @@
 namespace yue {
 namespace bell {
 
+LibraryTreeNode::LibraryTreeNode(Database::uid_t uid, QString text, int depth, LibraryTreeNode* parent)
+    : m_uid(uid)
+    , m_text(text)
+    , m_depth(depth)
+    , m_parent(parent)
+    , m_children()
+    , m_checkstate(Qt::Unchecked)
+    , m_expanded(false)
+{
+
+}
+
+LibraryTreeNode::~LibraryTreeNode()
+{
+    while (m_children.size() > 0) {
+        LibraryTreeNode* child = m_children.back();
+        delete child;
+        m_children.pop_back();
+    }
+}
+
 void LibraryTreeNode::setCheckState(Qt::CheckState state)
 {
     if (m_uid==-1) // null / dummy node

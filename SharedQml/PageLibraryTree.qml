@@ -36,10 +36,11 @@ PageBase {
 
     LineInput {
         id: searchInput
+        hint: "Search Library"
         anchors.top: parent.top;
         anchors.left: parent.left;
         anchors.right: parent.right;
-        height: gDevice.textHeight * 1.5
+        height: gDevice.textHeight * 2.25
         onAccepted: {
             treeModel.search( searchInput.text );
         }
@@ -76,7 +77,9 @@ PageBase {
                 anchors.top: parent.top
                 anchors.bottom: parent.bottom
                 anchors.left: parent.left
-                anchors.leftMargin: depth * (height/2)
+                // need some paddnig for depth==0 to
+                // get the button out of the gutter
+                anchors.leftMargin: (height/3) + (depth * (height/2))
 
                 visible: childCount > 0
                 expanded: isExpanded
@@ -92,21 +95,37 @@ PageBase {
             Text {
                 id: delegateText
                 anchors.verticalCenter: parent.verticalCenter
-
-                anchors.right: parent.right
+                height: parent.height
+                verticalAlignment: Text.AlignVCenter
+                anchors.right: (depth==2)?contextMenuIcon.left:parent.right
                 anchors.left: delegateButton.right
                 text: display
-            }
-
-            MouseArea {
-                anchors.left: delegateButton.right
-                anchors.right: parent.right
-                anchors.top: parent.top
-                anchors.bottom: parent.bottom
-
-                onClicked: treeModel.toggleCheckState( index )
+                font.bold: depth < 2
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: treeModel.toggleCheckState( index )
+                }
 
             }
+
+            Image {
+                id: contextMenuIcon
+                height: parent.height*.66
+                visible: depth==2
+                width: parent.height
+                anchors.right : parent.right
+                anchors.verticalCenter: parent.verticalCenter
+                source: "qrc:/shared/images/00_menu_a.svg"
+                asynchronous: true
+                sourceSize.height: parent.height*.66
+                MouseArea {
+                    anchors.fill: parent;
+                    onClicked: {
+                        console.log()
+                    }
+                }
+            }
+
 
             Rectangle {
                 /*anchors.left: parent.left
@@ -116,7 +135,8 @@ PageBase {
                 */
                 anchors.fill: parent
                 visible: checkState == Qt.Checked
-                color: "#220000FF"
+                color: (depth==0)?"#200000EE":((depth==1)?"#300000EE":"#400000EE")
+
             }
 
             ListView.onAdd: SequentialAnimation {
@@ -148,12 +168,20 @@ PageBase {
             Rectangle {
                 anchors.bottom: parent.bottom;
                 height: 2
+                visible: display!="" // check for dummy row
                 width: parent.width
                 color: "#33777777"
             }
 
         }
 
+        footer: Component {
+            Rectangle {
+                width: parent.width
+                height: view.height/2
+                color: "transparent"
+            }
+        }
         addDisplaced: Transition {
             NumberAnimation { properties: "x,y"; duration: 500 }
         }

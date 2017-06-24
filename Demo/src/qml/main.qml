@@ -202,7 +202,7 @@ ApplicationWindow {
     }
 
     function changePage() {
-        loader.source = "qrc:/shared/PagePlaylist.qml"
+        loader.source = "qrc:/shared/PageReorderablePlayList.qml"
     }
 
     Component.onCompleted: {

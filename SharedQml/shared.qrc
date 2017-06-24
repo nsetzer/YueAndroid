@@ -34,6 +34,7 @@
         <file>images/shadow_long.png</file>
         <file>images/shadow_title.png</file>
         <file>images/background.jpg</file>
+        <file>images/background2.jpg</file>
         <file>MainMenu.qml</file>
         <file>MenuIconLive.qml</file>
         <file>PageBase.qml</file>

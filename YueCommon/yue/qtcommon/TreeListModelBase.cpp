@@ -42,8 +42,8 @@ TreeListModelBase::TreeListModelBase(QObject *parent)
         m_forest.push_back(parent);
     }
     */
-    QList<yue::bell::LibraryTreeNode*> forest = yue::bell::Library::instance()->queryToForest("");
-    setNewData(forest);
+    //QList<yue::bell::LibraryTreeNode*> forest = yue::bell::Library::instance()->queryToForest("");
+    //setNewData(forest);
 
 
 }
@@ -115,13 +115,23 @@ QHash<int, QByteArray> TreeListModelBase::roleNames() const
 void TreeListModelBase::setNewData(QList<yue::bell::LibraryTreeNode*> lst)
 {
     emit beginResetModel();
+    // free any memory allocated from the previous search
+    if (m_forest.size()>0) {
+        m_tabledata.clear();
+        while (m_forest.size()>0) {
+            yue::bell::LibraryTreeNode* node = m_forest.back();
+            delete node;
+            m_forest.pop_back();
+        }
+    }
+
     m_forest = lst;
     //TODO memory leaks
     // use custom node list that delets pointers ?
     m_tabledata = QList<yue::bell::LibraryTreeNode*>(lst);
-    m_tabledata.push_back(new yue::bell::LibraryTreeNode(-1,"",0,NULL));
-    m_tabledata.push_back(new yue::bell::LibraryTreeNode(-1,"",0,NULL));
-    m_tabledata.push_back(new yue::bell::LibraryTreeNode(-1,"",0,NULL));
+    //m_tabledata.push_back(new yue::bell::LibraryTreeNode(-1,"",0,NULL));
+    //m_tabledata.push_back(new yue::bell::LibraryTreeNode(-1,"",0,NULL));
+    //m_tabledata.push_back(new yue::bell::LibraryTreeNode(-1,"",0,NULL));
     emit endResetModel();
 }
 

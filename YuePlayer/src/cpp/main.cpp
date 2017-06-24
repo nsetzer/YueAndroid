@@ -9,6 +9,7 @@
 #include "yue/bell/playlist.hpp"
 #include "yue/bell/MediaCtrlBase.h"
 #include "yue/bell/MediaCtrlLocal.h"
+#include "yue/device.h"
 #include "yue/qtcommon/qtcommon.hpp"
 
 #include "MediaCtrlRemoteClient.h"
@@ -34,7 +35,6 @@ int main(int argc, char *argv[])
     yue::bell::Database* db = yue::bell::Database::create();
 
     // all runtime cross thread signal/slots
-
 
 #ifdef Q_OS_ANDROID
     db->connect("/mnt/sdcard/Music/library.db");
@@ -68,6 +68,7 @@ int main(int argc, char *argv[])
         qDebug() << "service created";
     }
     else{
+        yue::qtcommon::Device::create();
 
         qDebug() << "client application starting";
         yue::qtcommon::registerQmlTypes();
