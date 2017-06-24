@@ -44,6 +44,78 @@ PageBase {
         view.positionViewAtIndex(MediaPlayer.currentIndex,ListView.Center);
     }
 
+    function min(x,y) {
+        if (x<y)
+            return x
+        return y
+    }
+
+    function max(x,y) {
+        if (x>y)
+            return x
+        return y
+    }
+
+    function globalPositionImpl(node,stopAt) {
+        var returnPos = {};
+        returnPos.x = 0;
+        returnPos.y = 0;
+        if(node !== undefined && node !== null && node !== stopAt) {
+            var parentValue = globalPosition(node.parent);
+            returnPos.x = parentValue.x + node.x;
+            returnPos.y = parentValue.y + node.y;
+        }
+        return returnPos;
+    }
+
+    function globalPosition(node) {
+        return globalPositionImpl(node,null)
+    }
+
+    property int pressAndHoldDuration: 200 // ms
+    property int autoScrollMargin: (gDevice.textHeight * 4.5)
+    property int autoScrollStep: gDevice.textHeight * .5
+    property int autoScrollDirection: 0
+    property int autoScrollIncrements: 0
+    property var autoScrollTarget: null
+
+    Timer {
+        id: timerAutoScroll
+        interval: 33//max(25,150/(autoScrollIncrements+5)/5)
+        repeat: true
+        onTriggered: {
+            autoScrollIncrements+=1
+            var rate = autoScrollDirection * autoScrollStep
+            view.contentY =  min(view.contentHeight,max(0,view.contentY+rate))
+
+            if (autoScrollTarget!==null) {
+                autoScrollTarget.onAutoScrollCheckMouse()
+            }
+        }
+    }
+
+    function enableAutoScrollUp(bFast) {
+        if (autoScrollDirection>=0) {
+            autoScrollIncrements=0
+        }
+        autoScrollDirection = bFast?-2.5:-1
+        timerAutoScroll.start()
+    }
+    function enableAutoScrollDown(bFast) {
+        if (autoScrollDirection<=0) {
+            autoScrollIncrements=0
+        }
+        autoScrollDirection = bFast?2.5:1
+        timerAutoScroll.start()
+    }
+    function disableAutoScroll() {
+        autoScrollIncrements = 0;
+        autoScrollDirection = 0;
+        timerAutoScroll.stop()
+        autoScrollTarget = null
+
+    }
+
     width: 300; height: 400
 
     SongListModel {
@@ -64,10 +136,12 @@ PageBase {
             id: dragArea
 
             property bool held: false
+            property bool swipe_: false
 
             property int swipeTreshold: 32
             property bool ready: false
             property point _origin
+            property point _position
             property int xoffset: 0
             property int yoffset: 0
 
@@ -82,36 +156,74 @@ PageBase {
             signal swipeUp(int distance)
             signal swipeDown(int distance)
 
-            anchors.left: parent.left
-            anchors.right: parent.right
+            //anchors.left: parent.left
+            //anchors.right: parent.right
+            width: parent.width
             height: content.height
 
             drag.target: held ? content : undefined
             drag.axis: Drag.YAxis
 
+            /*
             onPressAndHold: {
                 held = true
+            }
+            */
+            Timer {
+                id: timerPressAndHold
+                repeat: false
+                interval: pressAndHoldDuration;
+                onTriggered: {
+                    held = true
+                }
             }
 
             onPressed: {
                 drag.axis = Drag.XAndYAxis
+                //drag.axis = Drag.YAxis
                 _origin = Qt.point(mouse.x, mouse.y)
+                disableAutoScroll()
+
+                timerPressAndHold.start()
             }
 
             onPositionChanged: {
+                _position = Qt.point(mouse.x, mouse.y)
+                timerPressAndHold.stop()
+                if (held) {
+                    var view_y = globalPosition(view).y;
+                    var drag_y = globalPosition(dragArea).y + mouse.y;
+                    var region_up = view_y + autoScrollMargin
+                    var region_dn = view_y + view.height - autoScrollMargin
+                    if (drag_y < region_up) {
+                        enableAutoScrollUp(drag_y < (view_y + (autoScrollMargin/2)))
+                        autoScrollTarget = dragArea
+                        //console.log("enable auto scroll up   : " + drag_y + " < " + region_up)
+                    } else if (drag_y > region_dn) {
+                        enableAutoScrollDown(drag_y > (view_y + view.height - (autoScrollMargin/2)))
+                        autoScrollTarget = dragArea
+                        //console.log("enable auto scroll down : " + drag_y + " > " + region_dn)
+                    } else {
+                        disableAutoScroll()
+                        //console.log("disable auto scroll")
+                    }
+                }
+
                 switch (drag.axis) {
                     case Drag.XAndYAxis:
-                        if (Math.abs(mouse.x - _origin.x) > swipeTreshold)
+                        if (Math.abs(mouse.x - _origin.x) > swipeTreshold) {
                             drag.axis = Drag.XAxis
-                        else if (Math.abs(mouse.y - _origin.y) > swipeTreshold)
+                            swipe_ = true
+                            held=true
+                            timerPressAndHold.stop()
+                        } else if (Math.abs(mouse.y - _origin.y) > swipeTreshold) {
                             drag.axis = Drag.YAxis
+                        }
                         break
 
                     case Drag.XAxis: {
                         xoffset = mouse.x - _origin.x;
                         move(xoffset, 0);
-                        //console.log(xoffset)
-                        //held = true
                         break
                     }
                     case Drag.YAxis: {
@@ -119,18 +231,25 @@ PageBase {
                         move(0, yoffset);
                         break
                     }
+
                 }
+
+
             }
 
             onReleased: {
+                timerPressAndHold.stop()
                 held = false
+                swipe_= false;
+                disableAutoScroll()
+
                 var distance;
                 switch (drag.axis) {
                 case Drag.XAndYAxis: canceled(mouse) ; break
                 case Drag.XAxis: {
                     distance = mouse.x - _origin.x
                     console.log("swipe distance LR: " + distance + " width: " + parent.width)
-                    if (Math.abs(distance)/parent.width < 1/2)
+                    if (Math.abs(distance)/parent.width < 1/3)
                         return
                     if ( distance < 0) {
                         swipeLeft(Math.abs(distance))
@@ -166,10 +285,10 @@ PageBase {
                 width: dragArea.width;
                 height: gDevice.textHeight * 3
 
-                border.width: 1
-                border.color: "lightsteelblue"
+                //border.width: 1
+                //border.color: "lightsteelblue"
 
-                color: (dragArea.held ? ((Math.abs(xoffset)/parent.width > 1/2)?"gold":"lightsteelblue") : "white")
+                color: (dragArea.held ? ((Math.abs(xoffset)/parent.width > 1/3)?"orangered":"lightsteelblue") : "white")
                 Behavior on color { ColorAnimation { duration: 100 } }
 
                 radius: 2
@@ -194,17 +313,39 @@ PageBase {
                     currentIndex: listModel.currentIndex
                 }
 
+                Rectangle {
+                    anchors.bottom: parent.bottom;
+                    height: 2
+                    width: parent.width
+                    color: "#33777777"
+                }
             }
 
             DropArea {
-                // TODO: fixed pixel margin
-                anchors { fill: parent; margins: 10 }
+
+                anchors { fill: parent; }
 
                 onEntered: {
                    listModel.move(
                         drag.source.DelegateModel.itemsIndex,
                         dragArea.DelegateModel.itemsIndex);
                 }
+            }
+
+            function onAutoScrollCheckMouse() {
+
+                // when auto scroll is in effect mouse events and drop events
+                // dont trigger. check the position of the mouse in the view
+                // and mimic the droparea effect of moving the item
+
+                if (held) {
+                    var pos = globalPositionImpl(_position,view)
+                    var index = view.indexAt(0,view.contentY+pos.y)
+                    if (index>=0) {
+                        listModel.move(dragArea.DelegateModel.itemsIndex, index)
+                    }
+                }
+
             }
 
             onSwipeRight: {
@@ -233,8 +374,6 @@ PageBase {
 
         maximumFlickVelocity: 4000*gDevice.dp
 
-
-        spacing: 4
         cacheBuffer: 100
 
         displaced: Transition {
