@@ -32,10 +32,12 @@ PageBase {
 
     LibraryTreeListModel {
         id: treeModel
+        defaultQuery: app.defaultLibraryQuery
     }
 
     LineInput {
         id: searchInput
+        text: app.defaultLibraryQuery
         hint: "Search Library"
         anchors.top: parent.top;
         anchors.left: parent.left;
@@ -121,11 +123,10 @@ PageBase {
                 MouseArea {
                     anchors.fill: parent;
                     onClicked: {
-                        console.log()
+                        menu.open()
                     }
                 }
             }
-
 
             Rectangle {
                 /*anchors.left: parent.left
@@ -173,6 +174,28 @@ PageBase {
                 color: "#33777777"
             }
 
+            Menu {
+                id: menu
+                y: delegateItem.height
+                x: delegateItem.width - menu.width
+                width: view.width / 2
+
+
+                MenuItem {
+                    text: "Play Song"
+                    visible: index !== MediaPlayer.currentIndex
+                    height: visible? gDevice.textHeight*2:0
+                    onTriggered: {
+                    }
+                }
+                MenuItem {
+                    text: "Play Song Next"
+                    visible: index !== MediaPlayer.currentIndex
+                    height: visible? gDevice.textHeight*2:0
+                    onTriggered: {
+                    }
+                }
+            } // end menu
         }
 
         footer: Component {
@@ -232,7 +255,8 @@ PageBase {
 
             onClicked: {
                 if (treeModel.createPlaylist()) {
-                    app.changePage();
+                    MediaPlayer.playIndex(0)
+                    app.openCurrentPlaylist();
                 }
             }
         }

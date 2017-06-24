@@ -19,6 +19,8 @@ ApplicationWindow {
 
     visible: true
 
+    property var onLoadCallback: null
+    property string defaultLibraryQuery: ""
     QtObject {
         id: palette
         //http://www.materialpalette.com/indigo/yellow
@@ -33,7 +35,6 @@ ApplicationWindow {
 
         property color currentHighlightItem: "#dcdcdc"
     }
-
 
     property int orientationPortrait: 1
     property int orientationLandscape: 2
@@ -107,6 +108,7 @@ ApplicationWindow {
                 anchors.fill: parent
                 onMenuItemClicked: {
                     onMenu()
+                    app.defaultLibraryQuery = "" //reset
                     loader.source = page
                 }
             }
@@ -183,6 +185,9 @@ ApplicationWindow {
                 console.log("loaded:" + loader.item.title)
                 menuBar.title = loader.item.title || "error"
                 item.openPage();
+                if (app.onLoadCallback!==null){
+                    app.onLoadCallback()
+                } 
             }
             Rectangle {
                 id: curtainLoading
@@ -197,17 +202,47 @@ ApplicationWindow {
         }
     }
 
+
     function onMenu() {
         menuView.x = app.menuIsShown ? -menuWidth : 0
     }
 
     function changePage() {
         loader.source = "qrc:/shared/PageReorderablePlayList.qml"
+        mainMenu.currentItem = 1
+    }
+
+    function openLibrarySearchArtist(artist) {
+
+        //app.onLoadCallback = function() {console.log(artist)};
+        var r = new RegExp("\"", 'g')
+        artist = artist.replace(r,"\\\"")
+        app.defaultLibraryQuery = "artist = \"" + artist + "\""
+        loader.source = "qrc:/shared/PageLibrary.qml"
+
+
+        mainMenu.currentItem = 2
+    }
+
+    function openLibrarySearchAlbum(artist,album) {
+
+        var r = new RegExp("\"", 'g')
+        artist = artist.replace(r,"\\\"")
+        album = album.replace(r,"\\\"")
+        app.defaultLibraryQuery = "artist = \"" + artist + "\" album = \"" + album + "\""
+        //app.onLoadCallback = function () {console.log(artist + " - " + album)};
+        loader.source = "qrc:/shared/PageLibrary.qml"
+        mainMenu.currentItem = 2
+    }
+
+    function openCurrentPlaylist() {
+        loader.source = "qrc:/shared/PageReorderablePlayList.qml"
+        mainMenu.currentItem = 1
     }
 
     Component.onCompleted: {
 
         currentPage = "qrc:/shared/PageReorderablePlayList.qml"
-        mainMenu.currentItem = 0
+        mainMenu.currentItem = 1
     }
 }

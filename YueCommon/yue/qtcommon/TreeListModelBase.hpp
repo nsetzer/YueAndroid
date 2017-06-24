@@ -13,14 +13,16 @@ class YUECOMMON_EXPORT TreeListModelBase : public QAbstractListModel
 {
     Q_OBJECT
 
+
+
+    Q_PROPERTY(bool anySelected READ anySelected() NOTIFY selectionChanged)
+    Q_PROPERTY(bool allSelected READ allSelected() NOTIFY selectionChanged)
+protected:
     static int CheckRole;
     static int ExpandedRole;
     static int DepthRole;
     static int ChildCountRole;
-
-    Q_PROPERTY(bool anySelected READ anySelected() NOTIFY selectionChanged)
-    Q_PROPERTY(bool allSelected READ allSelected() NOTIFY selectionChanged)
-
+    static int UserRole;
 public:
 
     explicit TreeListModelBase(QObject *parent = nullptr);
@@ -51,7 +53,6 @@ public slots:
 
 protected:
     QList<yue::bell::LibraryTreeNode*> m_forest;
-private:
     QList<yue::bell::LibraryTreeNode*> m_tabledata;
 };
 

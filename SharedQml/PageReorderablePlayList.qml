@@ -128,6 +128,30 @@ PageBase {
         text: "000."
     }
 
+    Popup {
+        id: popup
+        //x: 0 //parent.verticalCenter - height/2
+        //y: 0 // parent.width - width
+
+        leftPadding: parent.width/3
+        rightPadding: gDevice.textHeight
+        //width: parent.width/3
+        //height: 100
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        Rectangle {
+
+            Column {
+            Button{id: btn1; text:"textA"}
+            Button{id: btn2; text:"textB"}
+            Button{id: btn3; text:"textC"}
+            }
+
+            color: "#33FFFF00"
+        }
+    }
+
     Component {
         id: dragDelegate
 
@@ -158,7 +182,7 @@ PageBase {
 
             //anchors.left: parent.left
             //anchors.right: parent.right
-            width: parent.width
+            width: view.width
             height: content.height
 
             drag.target: held ? content : undefined
@@ -311,6 +335,56 @@ PageBase {
                     anchors.fill: parent
                     indexWidth: textMetricsIndex.width
                     currentIndex: listModel.currentIndex
+                    width: parent.width
+
+                    onMoreClicked: {
+                        //MediaPlayer.playIndex(index)
+                        //menu.y= delegate.height
+                        //menu.x= delegate.width - menu.width
+                        menu.open()
+                    }
+
+                    Menu {
+                        id: menu
+                        y: delegate.height
+                        x: delegate.width - menu.width
+                        width: view.width / 2
+
+
+                        MenuItem {
+                            text: "Play Song"
+                            visible: index !== MediaPlayer.currentIndex
+                            height: visible? gDevice.textHeight*2:0
+                            onTriggered: {
+                                MediaPlayer.playIndex(index)
+                            }
+                        }
+                        MenuItem {
+                            text: "Play Song Next"
+                            visible: index !== MediaPlayer.currentIndex
+                            height: visible? gDevice.textHeight*2:0
+                            onTriggered: {
+                                if (index !== MediaPlayer.currentIndex) {
+                                    listModel.move(index,MediaPlayer.currentIndex+1)
+                                }
+                            }
+                        }
+                        MenuItem {
+                            height: visible? gDevice.textHeight*2:0
+                            text: "Search For Artist"
+                            onTriggered: {
+                                openLibrarySearchArtist(artist)
+                            }
+                        }
+                        MenuItem {
+                            height: visible? gDevice.textHeight*2:0
+                            text: "Search For Album"
+                            onTriggered: {
+                                openLibrarySearchAlbum(artist, album)
+                            }
+                        }
+                    } // end menu
+
                 }
 
                 Rectangle {

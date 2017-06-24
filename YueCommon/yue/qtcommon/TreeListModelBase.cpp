@@ -11,6 +11,7 @@ int TreeListModelBase::CheckRole      = Qt::UserRole+1;
 int TreeListModelBase::ExpandedRole   = Qt::UserRole+2;
 int TreeListModelBase::DepthRole      = Qt::UserRole+3;
 int TreeListModelBase::ChildCountRole = Qt::UserRole+4;
+int TreeListModelBase::UserRole       = TreeListModelBase::ChildCountRole;
 /*
  * experiment:
  *  BasicListModel<T>

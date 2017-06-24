@@ -45,8 +45,8 @@ android {
     INSTALLS += ANDROID_JAVA_SOURCES
 }
 
-win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../YueCommon/ -lYueCommon
-else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../YueCommon/ -lYueCommond
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../YueCommon/release/ -lYueCommon
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../YueCommon/debug/ -lYueCommon
 else:unix: LIBS += -L$$OUT_PWD/../YueCommon/ -lYueCommon
 
 INCLUDEPATH += $$PWD/../YueCommon

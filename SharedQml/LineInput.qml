@@ -44,7 +44,10 @@ FocusScope {
         TextInput {
             id: input
             focus: true
-            anchors { left: prefix.right; right: parent.right; top: parent.top; bottom: parent.bottom }
+            anchors { left: prefix.right;
+                      right: btnClear.left;
+                      top: parent.top;
+                      bottom: parent.bottom }
             verticalAlignment: Text.AlignVCenter
             //font.pixelSize: 18
             //color: "#707070"
@@ -53,13 +56,31 @@ FocusScope {
 
         Image {
             source: "qrc:/shared/images/00_search_b.svg"
-            anchors.right: parent.right
+            anchors.right: btnClear.left
             anchors.rightMargin: width/2
             anchors.verticalCenter: parent.verticalCenter
             asynchronous: true
             sourceSize.height: parent.height
             MouseArea {
+                anchors.fill: parent
                 onClicked: wrapper.accepted()
+            }
+        }
+
+        Image {
+            id: btnClear
+            source: "qrc:/shared/images/00_clear_a.svg"
+
+            anchors.right: parent.right
+            anchors.verticalCenter: parent.verticalCenter
+            asynchronous: true
+            sourceSize.height: parent.height
+            MouseArea {
+                anchors.fill: parent
+                onClicked: {
+                    input.text = ""
+                    wrapper.accepted();
+                }
             }
         }
     }

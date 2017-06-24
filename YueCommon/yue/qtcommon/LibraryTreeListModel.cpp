@@ -7,11 +7,15 @@
 namespace yue {
 namespace qtcommon {
 
+int LibraryTreeListModel::UniqueIdRole = LibraryTreeListModel::UserRole + 1;
+
 LibraryTreeListModel::LibraryTreeListModel(QObject *parent)
     : TreeListModelBase(parent)
 {
 
-    search("");
+    //search("");
+    connect(this,&LibraryTreeListModel::defaultQueryChanged,
+            this,&LibraryTreeListModel::onDefaultQueryChanged);
 }
 
 /**
@@ -74,6 +78,32 @@ void LibraryTreeListModel::collectSelectedSongs(QMap<yue::bell::Database::uid_t,
             collectSelectedSongs(groups,child);
         }
     }
+}
+
+QVariant LibraryTreeListModel::data(const QModelIndex &index, int role/* = Qt::DisplayRole*/) const
+{
+    if (index.row() < 0 || index.row() >= rowCount())
+        return QVariant();
+
+    if (role == LibraryTreeListModel::UniqueIdRole)
+        return m_tabledata[index.row()]->getUid();
+
+    return TreeListModelBase::data(index,role);
+}
+
+QHash<int, QByteArray> LibraryTreeListModel::roleNames() const
+{
+
+    QHash<int, QByteArray> roles(TreeListModelBase::roleNames());
+
+    roles[LibraryTreeListModel::UniqueIdRole] = "uid";
+
+    return roles;
+}
+
+void LibraryTreeListModel::onDefaultQueryChanged()
+{
+    search(m_defaultQuery);
 }
 
 } // qtcommon

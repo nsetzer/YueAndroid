@@ -11,6 +11,8 @@ Item {
     property real indexWidth: 0
     property int  currentIndex: -1
 
+    signal moreClicked(int index);
+
     function formatDuration(s) {
 
         var h = Math.floor(s / 3600);
@@ -61,10 +63,10 @@ Item {
 
         MouseArea {
             anchors.fill: parent;
-            onClicked: {
-                console.log("remove: " + index + " " + plmodel.removeItem)
-                plmodel.removeItem(index)
-            }
+            //onClicked: {
+            //    /console.log("remove: " + index + " " + plmodel.removeItem)
+            //    //plmodel.removeItem(index)
+            //}
         }
 
     }
@@ -115,7 +117,8 @@ Item {
             anchors.fill: parent;
             onClicked: {
                 console.log("context: " + index )
-                MediaPlayer.playIndex( index );
+                //MediaPlayer.playIndex( index );
+                moreClicked(index)
             }
         }
     }
