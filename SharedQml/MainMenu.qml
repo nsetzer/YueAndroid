@@ -13,7 +13,7 @@ Item {
         ListElement {
             item: "Now Playing"
             icon: "qrc:/shared/images/01_now_playing_a.svg"
-            page: "qrc:/shared/PageSettings.qml"
+            page: "qrc:/shared/PageNowPlaying.qml"
         }
         ListElement {
             item: "Current Playlist"
@@ -25,6 +25,7 @@ Item {
             icon: "qrc:/shared/images/03_music_library_a.svg"
             page: "qrc:/shared/PageLibrary.qml"
         }
+        /*
         ListElement {
             item: "Playlists"
             icon: "qrc:/shared/images/05_ordered_list_a.svg"
@@ -34,6 +35,12 @@ Item {
             item: "Playlists"
             icon: "qrc:/shared/images/02_playlist_e.svg"
             page: "qrc:/shared/SwipeListDemo.qml"
+        }.
+        */
+        ListElement {
+            item: "Dynamic Playlists"
+            icon: "qrc:/shared/images/04_dynamic_a.svg"
+            page: "qrc:/shared/PageDynamicPlaylists.qml"
         }
         ListElement {
             item: "File System"

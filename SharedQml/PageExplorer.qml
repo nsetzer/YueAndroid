@@ -37,6 +37,7 @@ PageBase {
         anchors.left: parent.left;
         anchors.right: parent.right;
         clip: true
+        maximumFlickVelocity: 4000*gDevice.dp
 
         model: dirModel
         delegate: SharedQml.ListItemDelegate {

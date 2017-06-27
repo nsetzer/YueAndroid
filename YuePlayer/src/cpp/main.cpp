@@ -32,23 +32,35 @@ int main(int argc, char *argv[])
     QSharedPointer<MediaCtrlRemoteServer> mcsvc;
     QSharedPointer<yue::bell::MediaCtrlBase> mccli;
 
+
     yue::bell::Database* db = yue::bell::Database::create();
 
     // all runtime cross thread signal/slots
 
 #ifdef Q_OS_ANDROID
-    db->connect("/mnt/sdcard/Music/library.db");
+
+    QString dirPath =yue::qtcommon::Device::getDirectory(yue::qtcommon::Device::DIRECTORY_MUSIC);
+    QDir dirMusic(dirPath);
+    QString libPath = dirMusic.absoluteFilePath("yue-library.v1.sqlitedb");
+    db->connect(libPath);
+
+
+    //db->connect("/mnt/sdcard/Music/library.db");
+    //db->connect("/mnt/sdcard/Music/yue-library.v1.sqlitedb");
 
 #else
 
 #ifdef Q_OS_LINUX
     db->connect("/home/nsetzer/projects/android/YueMusicPlayer/yue.db");
 #else
-    db->connect("D:/git/YueMusicPlayer/yue.db");
+    //db->connect("D:/git/YueMusicPlayer/yue.db");
+    db->connect(":memory:");
 #endif
 #endif
 
+    qDebug() << "main: create library";
     yue::bell::Library::create();
+    qDebug() << "main: create playlist manager";
     yue::bell::PlaylistManager::create();
 
     if (QCoreApplication::arguments().count() > 1){
@@ -68,7 +80,7 @@ int main(int argc, char *argv[])
         qDebug() << "service created";
     }
     else{
-        yue::qtcommon::Device::create();
+
 
         qDebug() << "client application starting";
         yue::qtcommon::registerQmlTypes();
@@ -79,6 +91,7 @@ int main(int argc, char *argv[])
         mccli = QSharedPointer<yue::bell::MediaCtrlBase>(new yue::bell::MediaCtrlLocal());
 #endif
         engine.rootContext()->setContextProperty("MediaPlayer", mccli.data());
+        yue::qtcommon::Device::create();
         engine.rootContext()->setContextProperty("gDevice", yue::qtcommon::Device::instance());
         yue::bell::MediaCtrlBase::registerInstance( mccli );
 

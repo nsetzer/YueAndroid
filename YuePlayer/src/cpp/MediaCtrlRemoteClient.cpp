@@ -72,6 +72,7 @@ void MediaCtrlRemoteClient::setProgress(float progress)
 
 void MediaCtrlRemoteClient::onServiceProgressChanged(float progress)
 {
+    m_progress = progress;
     emit progressChanged(progress);
 }
 
@@ -82,13 +83,17 @@ void MediaCtrlRemoteClient::onServiceCurrentIndexChanged(int index)
 
 void MediaCtrlRemoteClient::onServiceStatusChanged(int status)
 {
+
     auto s = static_cast<yue::bell::MediaPlayerBase::Status>(status);
+    m_status = s;
     emit statusChanged(s);
 }
 
 void MediaCtrlRemoteClient::onServiceStateChanged(int state)
 {
+
     auto s = static_cast<yue::bell::MediaPlayerBase::State>(state);
+    m_state = s;
     emit stateChanged(s);
 }
 

@@ -21,8 +21,11 @@ MediaCtrlLocal::MediaCtrlLocal(QObject *parent/* = nullptr*/)
 
     connect(m_pBackend.data(),&MediaCtrlBackend::statusChanged,
             this,&MediaCtrlLocal::onStatusChanged);
-
-    m_pBackend->load();
+    try {
+        m_pBackend->load();
+    } catch (std::runtime_error& e) {
+        qWarning() << "Error Loading Song: " << e.what();
+    }
 }
 
 } // bell

@@ -49,6 +49,7 @@ Database::~Database()
 void Database::connect(QString path)
 {
     // path:  :memory:
+    qDebug() << "connect to database: " << path;
     QSqlDatabase m_db = QSqlDatabase::addDatabase("QSQLITE");
     m_db.setDatabaseName(path);
     if (!m_db.open()) {

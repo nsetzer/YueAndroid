@@ -38,10 +38,21 @@ public slots:
     virtual void setProgress(float progress) { m_pBackend->setProgress(progress); }
 
 private slots:
-    void onProgressChanged(float progress) { emit progressChanged(progress); }
-    void onCurrentIndexChanged(int index) { emit currentIndexChanged(index); }
-    void onStatusChanged(MediaPlayerBase::Status status) { emit statusChanged(status); }
-    void onStateChanged(yue::bell::MediaPlayerBase::State state) { emit stateChanged(state); }
+    void onProgressChanged(float progress) {
+        m_progress = progress;
+        emit progressChanged(progress);
+    }
+    void onCurrentIndexChanged(int index) {
+        emit currentIndexChanged(index);
+    }
+    void onStatusChanged(MediaPlayerBase::Status status) {
+        m_status = status;
+        emit statusChanged(status);
+    }
+    void onStateChanged(yue::bell::MediaPlayerBase::State state) {
+        m_state = state;
+        emit stateChanged(state);
+    }
 
 private:
     QScopedPointer<MediaCtrlBackend> m_pBackend;

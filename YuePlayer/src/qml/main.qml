@@ -212,6 +212,12 @@ ApplicationWindow {
         mainMenu.currentItem = 1
     }
 
+    function openLibrarySearch(query) {
+        app.defaultLibraryQuery = query
+        loader.source = "qrc:/shared/PageLibrary.qml"
+        mainMenu.currentItem = 2
+    }
+
     function openLibrarySearchArtist(artist) {
 
         //app.onLoadCallback = function() {console.log(artist)};

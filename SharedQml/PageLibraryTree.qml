@@ -186,6 +186,7 @@ PageBase {
                     visible: index !== MediaPlayer.currentIndex
                     height: visible? gDevice.textHeight*2:0
                     onTriggered: {
+                        MediaPlayer.playSong( uid )
                     }
                 }
                 MenuItem {
@@ -193,6 +194,7 @@ PageBase {
                     visible: index !== MediaPlayer.currentIndex
                     height: visible? gDevice.textHeight*2:0
                     onTriggered: {
+                        MediaPlayer.playNext( uid )
                     }
                 }
             } // end menu

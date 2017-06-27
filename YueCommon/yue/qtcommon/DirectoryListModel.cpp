@@ -142,6 +142,13 @@ void DirectoryListModel::changeDirectory(QString path)
                 m_tabledata.push_back(fi);
             }
         }
+        {
+            QFileInfo fi("/storage");
+            if (fi.permission(QFile::ExeGroup))
+            {
+                m_tabledata.push_back(fi);
+            }
+        }
 
     }
     qWarning("table size: %d",m_tabledata.size());

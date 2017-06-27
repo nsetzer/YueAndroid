@@ -173,21 +173,30 @@ Database::uid_t Playlist::setCurrent(int idx)
 QPair<Database::uid_t,size_t> Playlist::current()
 {
      Database::uid_t uid;
-     size_t index;
+     size_t index,size;
      QSqlQuery q(m_db->db());
 
      q.exec("begin");
-     q.prepare("SELECT idx FROM playlists WHERE uid=?");
+     q.prepare("SELECT idx,size FROM playlists WHERE uid=?");
      q.addBindValue(toQVariant(m_plid));
      q.exec();
-     q.first();
+     if (!q.first()) {
+         throw std::runtime_error("no current song");
+     }
      index = q.value(0).toULongLong();
+     size = q.value(1).toULongLong();
+
+     if (size<1 || index>=size) {
+         throw std::runtime_error("no current song");
+     }
 
      q.prepare("SELECT song_id FROM playlist_songs WHERE (uid=? AND idx=?)");
      q.addBindValue(toQVariant(m_plid));
      q.addBindValue(index);
      q.exec();
-     q.first();
+     if (!q.first()) {
+         throw std::runtime_error("no current song");
+     }
      uid = q.value(0).toULongLong();
 
      q.exec("end");

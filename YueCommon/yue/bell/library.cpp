@@ -418,6 +418,12 @@ QList<Database::uid_t> Library::createPlaylist(QString query, size_t size/* = 0*
 
     // shuffle the results
 
+    /*
+     TODO: support index order, instead of shuffled
+     (Song.year,Song.asc),
+     (Song.album,Song.asc),
+     (Song.album_index,Song.asc)]
+    */
     auto lst = Library::shuffle(data,groups);
     if (size>0 && lst.size()>size) {
         lst.erase(lst.begin()+size,lst.end());

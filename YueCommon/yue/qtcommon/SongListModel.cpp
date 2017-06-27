@@ -5,24 +5,27 @@ namespace qtcommon {
 
 void MoveUpdateThread::run() {
 
-    m_mutex.lock();
     auto pl = yue::bell::PlaylistManager::instance()->openCurrent();
 
     while (m_alive) {
-        m_cond.wait(&m_mutex);
         QList<yue::bell::Database::uid_t> lst;
-        for (auto& item : m_model->getList().elems()) {
-            lst.push_back(item.uid );
-        }
+        {
+            // lock the mutex and wait for a notification
+            QMutexLocker lk(&m_mutex);
+            m_cond.wait(&m_mutex);
+            // copy the current state of the model
+            for (auto& item : m_model->getList().elems()) {
+                lst.push_back(item.uid );
+            }
+        }// release mutex
+
+        // update database without blocking main thread
+        // this can be a long operation
         pl->set(lst);
         pl->setCurrent(m_model->getList().currentIndex());
 
-        qDebug() << "force update";
-        /*for (auto& action : m_actions) {
-            pl->move(action.first,action.second);
-        }*/
-
     }
+
 }
 
 void MoveUpdateThread::stop()
@@ -103,7 +106,12 @@ void SongListModel::setPlaylist(QSharedPointer<yue::bell::Playlist> playlist)
         d.length = query.value(5).toInt();
         m_lst.push_back(d);
     }
-    m_lst.setCurrentIndex(m_playlist->current().second);
+    try {
+        m_lst.setCurrentIndex(m_playlist->current().second);
+    } catch (std::runtime_error& e) {
+        qWarning() << "Error Loading Song: " << e.what();
+        m_lst.setCurrentIndex(-1);
+    }
 }
 
 int SongListModel::rowCount(const QModelIndex &parent/* = QModelIndex()*/) const

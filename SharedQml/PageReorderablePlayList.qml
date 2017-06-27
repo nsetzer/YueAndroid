@@ -500,6 +500,14 @@ PageBase {
             MediaPlayer.next();
         }
 
+        onSeekBackward: {
+            MediaPlayer.setProgress(MediaPlayer.getProgress()-0.01);
+        }
+
+        onSeekForward: {
+            MediaPlayer.setProgress(MediaPlayer.getProgress()+0.01);
+        }
+
         onPlayPauseClicked: {
             MediaPlayer.playpause();
         }

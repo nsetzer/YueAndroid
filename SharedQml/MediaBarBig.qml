@@ -15,7 +15,6 @@ Rectangle {
     signal seekForward();
     signal playPauseClicked();
 
-    property int margin: 2
     property real fprogress: 0
 
     property int playerState: 0
@@ -52,26 +51,12 @@ Rectangle {
 
     color: "pink"
 
-    Rectangle {
-        id: progressBarShadow
-        anchors.left : parent.left
-        anchors.top : parent.top
-
-        height: margin
-        width: parent.width
-        color: "#888888"
-
-    }
-
-    Rectangle {
+    Slider {
         id: progressBar
-        anchors.left : parent.left
         anchors.top : parent.top
-
-        height: margin
-        width: parent.width * fprogress
-        color: "blue"
-
+        anchors.horizontalCenter : parent.horizontalCenter
+        width: parent.width*80
+        height: gDevice.textHeight * 2
     }
 
     Rectangle {

@@ -16,7 +16,11 @@ MediaCtrlRemoteServer::MediaCtrlRemoteServer()
     connect(m_pBackend.data(),&yue::bell::MediaCtrlBackend::statusChanged,
             this,&MediaCtrlRemoteServer::onStatusChanged);
 
-    m_pBackend->load();
+    try {
+        m_pBackend->load();
+    } catch (std::runtime_error& e) {
+        qWarning() << "Error Loading Song: " << e.what();
+    }
 }
 
 

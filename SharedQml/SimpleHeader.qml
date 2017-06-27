@@ -60,13 +60,16 @@ Rectangle {
         anchors.left: parent.left
         anchors.leftMargin: 16
 
+        height: parent.height * .75
+        width: height
+
         MouseArea {
             id: mouse
             hoverEnabled: true
             anchors.centerIn: parent
             visible: backVisible
-            width: 38
-            height: 31
+            height: parent.height
+            width: height
             anchors.verticalCenterOffset: -1
             onClicked: root.backClicked()
             Rectangle {

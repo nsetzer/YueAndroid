@@ -29,10 +29,20 @@ public:
         return m_instance;
     }
 
-    size_t currentIndex();
-signals:
-    // signals emitted by the server
+    int currentIndex();
+    Q_INVOKABLE void playNext(int uid);
+    Q_INVOKABLE void playSong(int uid);
 
+
+    Q_INVOKABLE MediaPlayerBase::Status getStatus() { return m_status; }
+    Q_INVOKABLE MediaPlayerBase::State getState() { return m_state; }
+    Q_INVOKABLE float getProgress() { return m_progress; }
+    Q_INVOKABLE void setCurrentPlaylist(QList<yue::bell::Database::uid_t>& lst);
+signals:
+    // signals emitted by the base class
+    void playlistReset();
+
+    // signals emitted by the server
     void progressChanged(float progress);
     void currentIndexChanged(int index);
     void statusChanged(MediaPlayerBase::Status status);
@@ -53,6 +63,11 @@ public slots:
 
     //virtual void setNewPlaylist(SongList lst);
 private slots:
+
+protected:
+    float m_progress=0;
+    MediaPlayerBase::Status m_status = MediaPlayerBase::Status::Unknown;
+    MediaPlayerBase::State m_state = MediaPlayerBase::State::Unknown;
 
     //virtual void load(Database::uid_t uid)=0;
 };

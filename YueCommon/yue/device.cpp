@@ -2,10 +2,25 @@
 #include "yue/device.h"
 #include <QFontMetricsF>
 
+#ifdef Q_OS_ANDROID
+#include <QAndroidJniEnvironment>
+#include <QAndroidJniObject>
+#endif
+
+#include <QStandardPaths>
+#include <QDir>
+
 namespace yue {
 namespace qtcommon {
 
 Device* Device::m_instance=nullptr;
+
+
+QString Device::DIRECTORY_DCIM = "DIRECTORY_DCIM";
+QString Device::DIRECTORY_DOCUMENTS = "DIRECTORY_DOCUMENTS";
+QString Device::DIRECTORY_MOVIES = "DIRECTORY_MOVIES";
+QString Device::DIRECTORY_MUSIC = "DIRECTORY_MUSIC";
+QString Device::DIRECTORY_PICTURES = "DIRECTORY_PICTURES";
 
 Device::Device(QObject *parent) : QObject(parent)
 {
@@ -58,6 +73,36 @@ Device::Device(QObject *parent) : QObject(parent)
 Device::~Device()
 {
 }
+
+
+
+QString Device::getDirectory(const QString &type)
+{
+    QString res;
+
+#ifdef Q_OS_ANDROID
+    QAndroidJniObject jniType = QAndroidJniObject::getStaticObjectField<jstring>("android/os/Environment", type.toUtf8().constData());
+
+    qDebug() << "environment: jni" << jniType.isValid();
+    QAndroidJniObject file = QAndroidJniObject::callStaticObjectMethod("android/os/Environment",
+                                                                       "getExternalStoragePublicDirectory",
+                                                                       "(Ljava/lang/String;)Ljava/io/File;",
+                                                                       jniType.object());
+    qDebug() << "environment: file" << file.isValid();
+    QAndroidJniObject absolutePath = file.callObjectMethod("getAbsolutePath","()Ljava/lang/String;");
+    qDebug() << "environment: absolutePath" << absolutePath.isValid();
+    res = absolutePath.toString();
+
+#else
+    if (type == DIRECTORY_DCIM) {
+        res = QStandardPaths::standardLocations(QStandardPaths::PicturesLocation)[0];
+    } else {
+        res = QDir::currentPath();
+    }
+#endif
+    return res;
+}
+
 
 
 } // qtcommon

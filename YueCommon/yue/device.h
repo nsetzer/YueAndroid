@@ -26,6 +26,13 @@ class YUECOMMON_EXPORT Device : public QObject
 
     static Device* m_instance;
 public:
+
+    static QString DIRECTORY_DCIM;
+    static QString DIRECTORY_DOCUMENTS;
+    static QString DIRECTORY_MOVIES;
+    static QString DIRECTORY_MUSIC;
+    static QString DIRECTORY_PICTURES;
+
     explicit Device(QObject *parent = 0);
     ~Device();
 
@@ -44,6 +51,9 @@ public:
     qreal dp() const { return m_dp; }
     qreal textHeight() { return m_textHeight; }
     QFont font() { return m_font; }
+
+
+    static QString getDirectory(const QString &type);
 
 signals:
 

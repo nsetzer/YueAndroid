@@ -2,7 +2,7 @@
 #include <QDir>
 #include <QDebug>
 #include "yue/qtcommon/LibraryTreeListModel.hpp"
-
+#include "yue/bell/MediaCtrlBase.h"
 
 namespace yue {
 namespace qtcommon {
@@ -38,9 +38,9 @@ bool LibraryTreeListModel::createPlaylist()
 
     auto lst = yue::bell::Library::shuffle( groups.keys(), groups );
 
-
-    auto pl = yue::bell::PlaylistManager::instance()->openCurrent();
-    pl->set(lst);
+    yue::bell::MediaCtrlBase::instance()->setCurrentPlaylist(lst);
+    //auto pl = yue::bell::PlaylistManager::instance()->openCurrent();
+    //pl->set(lst);
 
     //
     return true;
