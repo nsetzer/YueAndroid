@@ -9,6 +9,7 @@
 #include "yue/qtcommon/DirectoryListModel.hpp"
 #include "yue/qtcommon/PlaylistModel.h"
 #include "yue/qtcommon/SongListModel.h"
+#include "yue/qtcommon/AlbumArtImage.h"
 #include "yue/device.h"
 
 
@@ -24,7 +25,7 @@ YUECOMMON_EXPORT void registerQmlTypes()
     qmlRegisterType<DirectoryListModel>("com.yue.common", 1, 0, "DirectoryListModel");
     qmlRegisterType<PlaylistModel>("com.yue.common", 1, 0, "PlaylistModel");
     qmlRegisterType<SongListModel>("com.yue.common", 1, 0, "SongListModel");
-
+    qmlRegisterType<AlbumArtImage>("com.yue.common", 1, 0, "AlbumArtImage");
     //qmlRegisterType<Device>("com.yue.common", 1, 0, "Device");
 }
 

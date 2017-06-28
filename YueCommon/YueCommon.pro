@@ -46,7 +46,9 @@ SOURCES += \
     yue/bell/MediaPlayerBase.cpp \
     yue/bell/MediaPlayerQt.cpp \
     yue/bell/MediaCtrlBackend.cpp \
-    yue/qtcommon/SongListModel.cpp
+    yue/qtcommon/SongListModel.cpp \
+    yue/core/RandomArtExpressions.cpp \
+    yue/qtcommon/AlbumArtImage.cpp
 
 HEADERS += yue/global.h\
     yue/alien/utf8/utf8.h \
@@ -77,7 +79,9 @@ HEADERS += yue/global.h\
     yue/bell/MediaPlayerBase.h \
     yue/bell/MediaPlayerQt.h \
     yue/bell/MediaCtrlBackend.h \
-    yue/qtcommon/SongListModel.h
+    yue/qtcommon/SongListModel.h \
+    yue/core/RandomArtExpressions.h \
+    yue/qtcommon/AlbumArtImage.h
 
 
 

@@ -53,13 +53,14 @@ int main(int argc, char *argv[])
 #ifdef Q_OS_LINUX
     db->connect("/home/nsetzer/projects/android/YueMusicPlayer/yue.db");
 #else
-    //db->connect("D:/git/YueMusicPlayer/yue.db");
-    db->connect(":memory:");
+    db->connect("D:/git/YueMusicPlayer/yue.db");
+
 #endif
 #endif
 
     qDebug() << "main: create library";
     yue::bell::Library::create();
+    qDebug() << "main: create library complete. number of records:" << yue::bell::Library::instance()->size();
     qDebug() << "main: create playlist manager";
     yue::bell::PlaylistManager::create();
 

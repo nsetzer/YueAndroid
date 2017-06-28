@@ -47,8 +47,16 @@ Item {
         horizontalAlignment: Text.AlignRight
         font.pointSize: gDevice.font.pointSize - 1
     }
-
-    Image {
+    AlbumArtImage {
+        id: delegateIcon
+        height: parent.height - gDevice.textHeight/4
+        width: height
+        seedString: album;
+        anchors.left: txtIndex.right
+        anchors.leftMargin: gDevice.textHeight/4
+        anchors.verticalCenter: parent.verticalCenter
+    }
+    /*Image {
         id: delegateIcon
         height: parent.height
         width: height
@@ -57,7 +65,7 @@ Item {
         // set the maximum height of the laoded image.
         // width will automaticall set to preserve aspect ratio.
         // this saves memory for large images.
-        sourceSize.height: parent.height-4
+        sourceSize.height: parent.height
         anchors.left: txtIndex.right
         anchors.verticalCenter: parent.verticalCenter
 
@@ -70,11 +78,12 @@ Item {
         }
 
     }
-
+    */
     Text {
         id: txtTitle
         anchors.top: parent.top
         anchors.left: delegateIcon.right
+        anchors.leftMargin: gDevice.textHeight/4
         anchors.right: contextMenuIcon.left
         anchors.bottom: parent.verticalCenter
         text: title
@@ -87,6 +96,7 @@ Item {
     Text {
         anchors.bottom: parent.bottom
         anchors.left: delegateIcon.right
+        anchors.leftMargin: gDevice.textHeight/4
         anchors.top: parent.verticalCenter
         id: txtArtist
         text: artist

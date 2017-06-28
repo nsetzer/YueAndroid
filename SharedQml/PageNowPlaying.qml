@@ -3,6 +3,7 @@ import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.3
 
 import "." as SharedQml
+import com.yue.common 1.0
 
 PageBase {
     id: pageSettings
@@ -48,15 +49,29 @@ PageBase {
         text: "album"
     }
 
+    AlbumArtImage {
+        id: albumArt
+        anchors.top: textAlbum.bottom
+        anchors.topMargin: gDevice.textHeight
+        anchors.horizontalCenter: parent.horizontalCenter
+        width: parent.width * .80
+        height: width;
+        MouseArea {
+            anchors.fill: parent;
+            onClicked: albumArt.regenerate();
+        }
+    }
+/*
     Image {
         id: albumArt
         source: "qrc:/shared/images/00_song_art.svg"
         asynchronous: true
         anchors.top: textAlbum.bottom
         anchors.topMargin: gDevice.textHeight
+        anchors.horizontalCenter: parent.horizontalCenter
         width: parent.width * .80
         height: width;
-        anchors.horizontalCenter: parent.horizontalCenter
+
         sourceSize.width: width
 
         MouseArea {
@@ -66,7 +81,7 @@ PageBase {
             }
         }
 
-    }
+    }*/
 
     MediaBarBig {
         id: mediaBar

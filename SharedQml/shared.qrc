@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/shared">
+        <file>images/00_album.svg</file>
         <file>images/00_clear_a.svg</file>
         <file>images/00_file_default.svg</file>
         <file>images/00_file_doc.svg</file>
