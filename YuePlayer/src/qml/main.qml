@@ -248,7 +248,7 @@ ApplicationWindow {
 
     Component.onCompleted: {
 
-        currentPage = "qrc:/shared/PageReorderablePlayList.qml"
+        currentPage = "qrc:/shared/PageNowPlaying.qml"
         mainMenu.currentItem = 1
     }
 }

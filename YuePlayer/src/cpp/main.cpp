@@ -11,6 +11,7 @@
 #include "yue/bell/MediaCtrlLocal.h"
 #include "yue/device.h"
 #include "yue/qtcommon/qtcommon.hpp"
+#include "yue/qtcommon/ResourceCache.h"
 
 #include "MediaCtrlRemoteClient.h"
 #include "MediaCtrlRemoteServer.h"
@@ -25,8 +26,11 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
     QQmlApplicationEngine engine;
 
+    qRegisterMetaType<yue::bell::SongInfo>("SongInfo");
     qRegisterMetaType<yue::bell::MediaPlayerBase::State>("MediaPlayerBase::State");
     qRegisterMetaType<yue::bell::MediaPlayerBase::Status>("MediaPlayerBase::Status");
+    qRegisterMetaType<yue::bell::Database::uid_t>("Database::uid_t");
+    qRegisterMetaType<yue::qtcommon::ResourceCache::rid_t>("ResourceCache::rid_t");
 
     QSharedPointer<QRemoteObjectHost> srcNode;
     QSharedPointer<MediaCtrlRemoteServer> mcsvc;

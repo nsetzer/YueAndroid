@@ -49,18 +49,6 @@ public:
 
 namespace art {
 
-enum class YUECOMMON_EXPORT ExprKind : unsigned char {
-    X=0,
-    Y=1,
-    Average=2,
-    Cos=3,
-    Sin=4,
-    Tanh=5,
-    Inverse=6,
-    Squared=7,
-    Times=8,
-};
-
 class YUECOMMON_EXPORT Expr {
 public:
 
@@ -70,13 +58,9 @@ public:
     virtual float eval(float x, float y) = 0;
     virtual int size(void) = 0;
 
-    virtual std::string serialize();
-
     static Expr* create(Random& rnd);
     static Expr* deserialize(std::string code);
 
-    virtual std::vector<ExprKind> serialize_() = 0;
-    virtual size_t deserialize_(std::vector<ExprKind>, size_t index) = 0;
 };
 
 } // namespace art

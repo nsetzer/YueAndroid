@@ -1,43 +1,55 @@
 #include "yue/qtcommon/AlbumArtImage.h"
 #include "yue/core/RandomArtExpressions.h"
 #include <QSvgRenderer>
+#include <QThreadPool>
+#include <QtConcurrent>
+#include <QDebug>
+
+#include "yue/bell/library.hpp"
 
 namespace yue {
 namespace qtcommon {
 
-
-AlbumArtImage::AlbumArtImage()
-    : QQuickPaintedItem()
+QVariant ImageCacheThread::loadResource(ResourceCache::rid_t rid, QVariant userData)
 {
-    setFillColor(QColor(128,128,0));
 
-    //regenerate();
+    // QString seedString = "none";
+    // seedString.toUtf8().constData()
+    //qDebug() << "loading resource" << rid;
+    yue::bell::Database::uid_t artist;
+    yue::bell::Database::uid_t album;
+    QString path;
 
-    connect(this,&AlbumArtImage::seedStringChanged,
-            this,&AlbumArtImage::regenerate);
+    yue::bell::Library::instance()->getArtInfo(rid,artist,album,path);
 
-}
-
-void AlbumArtImage::paint(QPainter * painter)
-{
-    painter->setRenderHint(QPainter::Antialiasing,true);
-    painter->setRenderHint(QPainter::SmoothPixmapTransform,true);
-    if (!m_img.isNull())
-        painter->drawImage(0,0,m_img.scaledToWidth(width()));
-    //painter->drawImage(0,0,m_icon.scaledToWidth(width()));
-}
-
-void AlbumArtImage::regenerate()
-{
     yue::core::Random rnd;
-    rnd.seed(m_seedString.toUtf8().constData());
+    rnd.seed(album);
     yue::core::art::Expr* expr_r = yue::core::art::Expr::create(rnd);
     yue::core::art::Expr* expr_g = yue::core::art::Expr::create(rnd);
     yue::core::art::Expr* expr_b = yue::core::art::Expr::create(rnd);
 
+    /*
     int size = width()/2;
+    if (size > 256)
+        size = 256;
+    if (size < 8)
+        size = 8;
+    */
+    int size = -1;
+
+    if (userData.isValid()) {
+        size = userData.toSize().width()/4;
+    }
+
+    if (size < 8) {
+        size = 256;
+    }
+
     int width = size*2 + 1;
+
     QImage image(width,width,QImage::Format_ARGB32);
+
+
     for (int px=0; px < width; px++) {
         for (int py=0; py < width; py++) {
             float x = static_cast<float>(px - size) / size;
@@ -55,24 +67,99 @@ void AlbumArtImage::regenerate()
         }
     }
 
-    QSvgRenderer renderer(QString(":/shared/images/00_file_song.svg"));
-    //int size = 128;
-    //int width = size*2 + 1;
-    //QImage image(width, width, QImage::Format_ARGB32);
-    //image.fill(0x00000000);
-    QPainter painter(&image);
-    renderer.render(&painter);
-    //m_icon = image;
-
-    m_img = image;
-
     delete expr_r;
     delete expr_g;
     delete expr_b;
 
-    update();
+    QSvgRenderer renderer(QString(":/shared/images/00_file_song.svg"));
+    QPainter painter(&image);
+    painter.setCompositionMode(QPainter::CompositionMode_Multiply);
+    renderer.render(&painter);
 
+    return image;
 }
+
+ImageCache AlbumArtImage::m_cache(4,100);
+
+AlbumArtImage::AlbumArtImage()
+    : QQuickPaintedItem()
+    , m_seed(0)
+{
+
+    connect(&m_cache,&ResourceCache::notify,
+                this,&AlbumArtImage::onNotify);
+
+    m_img = QImage(128,128,QImage::Format_ARGB32);
+    m_img.fill(QColor(200,0,0));
+
+
+
+    //connect(this,&AlbumArtImage::seedChanged,
+    //        this,&AlbumArtImage::doRegenerate);
+    connect(this,&AlbumArtImage::doUpdate,
+            this,&AlbumArtImage::update);
+}
+
+AlbumArtImage::~AlbumArtImage()
+{
+    m_cache.revoke(m_seed);
+}
+
+void AlbumArtImage::setSeed(int seed) {
+
+    if (m_seed != 0) {
+        m_cache.revoke(m_seed);
+    }
+    m_seed = seed;
+
+    QSize size = QSize(width(),height());
+
+    QVariant data = m_cache.request(m_seed,size);
+
+    if (data.isValid()) {
+        m_img = data.value<QImage>();
+        update();
+    }
+
+    emit seedChanged();
+}
+
+void AlbumArtImage::paint(QPainter * painter)
+{
+    // reload the album art at the new size
+    // QQuickPaintedItem does not seem to have any resize signals
+    if (width() != m_previousWidth) {
+        m_previousWidth = width();
+        m_future = QtConcurrent::run(this,&AlbumArtImage::regenerate,true);
+    }
+
+    painter->setRenderHint(QPainter::Antialiasing,true);
+    painter->setRenderHint(QPainter::SmoothPixmapTransform,true);
+
+    painter->drawImage(0,0,m_img.scaledToWidth(width()));
+}
+
+void AlbumArtImage::doRegenerate()
+{
+    m_future = QtConcurrent::run(this,&AlbumArtImage::regenerate,true);
+}
+
+void AlbumArtImage::regenerate(bool bUpdate)
+{
+
+    //if (bUpdate)
+    emit doUpdate(QRect());
+}
+
+void AlbumArtImage::onNotify(ResourceCache::rid_t id, QVariant data)
+{
+    if (id == m_seed){
+        m_img = data.value<QImage>().copy();
+        //if (bUpdate)
+        emit doUpdate(QRect());
+    }
+}
+
 
 } // namespace qtcommon
 } // namespace yue

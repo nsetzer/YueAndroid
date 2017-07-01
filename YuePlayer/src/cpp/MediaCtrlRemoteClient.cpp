@@ -20,6 +20,8 @@ MediaCtrlRemoteClient::MediaCtrlRemoteClient()
         qCritical() << "failed to create RPC source";
         //m_rep.clear();
     }
+
+    loadCurrentSongInfo();
 }
 
 void MediaCtrlRemoteClient::load()
@@ -78,6 +80,7 @@ void MediaCtrlRemoteClient::onServiceProgressChanged(float progress)
 
 void MediaCtrlRemoteClient::onServiceCurrentIndexChanged(int index)
 {
+    loadCurrentSongInfo();
     emit currentIndexChanged(index);
 }
 

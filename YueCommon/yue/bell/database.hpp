@@ -67,4 +67,6 @@ QVariant toQVariant(size_t value);
 } // namespace bell
 } // namespace yue
 
+
+Q_DECLARE_METATYPE(yue::bell::Database::uid_t);
 #endif

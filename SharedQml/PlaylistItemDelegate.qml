@@ -51,7 +51,7 @@ Item {
         id: delegateIcon
         height: parent.height - gDevice.textHeight/4
         width: height
-        seedString: album;
+        seed: songid;
         anchors.left: txtIndex.right
         anchors.leftMargin: gDevice.textHeight/4
         anchors.verticalCenter: parent.verticalCenter

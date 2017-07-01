@@ -5,39 +5,66 @@
 #include <QPainter>
 #include <QImage>
 #include "yue/global.h"
+#include <QFuture>
+#include "yue/qtcommon/ResourceCache.h"
 
 namespace yue {
 namespace qtcommon {
 
+class ImageCacheThread : public ResourceCacheThread
+{
+public:
+    ImageCacheThread(ResourceCache* parent)
+        : ResourceCacheThread(parent)
+    {}
+    ~ImageCacheThread() = default;
+    virtual QVariant loadResource(ResourceCache::rid_t rid, QVariant userData) override;
+};
+
+class ImageCache : public ResourceCache
+{
+public:
+    ImageCache(int numThreads, size_t cacheSize, QObject* parent = nullptr)
+        : ResourceCache(numThreads, cacheSize, parent)
+    {};
+    ~ImageCache() = default;
+protected:
+    virtual ResourceCacheThread* newWorkerThread() override {
+        return new ImageCacheThread(this);
+    }
+};
 
 //http://doc.qt.io/qt-5/qquickpainteditem.html
 class YUECOMMON_EXPORT AlbumArtImage : public QQuickPaintedItem
 {
     Q_OBJECT
-    Q_PROPERTY(QString seedString READ seedString WRITE setSeedString NOTIFY seedStringChanged)
+    Q_PROPERTY(int seed READ seed WRITE setSeed NOTIFY seedChanged)
     QImage m_img;
-    QImage m_icon;
+
+    static ImageCache m_cache;
 public:
     AlbumArtImage();
-    virtual ~AlbumArtImage() = default;
+    virtual ~AlbumArtImage();
 
     void paint(QPainter *);
     
-    QString seedString() { return m_seedString; }
+    int seed() { return m_seed; }
 
-    void setSeedString(QString seedString) {
-        m_seedString = seedString;
-        emit seedStringChanged();
-    }
+    void setSeed(int seedString);
 
 signals:
-    void seedStringChanged();
+    void seedChanged();
+    void doUpdate(const QRect &rect);
 
 public slots:
-    Q_INVOKABLE void regenerate();
-
+    Q_INVOKABLE void regenerate(bool bUpdate=true);
+    void doRegenerate();
+    void onNotify(ResourceCache::rid_t id, QVariant data);
 private:
-    QString m_seedString;
+
+    int m_seed;
+    qreal m_previousWidth=-1;
+    QFuture<void> m_future;
 };
 
 } // namespace qtcommon

@@ -36,13 +36,28 @@ void MediaCtrlBase::playNext(int uid)
 {
     auto pl = PlaylistManager::instance()->openCurrent();
     auto pair = pl->current();
-    pl->insert(pair.second+1,static_cast<Database::uid_t>(uid));
+    pl->insert(static_cast<int>(pair.second)+1,static_cast<Database::uid_t>(uid));
 }
 
 void MediaCtrlBase::playSong(int uid)
 {
     playNext(uid);
     next();
+}
+
+void MediaCtrlBase::loadCurrentSongInfo()
+{
+    try {
+        Database::uid_t uid = PlaylistManager::instance()->openCurrent()->current().first;
+        Library::instance()->getDisplayInfo(uid,m_currentSong.m_artist,m_currentSong.m_album,m_currentSong.m_title);
+        m_currentSong.m_songid=uid;
+    } catch (std::runtime_error& e) {
+        qWarning() << "Error Loading Song: " << e.what();
+        m_currentSong.m_artist="error";
+        m_currentSong.m_album="error";
+        m_currentSong.m_title="error";
+        m_currentSong.m_songid=0;
+    }
 }
 
 } // bell

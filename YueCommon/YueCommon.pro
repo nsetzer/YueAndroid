@@ -5,7 +5,7 @@
 #-------------------------------------------------
 
 
-QT += core qml quick webview multimedia svg sql
+QT += core qml quick webview multimedia svg sql concurrent
 android {
     QT += androidextras
 }
@@ -48,7 +48,8 @@ SOURCES += \
     yue/bell/MediaCtrlBackend.cpp \
     yue/qtcommon/SongListModel.cpp \
     yue/core/RandomArtExpressions.cpp \
-    yue/qtcommon/AlbumArtImage.cpp
+    yue/qtcommon/AlbumArtImage.cpp \
+    yue/qtcommon/ResourceCache.cpp
 
 HEADERS += yue/global.h\
     yue/alien/utf8/utf8.h \
@@ -81,7 +82,9 @@ HEADERS += yue/global.h\
     yue/bell/MediaCtrlBackend.h \
     yue/qtcommon/SongListModel.h \
     yue/core/RandomArtExpressions.h \
-    yue/qtcommon/AlbumArtImage.h
+    yue/qtcommon/AlbumArtImage.h \
+    yue/qtcommon/ResourceCache.h \
+    yue/core/lrucache.h
 
 
 

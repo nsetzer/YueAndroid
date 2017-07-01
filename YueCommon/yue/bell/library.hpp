@@ -64,6 +64,8 @@ public:
     }
 
     QString getPath(Database::uid_t uid);
+    void getDisplayInfo(Database::uid_t uid,QString& artist, QString& album, QString& title);
+    void getArtInfo(Database::uid_t uid, Database::uid_t& artist_id, Database::uid_t& album_id, QString& path);
 
 private:
     bool _insert(QMap<QString,QVariant> data, Database::uid_t& uid);

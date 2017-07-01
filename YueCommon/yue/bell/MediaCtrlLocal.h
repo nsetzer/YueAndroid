@@ -13,6 +13,7 @@ namespace yue {
 namespace bell {
 
 
+
 class YUECOMMON_EXPORT MediaCtrlLocal : public MediaCtrlBase
 {
 
@@ -43,6 +44,7 @@ private slots:
         emit progressChanged(progress);
     }
     void onCurrentIndexChanged(int index) {
+        loadCurrentSongInfo();
         emit currentIndexChanged(index);
     }
     void onStatusChanged(MediaPlayerBase::Status status) {

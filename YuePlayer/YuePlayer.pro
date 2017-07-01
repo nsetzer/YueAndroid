@@ -1,5 +1,5 @@
 TEMPLATE = app
-QT += core qml quick webview multimedia remoteobjects svg sql
+QT += core qml quick webview multimedia remoteobjects svg sql concurrent
 android{
     QT += androidextras
 }

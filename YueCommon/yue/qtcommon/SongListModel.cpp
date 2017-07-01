@@ -154,7 +154,7 @@ QHash<int, QByteArray> SongListModel::roleNames() const
 
     QHash<int, QByteArray> roles(QAbstractItemModel::roleNames());
 
-    roles[SongListModel::SongIdRole] = "uid";
+    roles[SongListModel::SongIdRole] = "songid";
     roles[SongListModel::ArtistRole] = "artist";
     roles[SongListModel::AlbumRole] = "album";
     roles[SongListModel::TitleRole] = "title";

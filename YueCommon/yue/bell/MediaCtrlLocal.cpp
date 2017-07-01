@@ -26,6 +26,8 @@ MediaCtrlLocal::MediaCtrlLocal(QObject *parent/* = nullptr*/)
     } catch (std::runtime_error& e) {
         qWarning() << "Error Loading Song: " << e.what();
     }
+
+    loadCurrentSongInfo();
 }
 
 } // bell

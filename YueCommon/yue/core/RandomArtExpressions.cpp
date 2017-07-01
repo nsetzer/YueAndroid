@@ -17,7 +17,6 @@ namespace {
 using namespace art;
 
 Expr* newExpression(Random& rnd, int depth, float probability, float decay);
-Expr* constructExpression(ExprKind kind);
 
 class TerminalX : public Expr {
 
@@ -31,13 +30,6 @@ public:
     virtual int size(void) {
         return 1;
     }
-    virtual std::vector<ExprKind> serialize_() {
-        return {ExprKind::X,};
-    }
-    virtual size_t deserialize_(std::vector<ExprKind>, size_t index) {
-        return 0;
-    }
-
 };
 
 class TerminalY : public Expr {
@@ -52,14 +44,9 @@ public:
     virtual int size(void) {
         return 1;
     }
-    virtual std::vector<ExprKind> serialize_() {
-        return {ExprKind::Y,};
-    }
-    virtual size_t deserialize_(std::vector<ExprKind>, size_t index) {
-        return 0;
-    }
 };
 
+// this introduces a slant from bottom left to top right
 class TerminalAverage : public Expr {
 
 public:
@@ -72,192 +59,20 @@ public:
     virtual int size(void) {
         return 1;
     }
-    virtual std::vector<ExprKind> serialize_() {
-        return {ExprKind::Average,};
-    }
-    virtual size_t deserialize_(std::vector<ExprKind>, size_t index) {
-        return 0;
-    }
 };
 
-class ExprCos : public Expr {
+// this introduces a slant from top left to bottom right
+class TerminalAverage2 : public Expr {
 
-    Expr* arg;
 public:
-    ExprCos() : Expr() {}
-    ExprCos(Random& rnd, int depth, float probability, float decay)
+    TerminalAverage2()
         : Expr()
-    {
-        arg = newExpression(rnd, depth, probability, decay);
-    }
-
-    virtual ~ExprCos() {
-        delete arg;
-    }
-
+    {}
     virtual float eval(float x, float y) {
-        return cos(PI * arg->eval(x,y));
+        return (x-y)/2;
     }
-
     virtual int size(void) {
-        return arg->size() + 1;
-    }
-    virtual std::vector<ExprKind> serialize_() {
-        std::vector<ExprKind> v = {ExprKind::Cos,};
-        std::vector<ExprKind> v2 = arg->serialize_();
-        v.insert(v.end(),v2.begin(),v2.end());
-        return v;
-    }
-    virtual size_t deserialize_(std::vector<ExprKind> repr, size_t index) {
-        if (index >= repr.size())
-            throw std::runtime_error("deserialization error");
-        arg = constructExpression(repr[index]);
-        return arg->deserialize_(repr,index+1) + 1;
-    }
-};
-
-class ExprSin : public Expr {
-
-    Expr* arg;
-public:
-    ExprSin() : Expr() {}
-    ExprSin(Random& rnd, int depth, float probability, float decay)
-        : Expr()
-    {
-        arg = newExpression(rnd, depth, probability, decay);
-    }
-
-    virtual ~ExprSin() {
-        delete arg;
-    }
-
-    virtual float eval(float x, float y) {
-        return sin(PI * arg->eval(x,y));
-    }
-
-    virtual int size(void) {
-        return arg->size() + 1;
-    }
-    virtual std::vector<ExprKind> serialize_() {
-        std::vector<ExprKind> v = {ExprKind::Sin,};
-        std::vector<ExprKind> v2 = arg->serialize_();
-        v.insert(v.end(),v2.begin(),v2.end());
-        return v;
-    }
-    virtual size_t deserialize_(std::vector<ExprKind> repr, size_t index) {
-        if (index >= repr.size())
-            throw std::runtime_error("deserialization error");
-        arg = constructExpression(repr[index]);
-        return arg->deserialize_(repr,index+1) + 1;
-    }
-};
-
-class ExprTanh : public Expr {
-
-    Expr* arg;
-public:
-    ExprTanh() : Expr() {}
-    ExprTanh(Random& rnd, int depth, float probability, float decay)
-        : Expr()
-    {
-        arg = newExpression(rnd, depth, probability, decay);
-    }
-
-    virtual ~ExprTanh() {
-        delete arg;
-    }
-
-    virtual float eval(float x, float y) {
-        return tanh(PI * arg->eval(x,y));
-    }
-
-    virtual int size(void) {
-        return arg->size() + 1;
-    }
-    virtual std::vector<ExprKind> serialize_() {
-        std::vector<ExprKind> v = {ExprKind::Tanh,};
-        std::vector<ExprKind> v2 = arg->serialize_();
-        v.insert(v.end(),v2.begin(),v2.end());
-        return v;
-    }
-    virtual size_t deserialize_(std::vector<ExprKind> repr, size_t index) {
-        if (index >= repr.size())
-            throw std::runtime_error("deserialization error");
-        arg = constructExpression(repr[index]);
-        return arg->deserialize_(repr,index+1) + 1;
-    }
-};
-
-class ExprInverse : public Expr {
-
-    Expr* arg;
-public:
-    ExprInverse() : Expr() {}
-    ExprInverse(Random& rnd, int depth, float probability, float decay)
-        : Expr()
-    {
-        arg = newExpression(rnd, depth, probability, decay);
-    }
-
-    virtual ~ExprInverse() {
-        delete arg;
-    }
-
-    virtual float eval(float x, float y) {
-        return 1.0 - arg->eval(x,y);
-    }
-
-    virtual int size(void) {
-        return arg->size() + 1;
-    }
-    virtual std::vector<ExprKind> serialize_() {
-        std::vector<ExprKind> v = {ExprKind::Inverse,};
-        std::vector<ExprKind> v2 = arg->serialize_();
-        v.insert(v.end(),v2.begin(),v2.end());
-        return v;
-    }
-    virtual size_t deserialize_(std::vector<ExprKind> repr, size_t index) {
-        if (index >= repr.size())
-            throw std::runtime_error("deserialization error");
-        arg = constructExpression(repr[index]);
-        return arg->deserialize_(repr,index+1) + 1;
-    }
-};
-
-class ExprSquared : public Expr {
-
-    Expr* arg;
-public:
-    ExprSquared() : Expr() {}
-    ExprSquared(Random& rnd, int depth, float probability, float decay)
-        : Expr()
-    {
-        arg = newExpression(rnd, depth, probability, decay);
-    }
-
-    virtual ~ExprSquared() {
-        delete arg;
-    }
-
-    virtual float eval(float x, float y) {
-        float v = arg->eval(x,y);
-        return v*v;
-    }
-
-    virtual int size(void) {
-        return arg->size() + 1;
-    }
-    virtual std::vector<ExprKind> serialize_() {
-        std::vector<ExprKind> v = {ExprKind::Squared,};
-        std::vector<ExprKind> v2 = arg->serialize_();
-        v.insert(v.end(),v2.begin(),v2.end());
-        return v;
-    }
-    virtual size_t deserialize_(std::vector<ExprKind> repr, size_t index) {
-        if (index >= repr.size())
-            throw std::runtime_error("deserialization error");
-        arg = constructExpression(repr[index]);
-        return arg->deserialize_(repr,index+1) + 1;
+        return 1;
     }
 };
 
@@ -286,26 +101,126 @@ public:
     virtual int size(void) {
         return arg1->size() + arg2->size() + 1;
     }
-    virtual std::vector<ExprKind> serialize_() {
-        std::vector<ExprKind> v = {ExprKind::Times,};
-        std::vector<ExprKind> v2 = arg1->serialize_();
-        std::vector<ExprKind> v3 = arg2->serialize_();
-        v.insert(v.end(),v2.begin(),v2.end());
-        v.insert(v.end(),v3.begin(),v3.end());
-        return v;
+};
+
+class ExprCos : public Expr {
+
+    Expr* arg;
+public:
+    ExprCos() : Expr() {}
+    ExprCos(Random& rnd, int depth, float probability, float decay)
+        : Expr()
+    {
+        arg = newExpression(rnd, depth, probability, decay);
     }
-    virtual size_t deserialize_(std::vector<ExprKind> repr, size_t index) {
 
-        if (index >= repr.size())
-            throw std::runtime_error("deserialization error1");
-        arg1 = constructExpression(repr[index]);
-        size_t consumed1 = arg1->deserialize_(repr,index+1);
+    virtual ~ExprCos() {
+        delete arg;
+    }
 
-        if ( (index+1+consumed1) >= repr.size())
-            throw std::runtime_error("deserialization error2");
-        arg2 = constructExpression(repr[index+1+consumed1]);
-        size_t consumed2 = arg2->deserialize_(repr,index+2+consumed1);
-        return 2 + consumed1 + consumed2;
+    virtual float eval(float x, float y) {
+        return cos(PI * arg->eval(x,y));
+    }
+
+    virtual int size(void) {
+        return arg->size() + 1;
+    }
+};
+
+class ExprSin : public Expr {
+
+    Expr* arg;
+public:
+    ExprSin() : Expr() {}
+    ExprSin(Random& rnd, int depth, float probability, float decay)
+        : Expr()
+    {
+        arg = newExpression(rnd, depth, probability, decay);
+    }
+
+    virtual ~ExprSin() {
+        delete arg;
+    }
+
+    virtual float eval(float x, float y) {
+        return sin(PI * arg->eval(x,y));
+    }
+
+    virtual int size(void) {
+        return arg->size() + 1;
+    }
+};
+
+class ExprTanh : public Expr {
+
+    Expr* arg;
+public:
+    ExprTanh() : Expr() {}
+    ExprTanh(Random& rnd, int depth, float probability, float decay)
+        : Expr()
+    {
+        arg = newExpression(rnd, depth, probability, decay);
+    }
+
+    virtual ~ExprTanh() {
+        delete arg;
+    }
+
+    virtual float eval(float x, float y) {
+        return tanh(PI * arg->eval(x,y));
+    }
+
+    virtual int size(void) {
+        return arg->size() + 1;
+    }
+};
+
+class ExprInverse : public Expr {
+
+    Expr* arg;
+public:
+    ExprInverse() : Expr() {}
+    ExprInverse(Random& rnd, int depth, float probability, float decay)
+        : Expr()
+    {
+        arg = newExpression(rnd, depth, probability, decay);
+    }
+
+    virtual ~ExprInverse() {
+        delete arg;
+    }
+
+    virtual float eval(float x, float y) {
+        return 1.0 - arg->eval(x,y);
+    }
+
+    virtual int size(void) {
+        return arg->size() + 1;
+    }
+};
+
+class ExprSquared : public Expr {
+
+    Expr* arg;
+public:
+    ExprSquared() : Expr() {}
+    ExprSquared(Random& rnd, int depth, float probability, float decay)
+        : Expr()
+    {
+        arg = newExpression(rnd, depth, probability, decay);
+    }
+
+    virtual ~ExprSquared() {
+        delete arg;
+    }
+
+    virtual float eval(float x, float y) {
+        float v = arg->eval(x,y);
+        return v*v;
+    }
+
+    virtual int size(void) {
+        return arg->size() + 1;
     }
 };
 
@@ -327,103 +242,39 @@ Expr* newExpression(Random& rnd, int depth, float probability, float decay)
 
 
     if (rnd.rand() >= p) {
-        switch(rnd.randInt(0,2)) {
+        switch(rnd.randInt(0,3)) {
             case 0: return new TerminalX();
             case 1: return new TerminalY();
             case 2: return new TerminalAverage();
+            case 3: return new TerminalAverage2();
+
             default:
                 throw std::runtime_error("illegal i value");
         }
     } else {
-        p = probability*decay;
-        int max = 3;
-        //if (depth < 3)
-        //    max--;
-        switch(rnd.randInt(0,max)) {
-            case 0: return new ExprCos(rnd, depth+1, probability, decay);
-            case 1: return new ExprSin(rnd, depth+1, probability, decay);
-            case 2: return new ExprTanh(rnd, depth+1, probability, decay);
-            case 3: return new ExprTimes(rnd, depth+1, probability, decay);
-            case 4: return new ExprInverse(rnd, depth+1, probability, decay);
-            case 5: return new ExprSquared(rnd, depth+1, probability, decay);
+        switch(rnd.randInt(0,3)) {
+
+            case 0: return new ExprTimes(rnd, depth+1, probability, decay);
+            case 1: return new ExprCos(rnd, depth+1, probability, decay);
+            case 2: return new ExprSin(rnd, depth+1, probability, decay);
+            case 3: return new ExprTanh(rnd, depth+1, probability, decay);
+            // these actually reduce complexity in the image.
+            //case 4: return new ExprSquared(rnd, depth+1, probability, decay);
+            //case 5: return new ExprInverse(rnd, depth+1, probability, decay);
+
             default:
                 throw std::runtime_error("illegal i value");
         }
     }
 
-}
-
-Expr* constructExpression(ExprKind kind)
-{
-    switch (kind) {
-        case ExprKind::X:
-            return new TerminalX();
-        case ExprKind::Y:
-            return new TerminalY();
-        case ExprKind::Average:
-            return new TerminalAverage();
-        case ExprKind::Cos:
-            return new ExprCos();
-        case ExprKind::Sin:
-            return new ExprSin();
-        case ExprKind::Tanh:
-            return new ExprTanh();
-        case ExprKind::Inverse:
-            return new ExprInverse();
-        case ExprKind::Squared:
-            return new ExprSquared();
-        case ExprKind::Times:
-            return new ExprTimes();
-        default:
-        {
-            std::cout << "kind:" << static_cast<int>(kind) << std::endl;
-            throw std::runtime_error("illegal kind value");
-        }
-    }
 }
 
 } // anonymous
 
 namespace art {
 
-
-std::string Expr::serialize() {
-    std::vector<ExprKind> v = serialize_();
-    std::string s;
-    s.resize(v.size());
-    size_t i=0;
-    for (ExprKind kind : v) {
-        char c = static_cast<char>(kind);
-        // convert to hex
-        if (c<10) {
-            c += '0';
-        } else {
-            c += 'A' - 10;
-        }
-        s[i++]=c;
-    }
-    return s;
-}
-
 Expr* Expr::create(Random& rnd) {
     return newExpression(rnd,0,0.99F,1.0F/20.0F);
-}
-
-Expr* Expr::deserialize(std::string code) {
-    // translate back to a vector of kinds
-    std::vector<ExprKind> v;
-    for (char c : code) {
-        // convert to hex
-        if (c<'A') {
-            c -= '0';
-        } else {
-            c -= 'A' - 10; // TODO I THINK THERE IS A BUG HERE
-        }
-        v.push_back(static_cast<ExprKind>(c));
-    }
-    Expr* expr = constructExpression(v[0]);
-    expr->deserialize_(v,1);
-    return expr;
 }
 
 /*

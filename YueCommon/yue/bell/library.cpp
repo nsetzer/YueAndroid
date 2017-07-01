@@ -445,6 +445,40 @@ QString Library::getPath(Database::uid_t uid)
     throw std::runtime_error("failed to find uid");
 }
 
+void Library::getDisplayInfo(Database::uid_t uid,QString& artist, QString& album, QString& title)
+{
+    QSqlQuery q(m_db->db());
+    q.prepare("SELECT artist, album, title FROM library WHERE uid=?");
+    q.addBindValue( toQVariant(uid) );
+    bool result = q.exec();
+    if (q.lastError().isValid())
+        qWarning() << q.lastError();
+    if (result && q.first()) {
+        artist = q.value(0).toString();
+        album = q.value(1).toString();
+        title = q.value(2).toString();
+        return;
+    }
+    throw std::runtime_error("failed to find uid");
+}
+
+void Library::getArtInfo(Database::uid_t uid, Database::uid_t& artist_id, Database::uid_t& album_id, QString& path)
+{
+    QSqlQuery q(m_db->db());
+    q.prepare("SELECT artist, album, path FROM songs WHERE uid=?");
+    q.addBindValue( toQVariant(uid) );
+    bool result = q.exec();
+    if (q.lastError().isValid())
+        qWarning() << q.lastError();
+    if (result && q.first()) {
+        artist_id = q.value(0).toULongLong();
+        album_id = q.value(1).toULongLong();
+        path = q.value(2).toString();
+        return;
+    }
+    throw std::runtime_error("failed to find uid");
+}
+
 
 Database::uid_t Library::_get_or_create_artist_id(QString name, QString sortkey)
 {

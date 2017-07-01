@@ -12,10 +12,32 @@
 namespace yue {
 namespace bell {
 
+class YUECOMMON_EXPORT SongInfo
+{
+    Q_GADGET
+    Q_PROPERTY(QString artist READ artist)
+    Q_PROPERTY(QString album READ album)
+    Q_PROPERTY(QString title READ title)
+    Q_PROPERTY(Database::uid_t songid READ songid)
+public:
+
+    QString artist() { return m_artist; }
+    QString album() { return m_album; }
+    QString title() { return m_title; }
+    Database::uid_t songid() { return m_songid; }
+
+    QString m_artist;
+    QString m_title;
+    QString m_album;
+    Database::uid_t m_songid;
+};
+
+
 class YUECOMMON_EXPORT MediaCtrlBase : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(int currentIndex READ currentIndex  NOTIFY currentIndexChanged)
+    Q_PROPERTY(SongInfo currentSong READ currentSong NOTIFY currentIndexChanged)
 
     static QSharedPointer<yue::bell::MediaCtrlBase> m_instance;
 public:
@@ -30,9 +52,10 @@ public:
     }
 
     int currentIndex();
+    SongInfo currentSong() { return m_currentSong; }
+
     Q_INVOKABLE void playNext(int uid);
     Q_INVOKABLE void playSong(int uid);
-
 
     Q_INVOKABLE MediaPlayerBase::Status getStatus() { return m_status; }
     Q_INVOKABLE MediaPlayerBase::State getState() { return m_state; }
@@ -65,15 +88,21 @@ public slots:
 private slots:
 
 protected:
+    void loadCurrentSongInfo();
+    SongInfo m_currentSong;
     float m_progress=0;
     MediaPlayerBase::Status m_status = MediaPlayerBase::Status::Unknown;
     MediaPlayerBase::State m_state = MediaPlayerBase::State::Unknown;
+
+
 
     //virtual void load(Database::uid_t uid)=0;
 };
 
 } // bell
 } // yue
+
+Q_DECLARE_METATYPE(yue::bell::SongInfo)
 
 
 #endif // MEDIACTRLBASE_H
