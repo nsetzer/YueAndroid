@@ -9,7 +9,12 @@
 namespace yue {
 namespace core {
 
-
+/**
+ * TODO: in testing this occasionally returns corrupt data
+ * as a result of update() but sometimes even when update is not called.
+ * This was intended for integer and pointer types only
+ * Usually a QQueue and removeOne/enqueue is good enough for a lru cache.
+ */
 template<typename T>
 class lrucache
 {
@@ -22,7 +27,7 @@ public:
     {};
     ~lrucache()=default;
 
-    size_t size() {
+    size_t size() const {
         return m_lst.size();
     }
     void insert(T& item) {
@@ -44,6 +49,12 @@ public:
         m_map.erase(item);
         return item;
     }
+    void remove(const T& item) {
+        size_t index = m_map[item];
+        m_map.erase(item);
+        m_lst.erase(m_lst.begin()+index);
+    }
+
 
 private:
     // maintain a list of elements.

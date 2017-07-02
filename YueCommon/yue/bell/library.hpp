@@ -63,6 +63,8 @@ public:
 
     }
 
+    void sort(QList<Database::uid_t>& songs);
+
     QString getPath(Database::uid_t uid);
     void getDisplayInfo(Database::uid_t uid,QString& artist, QString& album, QString& title);
     void getArtInfo(Database::uid_t uid, Database::uid_t& artist_id, Database::uid_t& album_id, QString& path);

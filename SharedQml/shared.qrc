@@ -11,6 +11,8 @@
         <file>images/00_info.svg</file>
         <file>images/00_menu_a.svg</file>
         <file>images/00_menu_b.svg</file>
+        <file>images/00_playlist_ordered_a.png</file>
+        <file>images/00_playlist_shuffle_a.png</file>
         <file>images/00_search_a.svg</file>
         <file>images/00_search_b.svg</file>
         <file>images/00_song_art.svg</file>
@@ -61,5 +63,6 @@
         <file>SimpleListDemo.qml</file>
         <file>SwipeListDelegate.qml</file>
         <file>SwipeListDemo.qml</file>
+        <file>IconButton.qml</file>
     </qresource>
 </RCC>

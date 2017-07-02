@@ -10,6 +10,19 @@
 namespace yue {
 namespace qtcommon {
 
+namespace {
+int getSize(int width) {
+
+    int size = width/2;;
+
+    if (size < 8 || size > 128) {
+        size = 128;
+    }
+
+    return size;
+}
+} // anonymous
+
 QVariant ImageCacheThread::loadResource(ResourceCache::rid_t rid, QVariant userData)
 {
 
@@ -21,6 +34,20 @@ QVariant ImageCacheThread::loadResource(ResourceCache::rid_t rid, QVariant userD
     QString path;
 
     yue::bell::Library::instance()->getArtInfo(rid,artist,album,path);
+
+    QFileInfo fi(path);
+    QDir directory = fi.dir();
+    QString imagePath = directory.filePath(fi.completeBaseName() + ".jpg");
+
+    int size = getSize(userData.isValid() ? userData.toSize().width() : 0);
+    int width = size*2 + 1;
+
+    QFileInfo fi_img(imagePath);
+    if (fi_img.exists()) {
+        QImage image = QImage(imagePath);
+        if (!image.isNull())
+            return image.scaled(width, width, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    }
 
     yue::core::Random rnd;
     rnd.seed(album);
@@ -35,17 +62,7 @@ QVariant ImageCacheThread::loadResource(ResourceCache::rid_t rid, QVariant userD
     if (size < 8)
         size = 8;
     */
-    int size = -1;
 
-    if (userData.isValid()) {
-        size = userData.toSize().width()/4;
-    }
-
-    if (size < 8) {
-        size = 256;
-    }
-
-    int width = size*2 + 1;
 
     QImage image(width,width,QImage::Format_ARGB32);
 
@@ -77,6 +94,24 @@ QVariant ImageCacheThread::loadResource(ResourceCache::rid_t rid, QVariant userD
     renderer.render(&painter);
 
     return image;
+}
+
+/**
+ * @brief validate that the given resource was constructed using the given rid and userData.
+ * @param rid
+ * @param data
+ * @param resource
+ * @return false to request loading the resource again. or true if the resource
+ *         is acceptable.
+ */
+bool ImageCache::valid(ResourceCache::rid_t rid, QVariant userData, QVariant resource)
+{
+    Q_UNUSED(rid);
+
+    int size = getSize(userData.isValid() ? userData.toSize().width() : 0);
+    int width = size*2 + 1;
+    QImage img = resource.value<QImage>();
+    return img.width() == width;
 }
 
 ImageCache AlbumArtImage::m_cache(4,100);
@@ -146,7 +181,7 @@ void AlbumArtImage::doRegenerate()
 
 void AlbumArtImage::regenerate(bool bUpdate)
 {
-
+    Q_UNUSED(bUpdate);
     //if (bUpdate)
     emit doUpdate(QRect());
 }

@@ -83,7 +83,7 @@ void ResourceCacheThread::run()
         if (success) {
             res->setState(ResourceRequestItem::State::Complete);
             //qDebug() << "updating lrucache";
-            m_pCache->m_cache.insert(res);
+            m_pCache->m_lruqueue.enqueue(res->m_rid);
         } else if (res != nullptr) {
             delete res;
         }
@@ -164,6 +164,7 @@ QVariant ResourceCache::request(ResourceCache::rid_t rid, QVariant data/*=QVaria
 {
     ResourceRequestItem* res;
     QMutexLocker lk(&m_mutex);
+    QVariant variant;
 
     init(); // on first call, init the cache threads
 
@@ -175,28 +176,39 @@ QVariant ResourceCache::request(ResourceCache::rid_t rid, QVariant data/*=QVaria
         // idea of the number of subscribers
         res->increment();
 
-        // if the request is compelete, return the result
+        // if the request is compelete, return the resource
         if (res->getState() == ResourceRequestItem::State::Complete) {
-            //qDebug() << "updating priority";
-            //m_cache.update(res);
-            return res->m_resource;
+
+            if (valid(rid,data,res->m_resource)) {
+                // update the lru and return the current item
+                //m_cache.update(res);
+                m_lruqueue.removeOne(res->m_rid);
+                m_lruqueue.enqueue(res->m_rid);
+                variant = res->m_resource;
+            } else {
+                // tODO remove lru
+                //m_lrucache.remove(res);
+                m_lruqueue.removeOne(res->m_rid);
+                m_mapResource.erase(m_mapResource.find(res->m_rid));
+                createRequest(rid, data);
+            }
+        } else /*Queued*/ {
+            // update the request.
+            res->m_userData = data;
         }
     } else {
-
-        // create a new resource request
-        res = new ResourceRequestItem(rid,data);
-        m_mapResource.insert(rid, res);
-        m_requests.insert(res);
-        m_cond.wakeOne();
-
-        while (m_cache.size() > m_cacheSize) {
-            ResourceRequestItem* tmp = m_cache.pop();
-            m_mapResource.erase(m_mapResource.find(tmp->m_rid));
-            delete tmp;
-        }
+        createRequest(rid, data);
     }
 
-    return QVariant();
+    while (m_lruqueue.size() > m_cacheSize) {
+        ResourceCache::rid_t tmp = m_lruqueue.dequeue();
+        auto it = m_mapResource.find(tmp);
+        ResourceRequestItem* res_tmp = *it;
+        m_mapResource.erase(it);
+        delete res_tmp;
+    }
+
+    return variant;
 }
 
 void ResourceCache::revoke(ResourceCache::rid_t rid)
@@ -218,7 +230,20 @@ void ResourceCache::revoke(ResourceCache::rid_t rid)
         }
     }
 
-    m_cond.wakeAll();
+    //m_cond.wakeOne();
+}
+
+void ResourceCache::createRequest(ResourceCache::rid_t rid, QVariant data)
+{
+    ResourceRequestItem* res;
+
+    // create a new resource request
+    res = new ResourceRequestItem(rid,data);
+    m_mapResource.insert(rid, res);
+    m_requests.insert(res);
+    m_cond.wakeOne();
+
+
 }
 
 // TODO: I havent figured out how to use this to invalidate the cache.

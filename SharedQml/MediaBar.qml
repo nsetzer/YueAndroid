@@ -17,6 +17,7 @@ Rectangle {
 
     property int margin: 2
     property real fprogress: 0
+    property real resolution: 256
 
     property int playerState: 0
     property int playerStatus: 0

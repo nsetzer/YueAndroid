@@ -28,6 +28,8 @@ public:
         : ResourceCache(numThreads, cacheSize, parent)
     {};
     ~ImageCache() = default;
+
+    bool valid(ResourceCache::rid_t rid, QVariant userData, QVariant resource);
 protected:
     virtual ResourceCacheThread* newWorkerThread() override {
         return new ImageCacheThread(this);

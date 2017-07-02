@@ -22,7 +22,7 @@ LibraryTreeListModel::LibraryTreeListModel(QObject *parent)
  * @brief LibraryTreeListModel::createPlaylist
  * @return true when a playlist is created
  */
-bool LibraryTreeListModel::createPlaylist()
+bool LibraryTreeListModel::createPlaylist(bool shuffle/* = true*/)
 {
     LOG_FUNCTION_TIME();
 
@@ -36,8 +36,13 @@ bool LibraryTreeListModel::createPlaylist()
         return false;
     }
 
-    auto lst = yue::bell::Library::shuffle( groups.keys(), groups );
-
+    QList<yue::bell::Database::uid_t> lst;
+    if (shuffle) {
+        lst = yue::bell::Library::shuffle( groups.keys(), groups );
+    } else {
+        lst = groups.keys();
+        yue::bell::Library::instance()->sort( lst );
+    }
     yue::bell::MediaCtrlBase::instance()->setCurrentPlaylist(lst);
     //auto pl = yue::bell::PlaylistManager::instance()->openCurrent();
     //pl->set(lst);

@@ -30,6 +30,8 @@ PageBase {
 
     width: 300; height: 400
 
+    property bool createShuffledPlaylist: true
+
     LibraryTreeListModel {
         id: treeModel
         defaultQuery: app.defaultLibraryQuery
@@ -241,22 +243,34 @@ PageBase {
         Button {
             id: btnCheckAll
             anchors.left: parent.left
-            anchors.right: parent.horizontalCenter
+            anchors.right: btnPLaylistOrder.left
             height: gDevice.textHeight*2
             text: treeModel.anySelected ? "Unselect All" : "Select All";
 
             onClicked: treeModel.checkAll( !treeModel.anySelected )
 
         }
+        IconButton {
+            id: btnPLaylistOrder
+            height: gDevice.textHeight*2
+            width: height
+            anchors.horizontalCenter: parent.horizontalCenter
+            source: createShuffledPlaylist ? "qrc:/shared/images/00_playlist_shuffle_a.png" : "qrc:/shared/images/00_playlist_ordered_a.png"
+
+            onClicked: {
+                createShuffledPlaylist = !createShuffledPlaylist;
+            }
+
+        } //image
         Button {
             id: btnCreatePlaylist
-            anchors.left: parent.horizontalCenter
+            anchors.left: btnPLaylistOrder.right
             anchors.right: parent.right
             height: gDevice.textHeight*2
             text: "Create Playlist"
 
             onClicked: {
-                if (treeModel.createPlaylist()) {
+                if (treeModel.createPlaylist(createShuffledPlaylist)) {
                     MediaPlayer.playIndex(0)
                     app.openCurrentPlaylist();
                 }

@@ -13,6 +13,7 @@
 #include <QList>
 #include <QMap>
 #include <QVariant>
+#include <QQueue>
 
 #include <exception>
 
@@ -55,11 +56,14 @@ private:
     // map request identifiers to their requests.
     QMap<ResourceCache::rid_t,ResourceRequestItem*> m_mapResource;
     // maintain a cache of completed requests
-    yue::core::lrucache<ResourceRequestItem*> m_cache;
+    //yue::core::lrucache<ResourceRequestItem*> m_lrucache;
+    QQueue<ResourceCache::rid_t> m_lruqueue;
+
     std::vector<ResourceCacheThread*> m_workerThreads;
 
 
     void init();
+    void createRequest(ResourceCache::rid_t rid, QVariant data);
     ResourceRequestItem* acquire();
     void doNotify(ResourceCache::rid_t id, QVariant resource);
 

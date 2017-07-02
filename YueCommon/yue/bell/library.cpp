@@ -6,6 +6,7 @@
 #include "yue/core/search/grammar.hpp"
 #include "yue/core/shuffle.hpp"
 
+#include <algorithm>
 
 namespace yue {
 namespace bell {
@@ -431,6 +432,52 @@ QList<Database::uid_t> Library::createPlaylist(QString query, size_t size/* = 0*
     return lst;
 }
 
+namespace {
+
+    struct SortItem {
+        int year;
+        int index;
+        QString album;
+        QString title;
+    };
+}
+
+void Library::sort(QList<Database::uid_t>& songs)
+{
+    QMap<Database::uid_t,SortItem> itemMap;
+    QSqlQuery q(m_db->db());
+    q.prepare("SELECT uid, year, album, album_index, title FROM library");
+    q.exec();
+    if (q.lastError().isValid())
+        qWarning() << q.lastError();
+    while (q.next()) {
+        Database::uid_t uid = q.value(0).toULongLong();
+        int year = q.value(1).toInt();
+        QString album = q.value(2).toString();
+        int index = q.value(3).toInt();
+        QString title = q.value(4).toString();
+
+        itemMap[uid] = SortItem{year, index, album, title};
+    }
+
+    qDebug() << songs.size();
+    std::sort(songs.begin(),songs.end(),[&itemMap](Database::uid_t a, Database::uid_t b){
+        if (!itemMap.contains(a) || !itemMap.contains(b))
+            return false;
+        SortItem& itema = itemMap[a];
+        SortItem& itemb = itemMap[b];
+        if (itema.year != itemb.year) {
+            return itema.year < itemb.year;
+        } else if (itema.album != itemb.album) {
+            return itema.album < itemb.album;
+        } else if (itema.index != itemb.index) {
+            return itema.index < itemb.index;
+        }
+        return itema.title < itemb.title;
+
+    });
+}
+
 QString Library::getPath(Database::uid_t uid)
 {
     QSqlQuery q(m_db->db());
@@ -542,4 +589,5 @@ Database::uid_t Library::_get_or_create_album_id(Database::uid_t artist, QString
 
 } // namespace bell
 } // namespace yue
+
 

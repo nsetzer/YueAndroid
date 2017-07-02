@@ -22,7 +22,7 @@ public:
 
     explicit LibraryTreeListModel(QObject *parent = nullptr);
 
-    Q_INVOKABLE bool createPlaylist();
+    Q_INVOKABLE bool createPlaylist(bool shuffle = true);
     Q_INVOKABLE void search(QString query);
 
     QVariant data(const QModelIndex &index, int role/* = Qt::DisplayRole*/) const;

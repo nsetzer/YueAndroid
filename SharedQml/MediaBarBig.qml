@@ -1,5 +1,5 @@
 import QtQuick 2.7
-import QtQuick.Controls 2.0
+import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.3
 
 import com.yue.common 1.0
@@ -16,6 +16,7 @@ Rectangle {
     signal playPauseClicked();
 
     property real fprogress: 0
+    property real resolution: 256
 
     property int playerState: 0
     property int playerStatus: 0
@@ -34,6 +35,9 @@ Rectangle {
         target : MediaPlayer
         onProgressChanged: {
             mediaBar.fprogress = progress
+            console.log(fprogress)
+            if (!progressBar.pressed)
+                progressBar.value = mediaBar.fprogress;
         }
         /*onCurrentIndexChanged: {
             console.log(MediaPlayer.currentIndex)
@@ -51,12 +55,32 @@ Rectangle {
 
     color: "pink"
 
+
+
     Slider {
+        Timer {
+            id: progressBarTimer
+            interval: 100;
+            repeat: false
+            onTriggered: {
+                if (!progressBar.pressed)
+                    MediaPlayer.setProgress( progressBar.value );
+            }
+        }
+
         id: progressBar
         anchors.top : parent.top
         anchors.horizontalCenter : parent.horizontalCenter
-        width: parent.width*80
-        height: gDevice.textHeight * 2
+        anchors.left: mediaBar.left
+        anchors.right: mediaBar.right
+        height: gDevice.textHeight
+        from: 0.0
+        to: 1.0
+        stepSize: 0.01;
+        live: false
+        onMoved: {
+            progressBarTimer.start();
+        }
     }
 
     Rectangle {
