@@ -27,6 +27,8 @@ MediaPlayerQt::MediaPlayerQt(QObject *parent)
 
 void MediaPlayerQt::load(QString path)
 {
+    // this does not fail, look for error signals
+    // to see if the load content failed.
     QMediaContent content(QUrl::fromLocalFile(path));
     m_player.setMedia(content);
 }

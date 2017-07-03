@@ -46,26 +46,35 @@ public:
     }
 };
 
-// this introduces a slant from bottom left to top right
+// the random value of the y component creates
+// a random rotation. normaly the diagonal
+// would go from bottom left to top right
+// this allows the diagonal to rotate up to 180 degrees.
 class TerminalAverage : public Expr {
 
+    float vy;
 public:
-    TerminalAverage()
+    TerminalAverage(Random& rnd)
         : Expr()
-    {}
+    {
+        vy = rnd.rand(-1.0,1.0);
+    }
     virtual float eval(float x, float y) {
-        return (x+y)/2;
+        return (x+vy*y)/2;
     }
     virtual int size(void) {
         return 1;
     }
 };
 
-// this introduces a slant from top left to bottom right
+
+// normal average is (x+y)/2 which creates a diagonal component
+// from bottom left to top right
+// this instead introduces a slant from top left to bottom right
 class TerminalAverage2 : public Expr {
 
 public:
-    TerminalAverage2()
+    TerminalAverage2(Random& rnd)
         : Expr()
     {}
     virtual float eval(float x, float y) {
@@ -233,20 +242,20 @@ Expr* newExpression(Random& rnd, int depth, float probability, float decay)
     // lambda: decay / N
     // setting decay to 1/N will put the expect depth close to N
     float p;
-    if (depth<0) // don't terminate for small values
-        p = 1.0;
-    else if (depth > 16)
+    //if (depth<0) // don't terminate for small values
+    //    p = 1.0;
+    if (depth > 24)
         p = 0.0;
     else
         p = probability * exp(-decay*static_cast<float>(depth));
 
 
     if (rnd.rand() >= p) {
-        switch(rnd.randInt(0,3)) {
+        switch(rnd.randInt(0,2)) {
             case 0: return new TerminalX();
             case 1: return new TerminalY();
-            case 2: return new TerminalAverage();
-            case 3: return new TerminalAverage2();
+            case 2: return new TerminalAverage(rnd);
+            //case 3: return new TerminalAverage2(rnd);
 
             default:
                 throw std::runtime_error("illegal i value");

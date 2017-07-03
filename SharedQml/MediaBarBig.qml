@@ -35,7 +35,6 @@ Rectangle {
         target : MediaPlayer
         onProgressChanged: {
             mediaBar.fprogress = progress
-            console.log(fprogress)
             if (!progressBar.pressed)
                 progressBar.value = mediaBar.fprogress;
         }
@@ -70,7 +69,6 @@ Rectangle {
 
         id: progressBar
         anchors.top : parent.top
-        anchors.horizontalCenter : parent.horizontalCenter
         anchors.left: mediaBar.left
         anchors.right: mediaBar.right
         height: gDevice.textHeight

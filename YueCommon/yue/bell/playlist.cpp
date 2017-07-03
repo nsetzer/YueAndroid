@@ -59,7 +59,7 @@ QSharedPointer<Playlist> PlaylistManager::open(QString name)
 
 
 Playlist::Playlist(Library* library, Database::uid_t plid, QString name)
-    : QObject(library)
+    : QObject(/*TODO thread safe parents*/)
     , m_db(library->db())
     , m_plid(plid)
     , m_library(library)
@@ -236,7 +236,6 @@ QPair<Database::uid_t,size_t> Playlist::current()
      uid = q.value(0).toULongLong();
 
      q.exec("end");
-     qDebug() << "index" << index << "uid" << uid;
 
      return  QPair<Database::uid_t,size_t>(uid,index);
  }

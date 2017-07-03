@@ -49,7 +49,8 @@ SOURCES += \
     yue/qtcommon/SongListModel.cpp \
     yue/core/RandomArtExpressions.cpp \
     yue/qtcommon/AlbumArtImage.cpp \
-    yue/qtcommon/ResourceCache.cpp
+    yue/qtcommon/ResourceCache.cpp \
+    yue/bell/AlbumArt.cpp
 
 HEADERS += yue/global.h\
     yue/alien/utf8/utf8.h \
@@ -84,7 +85,8 @@ HEADERS += yue/global.h\
     yue/core/RandomArtExpressions.h \
     yue/qtcommon/AlbumArtImage.h \
     yue/qtcommon/ResourceCache.h \
-    yue/core/lrucache.h
+    yue/core/lrucache.h \
+    yue/bell/AlbumArt.h
 
 
 

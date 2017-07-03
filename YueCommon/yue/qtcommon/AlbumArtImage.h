@@ -42,6 +42,7 @@ class YUECOMMON_EXPORT AlbumArtImage : public QQuickPaintedItem
     Q_OBJECT
     Q_PROPERTY(int seed READ seed WRITE setSeed NOTIFY seedChanged)
     QImage m_img;
+    QImage m_imgScaled;
 
     static ImageCache m_cache;
 public:
@@ -59,8 +60,6 @@ signals:
     void doUpdate(const QRect &rect);
 
 public slots:
-    Q_INVOKABLE void regenerate(bool bUpdate=true);
-    void doRegenerate();
     void onNotify(ResourceCache::rid_t id, QVariant data);
 private:
 

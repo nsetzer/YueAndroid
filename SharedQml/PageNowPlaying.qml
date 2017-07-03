@@ -134,14 +134,6 @@ PageBase {
             implicitWidth: width
             implicitHeight: height
             seed: MediaPlayer.currentSong.songid;
-            MouseArea {
-                anchors.fill: parent
-                onClicked: {
-                    console.log(mediaBar.height)
-                    albumArt.regenerate();
-                }
-            }
-
         }
     }
 

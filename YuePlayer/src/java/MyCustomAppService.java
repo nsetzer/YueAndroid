@@ -21,7 +21,7 @@ public class MyCustomAppService extends QtService {
    public int onStartCommand(Intent intent, int flags, int startId) {
       int ret = super.onStartCommand(intent, flags, startId);
       Log.i("Service", "Service created!");
-      return ret;
+      return ret|START_STICKY;
       //return mStartMode;
    }
 

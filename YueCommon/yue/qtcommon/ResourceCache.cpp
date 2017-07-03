@@ -114,7 +114,7 @@ bool ResourceCacheThread::run_main(ResourceCache::rid_t rid, QVariant userData, 
 
 void ResourceCacheThread::join()
 {
-    //qDebug() << "join worker";
+    qDebug() << "join worker";
     wait();
 
 }
@@ -155,6 +155,7 @@ ResourceCache::~ResourceCache()
     for (ResourceCacheThread* thread : m_workerThreads) {
         thread->join();
         delete thread;
+        qDebug() << "join thread";
     }
 
     //qDebug() << "destroy cache";

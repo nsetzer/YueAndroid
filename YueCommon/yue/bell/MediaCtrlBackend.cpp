@@ -35,9 +35,13 @@ void MediaCtrlBackend::load(Database::uid_t uid)
 
 void MediaCtrlBackend::load()
 {
-    auto pl = PlaylistManager::instance()->openCurrent();
-    auto pair = pl->current();
-    load(pair.first);
+    try {
+        auto pl = PlaylistManager::instance()->openCurrent();
+        auto pair = pl->current();
+        load(pair.first);
+    } catch (std::runtime_error& e) {
+        qWarning() << "Error Loading Song: " << e.what();
+    }
 
 }
 void MediaCtrlBackend::playIndex(int index)
