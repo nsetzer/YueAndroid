@@ -22,6 +22,7 @@ private:
     Qt::CheckState m_checkstate; // Qt::Unchecked, Qt::PartiallyChecked Qt::Checked
     bool m_expanded;
 public:
+    LibraryTreeNode();
     LibraryTreeNode(Database::uid_t uid, QString text, int depth, LibraryTreeNode* parent = nullptr);
     ~LibraryTreeNode();
 

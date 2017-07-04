@@ -80,12 +80,13 @@ void AlbumArtImage::paint(QPainter * painter)
 {
     // reload the album art at the new size
     // QQuickPaintedItem does not seem to have any resize signals
-    if (m_imgScaled.isNull() || width() != m_previousWidth) {
+    if ((m_imgScaled.isNull() || width() != m_previousWidth) &&
+        !m_img.isNull()) {
         m_previousWidth = width();
         m_imgScaled = m_img.scaledToWidth(width());
     }
 
-    if (!m_imgScaled.isNull()) {
+    if (!m_imgScaled.isNull() ) {
         painter->setRenderHint(QPainter::Antialiasing,true);
         painter->setRenderHint(QPainter::SmoothPixmapTransform,true);
         painter->drawImage(0,0,m_imgScaled);

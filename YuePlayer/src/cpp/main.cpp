@@ -12,7 +12,7 @@
 #include "yue/device.h"
 #include "yue/qtcommon/qtcommon.hpp"
 #include "yue/qtcommon/ResourceCache.h"
-
+#include "yue/bell/LibraryTreeNode.hpp"
 #include "MediaCtrlRemoteClient.h"
 #include "MediaCtrlRemoteServer.h"
 
@@ -31,6 +31,8 @@ int main(int argc, char *argv[])
     qRegisterMetaType<yue::bell::MediaPlayerBase::Status>("MediaPlayerBase::Status");
     qRegisterMetaType<yue::bell::Database::uid_t>("Database::uid_t");
     qRegisterMetaType<yue::qtcommon::ResourceCache::rid_t>("ResourceCache::rid_t");
+    qRegisterMetaType<yue::bell::LibraryTreeNode>("LibraryTreeNode");
+    qRegisterMetaType<QList<yue::bell::LibraryTreeNode*>>("QList<yue::bell::LibraryTreeNode*>");
 
     QSharedPointer<QRemoteObjectHost> srcNode;
     QSharedPointer<MediaCtrlRemoteServer> mcsvc;

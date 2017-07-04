@@ -44,17 +44,20 @@ FocusScope {
         TextInput {
             id: input
             focus: true
+            clip: true
             anchors { left: prefix.right;
-                      right: btnClear.left;
+                      right: btnAccept.left;
                       top: parent.top;
                       bottom: parent.bottom }
+
             verticalAlignment: Text.AlignVCenter
-            //font.pixelSize: 18
-            //color: "#707070"
+            selectByMouse:  true
+
             onAccepted: wrapper.accepted()
         }
 
         Image {
+            id: btnAccept;
             source: "qrc:/shared/images/00_search_b.svg"
             anchors.right: btnClear.left
             anchors.rightMargin: width/2

@@ -3,6 +3,7 @@
 #include <QDebug>
 #include "yue/qtcommon/LibraryTreeListModel.hpp"
 #include "yue/bell/MediaCtrlBase.h"
+#include <QtConcurrent>
 
 namespace yue {
 namespace qtcommon {
@@ -13,9 +14,12 @@ LibraryTreeListModel::LibraryTreeListModel(QObject *parent)
     : TreeListModelBase(parent)
 {
 
-    //search("");
     connect(this,&LibraryTreeListModel::defaultQueryChanged,
             this,&LibraryTreeListModel::onDefaultQueryChanged);
+
+    connect(this,&LibraryTreeListModel::searchResult,
+            this,&LibraryTreeListModel::setNewData);
+
 }
 
 /**
@@ -25,6 +29,10 @@ LibraryTreeListModel::LibraryTreeListModel(QObject *parent)
 bool LibraryTreeListModel::createPlaylist(bool shuffle/* = true*/)
 {
     LOG_FUNCTION_TIME();
+
+    bool success = false;
+
+    QML_EXCEPTION_GUARD_BEGIN
 
     QMap<yue::bell::Database::uid_t, QString> groups;
 
@@ -43,19 +51,25 @@ bool LibraryTreeListModel::createPlaylist(bool shuffle/* = true*/)
         lst = groups.keys();
         yue::bell::Library::instance()->sort( lst );
     }
-    yue::bell::MediaCtrlBase::instance()->setCurrentPlaylist(lst);
-    //auto pl = yue::bell::PlaylistManager::instance()->openCurrent();
-    //pl->set(lst);
 
-    //
-    return true;
+    yue::bell::MediaCtrlBase::instance()->setCurrentPlaylist(lst, true);
+    //yue::bell::MediaCtrlBase::instance()->playSong(0);
+    success = true;
+
+    QML_EXCEPTION_GUARD_END
+
+    return success;
 }
 
 void LibraryTreeListModel::search(QString query)
 {
+    QtConcurrent::run(this,&LibraryTreeListModel::searchImpl, query);
+}
+
+void LibraryTreeListModel::searchImpl(QString query) {
     try {
         QList<yue::bell::LibraryTreeNode*> forest = yue::bell::Library::instance()->queryToForest(query);
-        setNewData(forest);
+        emit searchResult( forest );
         m_lastError = "";
     } catch (yue::core::ParseError& e) {
         m_lastError = e.what();

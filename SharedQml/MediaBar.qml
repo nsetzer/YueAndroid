@@ -51,8 +51,6 @@ Rectangle {
         }
     }
 
-    color: "pink"
-
     Rectangle {
         id: progressBarShadow
         anchors.left : parent.left

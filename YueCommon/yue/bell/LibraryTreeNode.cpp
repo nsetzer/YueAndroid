@@ -3,6 +3,18 @@
 namespace yue {
 namespace bell {
 
+LibraryTreeNode::LibraryTreeNode()
+    : m_uid(0)
+    , m_text("")
+    , m_depth(0)
+    , m_parent(nullptr)
+    , m_children()
+    , m_checkstate(Qt::Unchecked)
+    , m_expanded(false)
+{
+
+}
+
 LibraryTreeNode::LibraryTreeNode(Database::uid_t uid, QString text, int depth, LibraryTreeNode* parent)
     : m_uid(uid)
     , m_text(text)

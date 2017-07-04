@@ -14,6 +14,16 @@ Rectangle {
         return (x > y) ? x : y
     }
 
+    // make sure x is odd
+    function checkOdd(x) {
+        if (x%2==0)
+            return x+1
+        return x
+    }
+
+    property var primaryColor: "black"
+    property var secondaryColor: "blue"
+
     property bool expanded: false
     property int itemCheckState: Qt.Unchecked
 
@@ -21,30 +31,34 @@ Rectangle {
     color: "transparent"
 
 
-    property real rectMargin: root.height * 0.1
-    property real rectThickness: (root.height - 2 * rectMargin) / 5
+    property real rectLength: root.height * .8
+    property real rectWidth: root.height * .2
 
+    // -I-
 
+    // I
     Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         anchors.horizontalCenter: parent.horizontalCenter
+        radius: rectWidth/3
         //visible: !root.expanded
-        color: (itemCheckState == Qt.Unchecked) ? "black" : "blue"
-        width: root.rectThickness
-        height: (!root.expanded) ? root.height - 2 * rectMargin : 0
+        color: (itemCheckState == Qt.Unchecked) ? root.primaryColor : root.secondaryColor
+        width: rectWidth
+        height: (!root.expanded) ? rectLength : 0
 
         Behavior on height {
             NumberAnimation { duration: 250 }
         }
     }
 
+    // --
     Rectangle {
         anchors.verticalCenter: parent.verticalCenter
         anchors.horizontalCenter: parent.horizontalCenter
-
-        color: (itemCheckState == Qt.Unchecked) ? "black" : "blue"
-        width: root.height - 2 * rectMargin
-        height: root.rectThickness
+        radius: rectWidth/3
+        color: (itemCheckState == Qt.Unchecked) ? root.primaryColor : root.secondaryColor
+        width: rectLength
+        height: rectWidth
 
     }
 

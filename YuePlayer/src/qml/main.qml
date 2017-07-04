@@ -83,6 +83,10 @@ ApplicationWindow {
             onClicked: {
                 loader.item.titleClicked();
             }
+
+            onMoreClicked: {
+                loader.item.moreClicked();
+            }
         }
 
         Image {
@@ -185,6 +189,7 @@ ApplicationWindow {
                 console.log("loaded:" + loader.item.title)
                 menuBar.title = loader.item.title || "error"
                 item.openPage();
+                menuBar.showMoreButton = item.showMoreButton()
                 if (app.onLoadCallback!==null){
                     app.onLoadCallback()
                 } 

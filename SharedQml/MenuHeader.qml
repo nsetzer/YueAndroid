@@ -9,6 +9,10 @@ Rectangle {
 
     signal clicked();
 
+    property bool showMoreButton: false
+
+    signal moreClicked();
+
     MouseArea {
         anchors.fill: parent
 
@@ -46,6 +50,18 @@ Rectangle {
         text: title
         font.pixelSize: 0.35*parent.height
         color: palette.text
+    }
+
+    IconButton {
+        id: contextMenuIcon
+        height: parent.height*.66
+        width: height
+        visible: root.showMoreButton
+        anchors.right : parent.right
+        anchors.verticalCenter: parent.verticalCenter
+        source: "qrc:/shared/images/00_menu_a.svg"
+
+        onClicked: root.moreClicked();
     }
 
 

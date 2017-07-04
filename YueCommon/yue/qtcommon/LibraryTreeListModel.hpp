@@ -40,8 +40,10 @@ public:
 signals:
     void errorStatusChanged();
     void defaultQueryChanged();
+    void searchResult(QList<yue::bell::LibraryTreeNode*> forest);
 
 private:
+    void searchImpl(QString query);
     QString m_lastError;
     void collectSelectedSongs(QMap<yue::bell::Database::uid_t, QString>& groups, yue::bell::LibraryTreeNode* node );
     void onDefaultQueryChanged();

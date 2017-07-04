@@ -4,7 +4,7 @@ import QtQuick.Controls 2.2
 import QtQml.Models 2.2
 
 import com.yue.common 1.0
-
+import "constants.js" as Constants
 /*
 
   TODO:
@@ -491,6 +491,7 @@ PageBase {
         anchors.bottom : parent.bottom
         height: gDevice.textHeight * 2 + margin
         margin: gDevice.textHeight/4
+        color: Constants.darkPrimary
 
         onPrevClicked: {
             MediaPlayer.prev();

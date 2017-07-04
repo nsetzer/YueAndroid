@@ -21,6 +21,15 @@
 #  define YUECOMMON_EXPORT Q_DECL_IMPORT
 #endif
 
+
+#define QML_EXCEPTION_GUARD_BEGIN try {
+#define QML_EXCEPTION_GUARD_END \
+    } catch (std::exception& e) { \
+        qWarning().noquote() << "Uncaught exception in " << __FUNCTION__ << " : " << e.what(); \
+    } catch (...) { \
+        qWarning().noquote() << "Uncaught exception in " << __FUNCTION__; \
+    }
+
 #endif // YUE_COMMON_GLOBAL_H
 
 #include "yue/util/logging.hpp"

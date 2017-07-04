@@ -3,6 +3,7 @@ import QtQuick.Controls 2.2
 import QtQuick.Layouts 1.3
 
 import "." as SharedQml
+import "constants.js" as Constants
 import com.yue.common 1.0
 
 PageBase {
@@ -145,7 +146,7 @@ PageBase {
         height: gDevice.textHeight * 4
         width: parent.width
 
-        color: "red"
+        color: Constants.darkPrimary
 
         onPrevClicked: {
             MediaPlayer.prev();

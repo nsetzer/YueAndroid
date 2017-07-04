@@ -60,7 +60,8 @@ public:
     Q_INVOKABLE MediaPlayerBase::Status getStatus() { return m_status; }
     Q_INVOKABLE MediaPlayerBase::State getState() { return m_state; }
     Q_INVOKABLE float getProgress() { return m_progress; }
-    Q_INVOKABLE void setCurrentPlaylist(QList<yue::bell::Database::uid_t>& lst);
+    Q_INVOKABLE void setCurrentPlaylist(QList<yue::bell::Database::uid_t>& lst, bool autoplay = false);
+
 signals:
     // signals emitted by the base class
     void playlistReset();
@@ -89,6 +90,7 @@ private slots:
 
 protected:
     void loadCurrentSongInfo();
+
     SongInfo m_currentSong;
     float m_progress=0;
     MediaPlayerBase::Status m_status = MediaPlayerBase::Status::Unknown;
@@ -97,6 +99,7 @@ protected:
 
 
     //virtual void load(Database::uid_t uid)=0;
+
 };
 
 } // bell

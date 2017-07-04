@@ -18,6 +18,10 @@ PageBase {
         console.log("Title Clicked on page" + title)
     }
 
+    function showMoreButton() {
+        return true
+    }
+
     PageIndicator {
         id: indicator
 

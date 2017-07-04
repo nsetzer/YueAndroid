@@ -64,5 +64,6 @@
         <file>SwipeListDelegate.qml</file>
         <file>SwipeListDemo.qml</file>
         <file>IconButton.qml</file>
+        <file>constants.js</file>
     </qresource>
 </RCC>

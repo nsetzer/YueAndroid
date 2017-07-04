@@ -7,6 +7,7 @@
 #include <QQmlApplicationEngine>
 #include <QDebug>
 #include <QFont>
+#include <QColor>
 #ifdef Q_OS_ANDROID
 #include <QtAndroidExtras>
 #endif
@@ -51,7 +52,6 @@ public:
     qreal dp() const { return m_dp; }
     qreal textHeight() { return m_textHeight; }
     QFont font() { return m_font; }
-
 
     static QString getDirectory(const QString &type);
 

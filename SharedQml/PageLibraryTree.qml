@@ -5,7 +5,7 @@ import QtQuick.Window 2.2
 import QtQml.Models 2.2
 
 import com.yue.common 1.0
-
+import "constants.js" as Constants
 /*
 
   TODO:
@@ -70,8 +70,7 @@ PageBase {
         delegate:  Rectangle {
             id: delegateItem
             height: targetHeight
-            anchors.left: parent.left
-            anchors.right: parent.right
+            width: view.width
 
             readonly property int targetHeight: gDevice.textHeight * 2.25//delegateText.implicitHeight * 3
 
@@ -84,6 +83,9 @@ PageBase {
                 // need some paddnig for depth==0 to
                 // get the button out of the gutter
                 anchors.leftMargin: (height/3) + (depth * (height/2))
+
+                primaryColor: Constants.black
+                secondaryColor: Constants.darkPrimary
 
                 visible: childCount > 0
                 expanded: isExpanded
@@ -138,7 +140,7 @@ PageBase {
                 */
                 anchors.fill: parent
                 visible: checkState == Qt.Checked
-                color: (depth==0)?"#200000EE":((depth==1)?"#300000EE":"#400000EE")
+                color: (depth==2)?Constants.selectedLight:((depth==1)?Constants.selected:Constants.selectedDark)
 
             }
 
@@ -271,7 +273,6 @@ PageBase {
 
             onClicked: {
                 if (treeModel.createPlaylist(createShuffledPlaylist)) {
-                    MediaPlayer.playIndex(0)
                     app.openCurrentPlaylist();
                 }
             }

@@ -52,10 +52,6 @@ Rectangle {
         }
     }
 
-    color: "pink"
-
-
-
     Slider {
         Timer {
             id: progressBarTimer

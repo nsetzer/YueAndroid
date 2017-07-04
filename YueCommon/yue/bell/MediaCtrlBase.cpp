@@ -10,12 +10,19 @@ MediaCtrlBase::MediaCtrlBase(QObject *parent) : QObject(parent)
 
 }
 
-void MediaCtrlBase::setCurrentPlaylist(QList<yue::bell::Database::uid_t>& lst)
+void MediaCtrlBase::setCurrentPlaylist(QList<yue::bell::Database::uid_t>& lst, bool autoplay/* = false*/)
 {
-    auto pl = yue::bell::PlaylistManager::instance()->openCurrent();
+    LOG_FUNCTION_TIME();
+
+   auto pl = yue::bell::PlaylistManager::instance()->openCurrent();
     pl->set(lst);
 
     emit playlistReset();
+
+    if (autoplay) {
+        playSong(0);
+    }
+
 }
 
 int MediaCtrlBase::currentIndex()

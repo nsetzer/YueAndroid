@@ -16,6 +16,14 @@ Rectangle {
         console.log("Title Clicked on page" + title)
     }
 
+    function showMoreButton() {
+        return false
+    }
+
+    function moreClicked() {
+        console.log("More clicked on page " + title)
+    }
+
     Rectangle {
         id: curtain
         color: "black"
