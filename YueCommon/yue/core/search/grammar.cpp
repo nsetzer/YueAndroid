@@ -435,6 +435,9 @@ Grammar::_buildRule(SyntaxNode *node) {
 SearchGrammar::SearchGrammar() : Grammar() {
     // define the characters used by the grammar. the tokenizer
     // will break the text into tokens of a similar class in a context free way.
+    //util::time_point_t m_current_time;
+    m_recalculate_time = true;
+
     m_sigil = ".";
     m_all_text = "all_text";
     m_char_classes[Grammar::CharacterClass::whitespace] = {
@@ -524,6 +527,9 @@ SearchGrammar::buildColumnRule(SyntaxNode *nd_op,
 
         return buildIntegerColumnRule(type, column, nd_text);
     }
+    if (m_col_date.count(column) > 0) {
+        return buildDateColumnRule(type, column, nd_text);
+    }
     return buildStringColumnRule(type, column, nd_text);
 }
 
@@ -608,6 +614,79 @@ SearchGrammar::buildIntegerColumnRule(SearchGrammar::RuleType type,
     }
 }
 
+std::unique_ptr<SearchRule>
+SearchGrammar::buildDateColumnRule(SearchGrammar::RuleType type,
+                                      const std::string &column,
+                                      SyntaxNode *nd_text) {
+
+    // draft specificatoin for parser
+
+    // |<a   2   b>| |<c   1   d>| |<e 0 f>|
+    // [ 2days ago ] [ yesterday ] [ today ]
+
+    // y,m,d := todays date
+    // =0d  := EPOCHTIME(y,m,d)   < x < EPOCHTIME(y,m,d+1)
+    // =1d  := EPOCHTIME(y,m,d-1) < x < EPOCHTIME(y,m,d)
+    // <0d  := x > EPOCHTIME(y,m,d)
+    // >0d  := x < EPOCHTIME(y,m,d)
+    // <1d  := x > EPOCHTIME(y,m,d-1)
+    // >1d  := x < EPOCHTIME(y,m,d-1)
+    // <= := <
+    // >= := >
+
+    // = 2000/1/1 := EPOCHTIME(2000,1,1) < x < EPOCHTIME(2000,1,2)
+    // > 2000/1/1 := x > EPOCHTIME(2000,1,1)
+    // < 2000/1/1 := x < EPOCHTIME(2000,1,1)
+    // <= := <
+    // >= := >
+
+    // =2016 -> add1 unit should be year
+    // =2016/m -> add1 unit should be month
+
+    int value=0, value_lo=0, value_hi=0;
+
+    if (m_recalculate_time) {
+
+        m_current_time = util::currentTimePoint();
+    }
+
+    util::ydate_t date = util::extractDate(m_current_time);
+
+    parseRelativeDateDelta(nd_text->text(),date,true);
+
+    switch (type) {
+    case SearchGrammar::RuleType::PartialString:
+    case SearchGrammar::RuleType::Exact:
+        value_lo = util::dateToEpochTime(date);
+        date = dateDelta(date,0,0,1);
+        value_hi = util::dateToEpochTime(date);
+        return std::unique_ptr<SearchRule>(
+            new RangeSearchRule<int>(column, value_lo, value_hi));
+    case SearchGrammar::RuleType::InvertedPartialString:
+    case SearchGrammar::RuleType::InvertedExact:
+        value_lo = util::dateToEpochTime(date);
+        date = dateDelta(date,0,0,1);
+        value_hi = util::dateToEpochTime(date);
+        return std::unique_ptr<SearchRule>(
+            new NotRangeSearchRule<int>(column, value_lo, value_hi));
+    case SearchGrammar::RuleType::LessThan:
+    case SearchGrammar::RuleType::LessThanEqual:
+        value = util::dateToEpochTime(date);
+        return std::unique_ptr<SearchRule>(
+            new GreaterThanEqualSearchRule<int>(column, value));
+    case SearchGrammar::RuleType::GreaterThan:
+    case SearchGrammar::RuleType::GreaterThanEqual:
+        value = util::dateToEpochTime(date);
+        return std::unique_ptr<SearchRule>(
+            new LessThanEqualSearchRule<int>(column, value));
+    case SearchGrammar::RuleType::RegExpSearch:
+        throw SyntaxError(nd_text,
+                          "cannot perform REGEX search on date columns");
+    default:
+        throw ParseError("Unspecified Error");
+    }
+
+}
 std::unique_ptr<SearchRule>
 SearchGrammar::buildAllTextRule(SearchGrammar::RuleType type,
                                 const std::string &text) {

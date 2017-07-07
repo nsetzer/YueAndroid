@@ -9,7 +9,7 @@
 #include <string>
 #include <vector>
 #include <iterator>
-
+#include "yue/core/util/dateutil.h"
 #include "yue/core/search/rules.hpp"
 
 namespace yue {
@@ -262,19 +262,27 @@ class SearchGrammar : public Grammar {
                                                         SyntaxNode *nd_column,
                                                         SyntaxNode *nd_text);
 
-    std::unique_ptr<SearchRule>
+    virtual std::unique_ptr<SearchRule>
     buildStringColumnRule(SearchGrammar::RuleType type,
                           const std::string &column,
                           SyntaxNode *nd_text);
-    std::unique_ptr<SearchRule>
+    virtual std::unique_ptr<SearchRule>
     buildIntegerColumnRule(SearchGrammar::RuleType type,
                            const std::string &column,
                            SyntaxNode *nd_text);
+    virtual std::unique_ptr<SearchRule>
+    buildDateColumnRule(SearchGrammar::RuleType type,
+                        const std::string &column,
+                        SyntaxNode *nd_text);
 
     std::unique_ptr<SearchRule> buildAllTextRule(RuleType type,
                                                  const std::string &text);
 
     friend class SearchGrammarTest;
+
+protected:
+    util::time_point_t m_current_time;
+    bool m_recalculate_time;
 };
 
 } /*namespace core*/

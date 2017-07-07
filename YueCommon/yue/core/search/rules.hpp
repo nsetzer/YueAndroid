@@ -143,7 +143,7 @@ private:
     int m_value;
 
 public:
-    VariantInt(float value)
+    VariantInt(int value)
         : Variant()
         , m_value(value)
     {}
