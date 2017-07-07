@@ -9,9 +9,14 @@ namespace core {
 
 SearchGrammarTest::SearchGrammarTest() : m_grammar() {
     // construct a grammar with a couple sample columns
+    m_grammar.m_recalculate_time = false;
+    m_grammar.m_current_time = util::currentTimePoint();
+
     m_grammar.m_col_text.insert("artist");
     m_grammar.m_col_text.insert("album");
     m_grammar.m_col_text.insert("title");
+
+    m_grammar.m_col_date.insert("date");
 
     m_grammar.m_col_integer.insert("play_count");
 
@@ -23,6 +28,7 @@ SearchGrammarTest::SearchGrammarTest() : m_grammar() {
     m_grammar.m_col_abbreviations["title"] = "title";
     m_grammar.m_col_abbreviations["pcnt"] = "play_count";
     m_grammar.m_col_abbreviations["play_count"] = "play_count";
+    m_grammar.m_col_abbreviations["date"] = "date";
     m_grammar.m_col_abbreviations["text"] = m_grammar.m_all_text;
     m_grammar.m_col_abbreviations[m_grammar.m_all_text] = m_grammar.m_all_text;
 }
@@ -201,16 +207,16 @@ SearchGrammarTest::run_test() {
         // string types
         run(test_sql("artist=test", "artist LIKE ?",
                      {
-                         "test",
+                         "%test%",
                      }));
 
         run(test_sql("artist=test", "artist LIKE ?",
                      {
-                         "test",
+                         "%test%",
                      }));
         run(test_sql("artist!=test", "artist NOT LIKE ?",
                      {
-                         "test",
+                         "%test%",
                      }));
         run(test_sql("artist<test", "artist < ?",
                      {
@@ -262,7 +268,7 @@ SearchGrammarTest::run_test() {
         // check abbreviations
         run(test_sql("art=test", "artist LIKE ?",
                      {
-                         "test",
+                         "%test%",
                      }));
         run(test_sql("pcnt=5", "play_count == ?",
                      {
@@ -277,7 +283,16 @@ SearchGrammarTest::run_test() {
 
         // this depends on order of sets ...
         run(test_sql("test", "(album LIKE ? OR artist LIKE ? OR title LIKE ?)",
-                     {"test", "test", "test"}));
+                     {"%test%", "%test%", "%test%"}));
+
+        //
+        util::ydate_t date = util::extractDate(m_grammar.m_current_time);
+        int value_lo = util::dateToEpochTime(date);
+        date = dateDelta(date,0,0,1);
+        int value_hi = util::dateToEpochTime(date);
+        run(test_sql("date = 0d", "date BETWEEN ? AND ?",
+                     {util::toString<int>(value_lo),
+                      util::toString<int>(value_hi)}));
 
     }
 
@@ -318,6 +333,8 @@ SearchGrammarTest::test_sql(const std::string &query,
             // print out query values allowing for missing items.
             size_t n = result_val.size() > values.size() ? result_val.size()
                                                          : values.size();
+
+            std::cout << "arguments -- expected | actual" << std::endl;
             for (size_t i = 0; i < n; i++) {
                 std::cout << i << ": "
                           << ((i < values.size()) ? values[i] : "none")

@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 
+#include "yue/core/util/yuetest.h"
 #include "yue/core/search/grammar.hpp"
 #include "yue/core/search/rules.hpp"
 

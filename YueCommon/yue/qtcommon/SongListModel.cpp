@@ -132,7 +132,7 @@ QVariant SongListModel::data(const QModelIndex &index, int role/* = Qt::DisplayR
         return QVariant();
 
     if (role == SongListModel::SongIdRole)
-        return m_lst[index.row()].uid;
+        return bell::toQVariant(m_lst[index.row()].uid);
 
     if (role == SongListModel::ArtistRole)
         return m_lst[index.row()].artist;

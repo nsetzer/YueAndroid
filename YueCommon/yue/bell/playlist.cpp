@@ -192,7 +192,7 @@ QPair<Database::uid_t,size_t> Playlist::current()
 
      q.prepare("SELECT song_id FROM playlist_songs WHERE (uid=? AND idx=?)");
      q.addBindValue(toQVariant(m_plid));
-     q.addBindValue(index);
+     q.addBindValue(toQVariant(index));
      q.exec();
      if (!q.first()) {
          throw std::runtime_error("no current song");
@@ -230,7 +230,7 @@ QPair<Database::uid_t,size_t> Playlist::current()
      index++;
      q.prepare("SELECT song_id FROM playlist_songs WHERE (uid=? AND idx=?)");
      q.addBindValue(toQVariant(m_plid));
-     q.addBindValue(index);
+     q.addBindValue(toQVariant(index));
      q.exec();
      q.first();
      uid = q.value(0).toULongLong();
@@ -266,7 +266,7 @@ QPair<Database::uid_t,size_t> Playlist::current()
      index--;
      q.prepare("SELECT song_id FROM playlist_songs WHERE (uid=? AND idx=?)");
      q.addBindValue(toQVariant(m_plid));
-     q.addBindValue(index);
+     q.addBindValue(toQVariant(index));
      q.exec();
      q.first();
      uid = q.value(0).toULongLong();
