@@ -62,6 +62,7 @@
     <!-- For adding service(s) please check: https://wiki.qt.io/AndroidServices -->
 
 
+    <!-- android:stopWithTask="true" -->
     <service android:process=":qt" android:enabled="true" android:name="org.github.nsetzer.example.MyCustomAppService">
     <!--<service android:process=":qt" android:enabled="true" android:name="org.qtproject.qt5.android.bindings.QtService">-->
         <!-- android:process=":qt" is needed to force the service to run on a separate process than the Activity -->

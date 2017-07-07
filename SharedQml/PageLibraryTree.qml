@@ -114,6 +114,21 @@ PageBase {
 
             }
 
+            IconButton {
+                id: contextMenuIcon
+                height: parent.height*.66
+                width: height
+                visible: depth==2
+                anchors.right : parent.right
+                anchors.rightMargin: parent.height*.33
+                anchors.verticalCenter: parent.verticalCenter
+                source: "qrc:/shared/images/00_menu_a.svg"
+                color: "transparent"
+
+                onClicked: menu.open()
+            }
+
+            /*
             Image {
                 id: contextMenuIcon
                 height: parent.height*.66
@@ -131,6 +146,7 @@ PageBase {
                     }
                 }
             }
+            */
 
             Rectangle {
                 /*anchors.left: parent.left

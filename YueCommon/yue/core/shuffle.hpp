@@ -53,6 +53,10 @@ fisher_yates(std::vector<elem>& data)
     std::mt19937 gen(rd());
 
     size_t n = data.size() - 1;
+
+    if (n==0) // degenerate case: only one element
+        return;
+
     for (size_t i=0;i<n-1;i++) {
         std::uniform_int_distribution<size_t>dis(i, n);
         size_t j = dis(gen);
@@ -69,10 +73,6 @@ fisher_yates(std::vector<elem>& data)
  * but the order of the elements within a single group will not change.
  *
  *  https://labs.spotify.com/2014/02/28/how-to-shuffle-songs/
- *  Fisher-Yates
- *      for i in range(0,N)
- *          j = random.randint(0,i)
- *          a[j], a[i] = a[i], a[j]
  */
 template<class container, class elem, class T>
 container
@@ -80,7 +80,8 @@ shuffle(const container& data, std::function<const T (const elem&)> key)
 {
     typedef struct shuffle_util::element_t<elem> elem_t;
 
-    if (data.size()==0) {
+    size_t N = data.size();
+    if (N==0) {
         return container();
     }
 
@@ -122,9 +123,15 @@ shuffle(const container& data, std::function<const T (const elem&)> key)
 
     // O(G)
     // assign an unique offset for each group
+    // the offset is used to solve the degenerate case where the group size is
+    // small. If there were many groups with a size of 1, then the score
+    // would be zero for those items, biasing them towards the start
+    // group size = 1: items score is random
+    // group size = 2: score for index 0 is random between 0..n/2
+    // etc...
     for ( auto& it : groups) {
-        float h = log(groups.size()) / log(2.0);
-        group_offset[it.first] = h*dis(gen) - h/2.0;
+        float h = N / static_cast<float>(groups[it.first]);
+        group_offset[it.first] = h*dis(gen);
     }
 
     // O(N)
@@ -134,10 +141,10 @@ shuffle(const container& data, std::function<const T (const elem&)> key)
     for (auto& item : items) {
         const T k = key(*item.item);
         // determine the index for this element between 0 and N
-        float i = (items.size() * (static_cast<float>(item.index) / groups[k]));
+        float i = (N * (static_cast<float>(item.index) / groups[k]));
         // determine average delta between two points
-        float d = ((float)items.size()) / groups[k] / 2.0;
-        //
+        float d = static_cast<float>(N) / groups[k] / 2.0;
+        // determine the offset for this item
         float o = d*dis(gen) - d/2.0 + group_offset[k];
         item.score = o + i;
     }

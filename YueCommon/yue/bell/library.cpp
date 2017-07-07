@@ -417,6 +417,7 @@ QList<Database::uid_t> Library::createPlaylist(QString query, size_t size/* = 0*
         groups[uid] = group;
     }
 
+
     // shuffle the results
 
     /*

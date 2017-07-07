@@ -58,8 +58,10 @@ Rectangle {
         width: height
         visible: root.showMoreButton
         anchors.right : parent.right
+        anchors.rightMargin: parent.height*.33
         anchors.verticalCenter: parent.verticalCenter
         source: "qrc:/shared/images/00_menu_a.svg"
+        color: "transparent"
 
         onClicked: root.moreClicked();
     }

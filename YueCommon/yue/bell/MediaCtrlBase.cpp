@@ -20,7 +20,7 @@ void MediaCtrlBase::setCurrentPlaylist(QList<yue::bell::Database::uid_t>& lst, b
     emit playlistReset();
 
     if (autoplay) {
-        playSong(0);
+        playIndex(0);
     }
 
 }
