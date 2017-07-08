@@ -1,4 +1,5 @@
 
+#include <stdlib.h>
 #include <time.h>
 #include "yue/core/util/dateutil.h"
 

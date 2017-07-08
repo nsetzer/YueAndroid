@@ -13,7 +13,7 @@ public class MyCustomAppActivity extends QtActivity {
     public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         Log.i("Activity", "Starting service!");
-        Intent serviceIntent = new Intent(this, org.github.nsetzer.example.MyCustomAppService.class);
+        Intent serviceIntent = new Intent(this, MyCustomAppService.class);
         startService(serviceIntent);
     }
     @Override
@@ -30,6 +30,14 @@ public class MyCustomAppActivity extends QtActivity {
     }
     @Override
     public void onDestroy() {
+
+        //https://stackoverflow.com/questions/36369845/how-to-stop-service-the-service-when-android-app-has-been-closed
+        // https://developer.android.com/reference/android/app/Activity.html
+        //https://stackoverflow.com/questions/19568315/how-to-handle-code-when-app-is-killed-by-swiping-in-android/26882533#26882533
+        Log.i("Activity", "Service: on Destroy Activity");
+        Intent intent = new Intent(MyCustomAppActivity.this, MyCustomAppService.class);
+        stopService(intent);
+
         super.onDestroy();
     }
     @Override

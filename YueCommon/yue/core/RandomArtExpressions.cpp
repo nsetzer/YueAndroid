@@ -4,6 +4,8 @@
 #include <math.h>   // cos, sin, pow
 #include <random>
 #include <iostream>
+#include <exception>
+#include <stdexcept>
 
 #include "yue/core/RandomArtExpressions.h"
 
