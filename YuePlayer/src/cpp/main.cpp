@@ -19,6 +19,16 @@
 #ifdef Q_OS_ANDROID
 #include <QAndroidJniObject>
 #include <QtAndroid>
+
+#include "JavaCompat.h"
+
+JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*)
+{
+    Q_UNUSED(vm);
+    qDebug() << "JNI_OnLoad";
+    return JavaCompat::RegisterNatives();
+}
+
 #endif
 
 int main(int argc, char *argv[])
@@ -81,7 +91,7 @@ int main(int argc, char *argv[])
         }
 
         srcNode = QSharedPointer<QRemoteObjectHost>(new QRemoteObjectHost(QUrl(QStringLiteral("local:replica"))));
-        mcsvc = QSharedPointer<MediaCtrlRemoteServer>(new MediaCtrlRemoteServer());
+        mcsvc = MediaCtrlRemoteServer::create();
 
         srcNode->enableRemoting(mcsvc.data());
         qDebug() << "service created";

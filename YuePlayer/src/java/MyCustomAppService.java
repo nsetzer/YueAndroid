@@ -197,17 +197,22 @@ public class MyCustomAppService extends QtService {
    //@MainThread
    public void playpause() {
       Log.i("Service", "onbtn playpause pressed");
+      JNIServicePlayPauseCallback();
    }
 
    //@MainThread
    public void prev() {
       Log.i("Service", "onbtn prev pressed");
+      JNIServicePrevCallback();
    }
 
    //@MainThread
    public void next() {
       Log.i("Service", "onbtn next pressed");
+      JNIServiceNextCallback();
    }
+
+   public static native void JNIServiceCallback(int i);
 
    private MediaSession mMediaSession;
    //protected MediaSessionCallback mSessionCallback;
@@ -240,6 +245,10 @@ public class MyCustomAppService extends QtService {
         setSessionToken(mMediaSession.getSessionToken());
         */
     }
+
+    public static native void JNIServicePrevCallback();
+    public static native void JNIServiceNextCallback();
+    public static native void JNIServicePlayPauseCallback();
 
 
 }
