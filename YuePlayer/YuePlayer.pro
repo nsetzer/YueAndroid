@@ -9,11 +9,13 @@ CONFIG += c++11
 SOURCES += \
     src/cpp/main.cpp \
     src/cpp/MediaCtrlRemoteClient.cpp \
-    src/cpp/MediaCtrlRemoteServer.cpp
+    src/cpp/MediaCtrlRemoteServer.cpp \
+    src/cpp/JavaCompat.cpp
 
 HEADERS += \
     src/cpp/MediaCtrlRemoteClient.h \
-    src/cpp/MediaCtrlRemoteServer.h
+    src/cpp/MediaCtrlRemoteServer.h \
+    src/cpp/JavaCompat.h
 
 REPC_REPLICA += src/cpp/MediaControl.rep
 REPC_SOURCE  += src/cpp/MediaControl.rep

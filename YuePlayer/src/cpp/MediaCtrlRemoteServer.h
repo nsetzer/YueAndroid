@@ -1,7 +1,7 @@
 #ifndef MEDIACONTROLBACKEND_H
 #define MEDIACONTROLBACKEND_H
 
-#include <QScopedPointer>
+#include <QSharedPointer>
 #include "rep_MediaControl_source.h"
 #include "yue/bell/database.hpp"
 #include "yue/bell/library.hpp"
@@ -12,9 +12,20 @@
 class MediaCtrlRemoteServer : public MediaControlSource
 {
 
+    static QSharedPointer<MediaCtrlRemoteServer> m_instance;
+
 public:
     MediaCtrlRemoteServer();
     virtual ~MediaCtrlRemoteServer() = default;
+
+    static QSharedPointer<MediaCtrlRemoteServer> create() {
+        m_instance = QSharedPointer<MediaCtrlRemoteServer>(new MediaCtrlRemoteServer());
+        return m_instance;
+    }
+
+    static QSharedPointer<MediaCtrlRemoteServer> instance() {
+        return m_instance;
+    }
 
 signals:
     //void progressChanged(float progress);
