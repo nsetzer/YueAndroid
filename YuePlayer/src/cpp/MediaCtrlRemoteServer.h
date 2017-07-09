@@ -2,6 +2,7 @@
 #define MEDIACONTROLBACKEND_H
 
 #include <QSharedPointer>
+#include <QByteArray>
 #include "rep_MediaControl_source.h"
 #include "yue/bell/database.hpp"
 #include "yue/bell/library.hpp"
@@ -58,6 +59,9 @@ private:
     yue::bell::MediaPlayerBase::State m_state;
 
     void sendNotification();
+
+    QByteArray m_current_art;
+    QString m_message;
 
 };
 

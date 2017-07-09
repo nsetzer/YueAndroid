@@ -155,17 +155,16 @@ public class MyCustomAppService extends QtService {
 
          Resources res = ctx.getResources();
 
-         cover = BitmapFactory.decodeResource(res, R.drawable.icon);
+         //cover = BitmapFactory.decodeResource(res, R.drawable.icon);
+         cover = BitmapFactory.decodeByteArray (coverart,0,coverart.length);
 
          builder = new Notification.Builder(ctx);
          builder.setContentTitle("title")
                 .setContentText(title)
                 .setTicker("ticker")
                 .setVisibility(Notification.VISIBILITY_PUBLIC)
-                .setSmallIcon(R.drawable.icon);
-
-
-                //.setLargeIcon(R.drawable.ic_notif_audio);
+                .setSmallIcon(R.drawable.icon)
+                .setLargeIcon(cover);
 
          PendingIntent piPrev = PendingIntent.getBroadcast(ctx, 0, new Intent(ACTION_PLAYBACK_PREV), PendingIntent.FLAG_UPDATE_CURRENT);
          PendingIntent piPlayPause = PendingIntent.getBroadcast(ctx, 0, new Intent(ACTION_PLAYBACK_PLAYPAUSE), PendingIntent.FLAG_UPDATE_CURRENT);
@@ -183,7 +182,7 @@ public class MyCustomAppService extends QtService {
          //MediaSessionCompat.Token sessionToken = mMediaSession.getSessionToken();
 
          builder.setStyle(new Notification.MediaStyle()
-                .setShowActionsInCompactView(1,2));
+                .setShowActionsInCompactView(0,1,2));
                 //.setMediaSession(mMediaSession.getSessionToken()));
 
          Log.i("Service", "display notification");

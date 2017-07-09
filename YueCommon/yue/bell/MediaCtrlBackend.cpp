@@ -39,6 +39,9 @@ void MediaCtrlBackend::load()
         auto pl = PlaylistManager::instance()->openCurrent();
         auto pair = pl->current();
         load(pair.first);
+
+        emit currentIndexChanged(pair.second);
+
     } catch (std::runtime_error& e) {
         qWarning() << "Error Loading Song: " << e.what();
     }
