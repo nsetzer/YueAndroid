@@ -77,9 +77,10 @@ public:
 bool isLeapYear(int year);
 int daysInMonth(int year, int month);
 
-long dateDayNumber(long y, long m, long d);
-void dateFromDayNumber(long g, long& y, long& m, long& d);
-bool dateIsValid(long y, long m, long d);
+long dateDayNumber(const ydate_t& date);
+ydate_t dateFromDayNumber(long g);
+bool dateIsValid(const ydate_t& date);
+
 ydate_t dateDelta(const ydate_t& date, long dy, long dm, long dd);
 ydate_t dateDelta(const ydate_t& date, long dd);
 
