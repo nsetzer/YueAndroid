@@ -7,7 +7,6 @@
 #include <chrono>
 #include <ctime>
 #include <thread>
-#include <iostream>
 
 namespace yue {
 namespace core {

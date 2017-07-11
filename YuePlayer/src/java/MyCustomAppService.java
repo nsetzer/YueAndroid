@@ -123,6 +123,8 @@ public class MyCustomAppService extends QtService {
 
       unregisterReceiver(mReceiver);
 
+      JNIServiceExtAppCallback();
+
       super.onDestroy();
    }
 
@@ -135,16 +137,16 @@ public class MyCustomAppService extends QtService {
    */
 
    // byte[] coverart, long length
-   public static void showNotification( byte[] coverart, boolean playing, String title) {
+   public static void showNotification( byte[] coverart, boolean playing, String title, String message) {
       Log.i("Service", "a4 display notification");
-      m_instance.showNotificationImpl(coverart, playing, title);
+      m_instance.showNotificationImpl(coverart, playing, title, message);
    }
 
 
    //https://developer.android.com/guide/topics/ui/notifiers/notifications.html#controllingMedia
 
    // String title, boolean playing, byte[] coverart, long length
-   public void showNotificationImpl(byte[] coverart, boolean playing, String title) {
+   public void showNotificationImpl(byte[] coverart, boolean playing, String title, String message) {
       Context ctx = this;
       try {
 
@@ -159,12 +161,19 @@ public class MyCustomAppService extends QtService {
          cover = BitmapFactory.decodeByteArray (coverart,0,coverart.length);
 
          builder = new Notification.Builder(ctx);
-         builder.setContentTitle("title")
-                .setContentText(title)
-                .setTicker("ticker")
+         builder.setContentTitle(title)
+                .setContentText(message)
                 .setVisibility(Notification.VISIBILITY_PUBLIC)
                 .setSmallIcon(R.drawable.icon)
                 .setLargeIcon(cover);
+
+         // open the application when the notification is clicked
+         Intent appIntent = new Intent(ctx, MyCustomAppActivity.class);
+         PendingIntent appPendingIntent = PendingIntent.getActivity(
+                                          ctx, 0, appIntent,
+                                          Intent.FLAG_ACTIVITY_NEW_TASK);
+         builder.setContentIntent(appPendingIntent);
+
 
          PendingIntent piPrev = PendingIntent.getBroadcast(ctx, 0, new Intent(ACTION_PLAYBACK_PREV), PendingIntent.FLAG_UPDATE_CURRENT);
          PendingIntent piPlayPause = PendingIntent.getBroadcast(ctx, 0, new Intent(ACTION_PLAYBACK_PLAYPAUSE), PendingIntent.FLAG_UPDATE_CURRENT);
@@ -176,7 +185,6 @@ public class MyCustomAppService extends QtService {
          } else {
             builder.addAction(R.drawable.ic_notif_play, "play", piPlayPause);
          }
-
          builder.addAction(R.drawable.ic_notif_next, "next", piNext);
 
          //MediaSessionCompat.Token sessionToken = mMediaSession.getSessionToken();
@@ -187,7 +195,11 @@ public class MyCustomAppService extends QtService {
 
          Log.i("Service", "display notification");
          //startService(new Intent(ctx, MyCustomAppService.class));
+         //if (playing) {
          startForeground(3, builder.build());
+         //} else {
+         //   stopForeground(false);
+         //}
       } catch (IllegalArgumentException e) {
          Log.e("Service", "Failed to display notification", e);
       }
@@ -210,8 +222,6 @@ public class MyCustomAppService extends QtService {
       Log.i("Service", "onbtn next pressed");
       JNIServiceNextCallback();
    }
-
-   public static native void JNIServiceCallback(int i);
 
    private MediaSession mMediaSession;
    //protected MediaSessionCallback mSessionCallback;
@@ -248,6 +258,7 @@ public class MyCustomAppService extends QtService {
     public static native void JNIServicePrevCallback();
     public static native void JNIServiceNextCallback();
     public static native void JNIServicePlayPauseCallback();
+    public static native void JNIServiceExtAppCallback();
 
 
 }

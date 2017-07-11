@@ -3,6 +3,7 @@
 #include <iostream>
 #include "yue/core/search/grammar.hpp"
 #include "yue/alien/utf8/utf8.h"
+#include "yue/core/util/dateutil.h"
 
 namespace yue {
 namespace core {
@@ -646,26 +647,25 @@ SearchGrammar::buildDateColumnRule(SearchGrammar::RuleType type,
     int value=0, value_lo=0, value_hi=0;
 
     if (m_recalculate_time) {
-
         m_current_time = util::currentTimePoint();
     }
 
     util::ydate_t date = util::extractDate(m_current_time);
 
-    parseRelativeDateDelta(nd_text->text(),date,true);
+    util::parseRelativeDateDelta(nd_text->text(),date,true);
 
     switch (type) {
     case SearchGrammar::RuleType::PartialString:
     case SearchGrammar::RuleType::Exact:
         value_lo = util::dateToEpochTime(date);
-        date = dateDelta(date,0,0,1);
+        date = util::dateDelta(date,0,0,1);
         value_hi = util::dateToEpochTime(date);
         return std::unique_ptr<SearchRule>(
             new RangeSearchRule<int>(column, value_lo, value_hi));
     case SearchGrammar::RuleType::InvertedPartialString:
     case SearchGrammar::RuleType::InvertedExact:
         value_lo = util::dateToEpochTime(date);
-        date = dateDelta(date,0,0,1);
+        date = util::dateDelta(date,0,0,1);
         value_hi = util::dateToEpochTime(date);
         return std::unique_ptr<SearchRule>(
             new NotRangeSearchRule<int>(column, value_lo, value_hi));

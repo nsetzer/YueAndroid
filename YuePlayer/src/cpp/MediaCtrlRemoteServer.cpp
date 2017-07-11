@@ -1,6 +1,5 @@
 #include "MediaCtrlRemoteServer.h"
-#include <QAndroidJniObject>
-#include <QAndroidJniEnvironment>
+
 #include <QDebug>
 #include <QBuffer>
 #include <QByteArray>
@@ -9,6 +8,11 @@
 #include "yue/bell/library.hpp"
 #include "yue/bell/playlist.hpp"
 #include "yue/bell/AlbumArt.h"
+
+#ifdef Q_OS_ANDROID
+#include <QAndroidJniObject>
+#include <QAndroidJniEnvironment>
+#endif
 
 QSharedPointer<MediaCtrlRemoteServer> MediaCtrlRemoteServer::m_instance(nullptr);
 
@@ -58,7 +62,8 @@ void MediaCtrlRemoteServer::onCurrentIndexChanged(int index)
 
         QString artist, album, title;
         yue::bell::Library::instance()->getDisplayInfo(uid,artist, album, title);
-        m_message = artist + " - " + title;
+        m_title = title;
+        m_message = artist;
     } catch (std::runtime_error& e) {
         qWarning() << "Error Loading Song Information for notification: " << e.what();
         return;
@@ -83,6 +88,7 @@ void MediaCtrlRemoteServer::sendNotification()
 #ifdef Q_OS_ANDROID
 
     QAndroidJniEnvironment env;
+    QAndroidJniObject title = QAndroidJniObject::fromString(m_title);
     QAndroidJniObject message = QAndroidJniObject::fromString(m_message);
     jboolean playing = m_state == yue::bell::MediaPlayerBase::State::Playing;
 
@@ -93,9 +99,10 @@ void MediaCtrlRemoteServer::sendNotification()
 
     QAndroidJniObject::callStaticMethod<void>("org/github/nsetzer/example/MyCustomAppService",
                                        "showNotification",
-                                       "([BZLjava/lang/String;)V",
+                                       "([BZLjava/lang/String;Ljava/lang/String;)V",
                                        coverart,
                                        playing,
+                                       title.object<jstring>(),
                                        message.object<jstring>()
                                        );
 

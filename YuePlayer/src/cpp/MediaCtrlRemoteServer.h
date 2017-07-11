@@ -45,6 +45,8 @@ public slots:
     virtual void setVolume(float volume) { m_pBackend->setVolume(volume); }
     virtual void setProgress(float progress) { m_pBackend->setProgress(progress); }
 
+    virtual void stop() { m_pBackend->stop(); }
+
 private slots:
     void onProgressChanged(float progress);
     void onCurrentIndexChanged(int index);
@@ -61,6 +63,7 @@ private:
     void sendNotification();
 
     QByteArray m_current_art;
+    QString m_title;
     QString m_message;
 
 };

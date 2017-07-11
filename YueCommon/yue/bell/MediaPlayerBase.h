@@ -51,6 +51,7 @@ public slots:
     //virtual void next()=0;
     //virtual void prev()=0;
     virtual void setVolume(float volume) = 0;
+    virtual void stop()=0;
 
 protected:
     Status m_currentStatus;

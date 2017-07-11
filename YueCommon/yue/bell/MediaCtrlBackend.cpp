@@ -94,6 +94,12 @@ void MediaCtrlBackend::setVolume(float volume)
     m_pPlayer->setVolume(volume);
 }
 
+void MediaCtrlBackend::stop()
+{
+    m_pPlayer->stop();
+}
+
+
 void MediaCtrlBackend::setProgress(float progress)
 {
     m_pPlayer->setPosition(m_pPlayer->duration() * progress);

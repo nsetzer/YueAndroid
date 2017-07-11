@@ -58,6 +58,12 @@ void MediaPlayerQt::setVolume(float volume)
     m_player.setVolume(v);
 }
 
+void MediaPlayerQt::stop()
+{
+    m_player.stop();
+    m_player.setMedia(QMediaContent());
+}
+
 void MediaPlayerQt::onDurationChanged(qint64 duration)
 {
     // convert from milliseconds to seconds as float

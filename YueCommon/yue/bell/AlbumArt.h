@@ -9,7 +9,7 @@
 namespace yue {
 namespace bell {
 
-class AlbumArt
+class YUECOMMON_EXPORT AlbumArt
 {
     static int DEFAULT_WIDTH;
 public:

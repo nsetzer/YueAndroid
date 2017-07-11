@@ -50,14 +50,14 @@ template<>
 int
 fromString<int>(const std::string &s) {
     // std::stoi is not available on all platforms
-    return atoi(s.c_str());
+    return std::atoi(s.c_str());
 }
 
 template<>
 float
 fromString<float>(const std::string &s) {
     // std::stoi is not available on all platforms
-    return atof(s.c_str());
+    return std::atof(s.c_str());
 }
 
 template<>

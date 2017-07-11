@@ -9,7 +9,8 @@
 #include <string>
 #include <sstream>
 #include <vector>
-#include <stdlib.h> // atoi and atof over stoi and stof
+#include <cstdlib> // atoi and atof over stoi and stof
+
 namespace yue {
 namespace core {
 

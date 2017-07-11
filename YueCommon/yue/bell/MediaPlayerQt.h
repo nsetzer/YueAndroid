@@ -40,6 +40,7 @@ public slots:
     //virtual void next();
     //virtual void prev();
     virtual void setVolume(float volume) override;
+    virtual void stop();
 
 private slots:
     void onDurationChanged(qint64 duration);
