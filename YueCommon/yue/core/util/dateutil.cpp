@@ -76,16 +76,22 @@ int daysInMonth(int year, int month)
 }
 
 //https://alcor.concordia.ca//~gpkatch/gdate-algorithm.html
-long dateDayNumber(long y, long m, long d)
+long dateDayNumber(const ydate_t& date)
 {
+    long y = date.year;
+    long m = date.month;
+    long d = date.day;
+
     m = (m + 9) % 12;
     y = y - m/10;
     return 365*y + y/4 - y/100 + y/400 + (m*306 + 5)/10 + ( d - 1 );
 }
 
-void dateFromDayNumber(long g, long& y, long& m, long& d)
+ydate_t dateFromDayNumber(long g)
 {
+    long y,m,d;
     long dd, mm;
+
     y = (10000*g + 14780)/3652425;
     dd = g - (365*y + y/4 - y/100 + y/400);
     if (dd < 0) {
@@ -96,6 +102,8 @@ void dateFromDayNumber(long g, long& y, long& m, long& d)
     m = (mm + 2)%12 + 1;
     y = y + (mm + 2)/12;
     d = dd - (mm*306 + 5)/10 + 1;
+
+    return ydate_t(y,m,d);
 }
 
 /**
@@ -104,11 +112,11 @@ void dateFromDayNumber(long g, long& y, long& m, long& d)
  * @remark for example, (2000,11,31) is an invalid date
  *         and (2000,12,1) is a valid date
  */
-bool dateIsValid(long y, long m, long d)
+bool dateIsValid(const ydate_t& date)
 {
-    long yy,mm,dd;
-    dateFromDayNumber(dateDayNumber(y,m,d),yy,mm,dd);
-    return y==yy && m==mm && d==dd;
+    ydate_t date2;
+    date2 = dateFromDayNumber(dateDayNumber(date));
+    return date == date2;
 }
 
 /**
@@ -157,19 +165,17 @@ ydate_t dateDelta(const ydate_t& date, long dy, long dm, long dd)
         y -= 1;
     }
 
-    long g = dateDayNumber(y,m,d);
-    dateFromDayNumber(g+dd,y,m,d);
-
-    return ydate_t(y,m,d);
+    long g = dateDayNumber(ydate_t{y,m,d} );
+    ydate_t newDate = dateFromDayNumber(g+dd);
+    return newDate;
 }
 
 ydate_t dateDelta(const ydate_t& date, long dd)
 {
     long y,m,d;
-    long g = dateDayNumber(date.year,date.month,date.day);
-    dateFromDayNumber(g+dd,y,m,d);
-
-    return ydate_t(y,m,d);
+    long g = dateDayNumber(date);
+    ydate_t newDate = dateFromDayNumber(g+dd);
+    return newDate;
 }
 
 unsigned long dateToEpochTime(const ydate_t& date)

@@ -285,14 +285,49 @@ SearchGrammarTest::run_test() {
         run(test_sql("test", "(album LIKE ? OR artist LIKE ? OR title LIKE ?)",
                      {"%test%", "%test%", "%test%"}));
 
-        //
+        // check that date delta computation is correct
+        // the test freezes the current date to allow for exact
+        // comparison of epoch times.
         util::ydate_t date = util::extractDate(m_grammar.m_current_time);
-        int value_lo = util::dateToEpochTime(date);
+        int value, value_lo, value_hi;
+        value_lo = util::dateToEpochTime(date);
         date = dateDelta(date,0,0,1);
-        int value_hi = util::dateToEpochTime(date);
+        value_hi = util::dateToEpochTime(date);
         run(test_sql("date = 0d", "date BETWEEN ? AND ?",
                      {util::toString<int>(value_lo),
                       util::toString<int>(value_hi)}));
+
+        run(test_sql("date < 0d", "date >= ?",
+                     {util::toString<int>(value_lo),}));
+        run(test_sql("date > 0d", "date <= ?",
+                     {util::toString<int>(value_lo),}));
+
+        date = util::extractDate(m_grammar.m_current_time);
+        date = dateDelta(date,0,0,-1);
+        value = util::dateToEpochTime(date);
+        run(test_sql("date > 1d", "date <= ?",
+                     {util::toString<int>(value),}));
+
+        // check that date delta for a week is compute correctly
+        date = util::extractDate(m_grammar.m_current_time);
+        date = dateDelta(date,0,0,-7);
+        value = util::dateToEpochTime(date);
+        run(test_sql("date > 1w", "date <= ?",
+                     {util::toString<int>(value),}));
+
+        // check that date delta for a month is compute correctly
+        date = util::extractDate(m_grammar.m_current_time);
+        date = dateDelta(date,0,-1,0);
+        value = util::dateToEpochTime(date);
+        run(test_sql("date > 1m", "date <= ?",
+                     {util::toString<int>(value),}));
+
+        // check that date delta for a year is compute correctly
+        date = util::extractDate(m_grammar.m_current_time);
+        date = dateDelta(date,-1,0,0);
+        value = util::dateToEpochTime(date);
+        run(test_sql("date > 1y", "date <= ?",
+                     {util::toString<int>(value),}));
 
     }
 
