@@ -1,5 +1,10 @@
 #include "MediaCtrlRemoteClient.h"
 
+#ifdef Q_OS_ANDROID
+#include <QAndroidJniObject>
+#include <QAndroidJniEnvironment>
+#endif
+
 MediaCtrlRemoteClient::MediaCtrlRemoteClient()
 {
 
@@ -100,3 +105,11 @@ void MediaCtrlRemoteClient::onServiceStateChanged(int state)
     emit stateChanged(s);
 }
 
+void MediaCtrlRemoteClient::tts()
+{
+#ifdef Q_OS_ANDROID
+    QAndroidJniObject::callStaticMethod<void>("org/github/nsetzer/example/MyCustomAppActivity",
+                                       "promptSpeechInput",
+                                       "()V");
+#endif
+}

@@ -54,13 +54,13 @@ public:
     int currentIndex();
     SongInfo currentSong() { return m_currentSong; }
 
-    Q_INVOKABLE void playNext(int uid);
-    Q_INVOKABLE void playSong(int uid);
+
 
     Q_INVOKABLE MediaPlayerBase::Status getStatus() { return m_status; }
     Q_INVOKABLE MediaPlayerBase::State getState() { return m_state; }
     Q_INVOKABLE float getProgress() { return m_progress; }
     Q_INVOKABLE void setCurrentPlaylist(QList<yue::bell::Database::uid_t>& lst, bool autoplay = false);
+    Q_INVOKABLE virtual void tts() { qDebug() << "tts not implemented"; }
 
 signals:
     // signals emitted by the base class
@@ -72,8 +72,14 @@ signals:
     void statusChanged(MediaPlayerBase::Status status);
     void stateChanged(MediaPlayerBase::State state);
 
+    void doPlaySong(int uid);
+
 public slots:
     // functions to call (and implement) on the server
+
+    Q_INVOKABLE void playNext(int uid);
+    Q_INVOKABLE void playSong(int uid);
+
 
     virtual void load()=0;
 
@@ -84,6 +90,7 @@ public slots:
     virtual void prev()=0;
     virtual void setVolume(float volume) = 0;
     virtual void setProgress(float progress) = 0;
+
 
     //virtual void setNewPlaylist(SongList lst);
 private slots:

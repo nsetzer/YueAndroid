@@ -8,6 +8,7 @@ QSharedPointer<yue::bell::MediaCtrlBase> MediaCtrlBase::m_instance = nullptr;
 MediaCtrlBase::MediaCtrlBase(QObject *parent) : QObject(parent)
 {
 
+    connect(this,&MediaCtrlBase::doPlaySong,this,&MediaCtrlBase::playSong);
 }
 
 void MediaCtrlBase::setCurrentPlaylist(QList<yue::bell::Database::uid_t>& lst, bool autoplay/* = false*/)

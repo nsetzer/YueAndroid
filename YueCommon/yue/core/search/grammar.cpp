@@ -420,7 +420,7 @@ Grammar::_buildRule(SyntaxNode *node) {
             return std::unique_ptr<SearchRule>(
                 new AndSearchRule(std::move(rules)));
     } else if (node->mode() == StringValue::Mode::FlowNot) {
-        // make the child node
+        // make the child node for logical not
         SyntaxNode *child = node->m_children.front();
         std::unique_ptr<SearchRule> rule = _buildRule(child);
         return std::unique_ptr<SearchRule>(new NotSearchRule(std::move(rule)));

@@ -19,6 +19,15 @@ PageBase {
         console.log("Title Clicked on page" + title)
     }
 
+    function showMoreButton() {
+        return true
+    }
+
+    function moreClicked() {
+        console.log("More clicked on page " + title)
+        MediaPlayer.tts()
+    }
+
     function min(x,y) {
         if (x<y)
             return x

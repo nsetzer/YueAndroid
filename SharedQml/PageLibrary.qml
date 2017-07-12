@@ -22,6 +22,13 @@ PageBase {
         return true
     }
 
+    function moreClicked() {
+        console.log("More clicked on page " + title)
+        MediaPlayer.tts()
+    }
+
+
+
     PageIndicator {
         id: indicator
 

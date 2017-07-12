@@ -390,7 +390,12 @@ QList<Database::uid_t> Library::createPlaylist(QString query, size_t size/* = 0*
     // TODO: no limit on query
     // use artist and album to prevent repeats
     QSqlQuery q(m_db->db());
-    q.prepare("SELECT uid, artist FROM library");
+    if (query == "") {
+        q.prepare("SELECT uid, artist FROM library");
+    } else {
+        q = m_grammar.buildQuery(QStringList() << yue::core::Song::uid << yue::core::Song::artist,
+                              query);
+    }
     q.exec();
 
 
