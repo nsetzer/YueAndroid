@@ -1,0 +1,68 @@
+1 START SEARCHTERM_R .
+1 START COMMAND SEARCHTERM_R .
+
+# implement recursion in search terms
+5 SEARCHTERM_R SEARCHTERM
+3 SEARCHTERM_R SEARCHTERM _join SEARCHTERM_R
+1 SEARCHTERM_R ( SEARCHTERM_R )
+
+# define what a query looks like
+1 SEARCHTERM COLUMN OPERATION TEXT
+1 SEARCHTERM DATEOPERATION DATETEXT
+1 SEARCHTERM TEXT
+
+1 COMMAND play
+1 COMMAND create playlist
+1 COMMAND create playlists
+1 COMMAND create
+
+
+
+
+
+1 _join and
+1 _join or
+1 _join ||
+1 _join &&
+
+1 DATEOPERATION last played
+1 DATEOPERATION not played
+1 DATETEXT today
+1 DATETEXT this DATEUNIT
+1 DATETEXT last DATEUNIT
+1 DATEUNIT year
+1 DATEUNIT month
+1 DATEUNIT week
+1 DATEUNIT day
+
+1 OPERATION is
+1 OPERATION is not
+1 OPERATION matches
+1 OPERATION greater than
+1 OPERATION less than
+1 OPERATION <
+1 OPERATION <=
+1 OPERATION >
+1 OPERATION >=
+1 OPERATION =
+1 OPERATION ==
+
+1 COLUMN artist
+1 COLUMN album
+1 COLUMN play count
+1 COLUMN last played
+
+2 TEXT VALUE
+1 TEXT VALUE TEXT
+
+# OOV is a special terminal word standing in for any word not in the grammars
+1 VALUE OOV
+# list any terminal words used by the grammar, with zero weight
+0 VALUE not
+0 VALUE than
+0 VALUE less
+0 VALUE greater
+0 VALUE and
+0 VALUE or
+0 VALUE artist
+0 VALUE album
