@@ -37,7 +37,10 @@ YUE_TEST(nlpgrammar)
         parser.load_cfg(ifs);
     }
 
-    std::vector<std::string> sentence = {"artist","is","OOV","."};
+    //std::vector<std::string> sentence = {"artist","is","OOV","OOV","and", "title", "is", "OOV","."};
+    //std::vector<std::string> sentence = {"artist","is","OOV","OOV","and", "title", "is", "not", "OOV","."};
+    std::vector<std::string> sentence = {"artist","is","OOV","OOV","and", "not", "played", "this","month","."};
+    //std::vector<std::string> sentence = {"(", "title", "is", "OOV",")","."};
     parser.parse(sentence);
 
     YUE_TEST_END();

@@ -33,6 +33,7 @@ class StringValue {
     enum class Mode {
         Unknown,
         Text,
+        TextGroup,       /*a list of Text values*/
         BinaryOperator,  /* = == < etc*/
         FlowNot,         /* ! */
         FlowAnd,         /* && */
@@ -66,12 +67,13 @@ class SyntaxNode {
   public:
     SyntaxNode() : m_value(), m_children(){};
     SyntaxNode(const StringValue &value) : m_value(value), m_children(){}
-    SyntaxNode(const char *str, StringValue::Mode mode)
+    SyntaxNode(std::string str, StringValue::Mode mode)
         : m_value(str, 0, 0, mode), m_children(){}
     ~SyntaxNode(){};
 
     void pp(int depth = 0) const;
 
+    // add node as a child
     void append(SyntaxNode *node);
 
     const std::string &text(void) const {

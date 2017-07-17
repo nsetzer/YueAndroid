@@ -290,15 +290,268 @@ NLPContext::NLPContext()
 void print_tree(std::vector<std::string>& sentence, table_t& table, table_i idx, int k) {
 
     TableEntry& ent = table[idx][k];
-    if (ent.idx_t >=0) {
-        std::cout << ent.term << "(" << sentence[ent.idx_t] << ")";
+
+    if (util::startswith(ent.term,"<")) {
+        if (ent.idx_t >=0) {
+            std::cout << sentence[ent.idx_t];
+        } else {
+            print_tree(sentence,table, ent.idx_b,ent.idx_bk);
+            std::cout << ", ";
+            print_tree(sentence,table, ent.idx_c,ent.idx_ck);
+        }
     } else {
-        std::cout << ent.term << "(";
-        print_tree(sentence,table, ent.idx_b,ent.idx_bk);
-        std::cout << ", ";
-        print_tree(sentence,table, ent.idx_c,ent.idx_ck);
-        std::cout << ")";
+        if (ent.idx_t >=0) {
+            std::cout << ent.term << "(" << sentence[ent.idx_t] << ")";
+        } else {
+            std::cout << ent.term << "(";
+            print_tree(sentence,table, ent.idx_b,ent.idx_bk);
+            std::cout << ", ";
+            print_tree(sentence,table, ent.idx_c,ent.idx_ck);
+            std::cout << ")";
+        }
     }
+}
+
+void
+build_tree_text(
+    std::vector<std::string>& sentence,
+    table_t& table,
+    table_i idx,
+    int k,
+    std::vector<std::string>& results) {
+
+    TableEntry& ent = table[idx][k];
+    if (ent.idx_t >=0) {
+        results.push_back(sentence[ent.idx_t]);
+    } else {
+        build_tree_text(sentence, table, ent.idx_b,ent.idx_bk,results);
+        build_tree_text(sentence, table, ent.idx_c,ent.idx_ck,results);
+    }
+}
+
+SyntaxNode* build_tree(std::vector<std::string>& sentence, table_t& table, table_i idx, int k, SyntaxNode* parent) {
+
+    TableEntry& ent = table[idx][k];
+
+    // text is a special case terminal, which may have children
+    if (ent.term == "TEXT" || ent.term == "VALUE") {
+        std::vector<std::string> strs;
+        build_tree_text(sentence, table, idx, k, strs);
+        if (strs.size()==1) {
+            return new SyntaxNode(strs[0],StringValue::Mode::Text);
+        } else {
+            SyntaxNode *nd = new SyntaxNode("",StringValue::Mode::TextGroup);
+            for(std::string s : strs) {
+                nd->append(new SyntaxNode(s,StringValue::Mode::Text));
+            }
+            return nd;
+        }
+    }
+
+    // process terminal nodes
+    if (ent.idx_t >= 0) {
+        StringValue::Mode mode = StringValue::Mode::Text;
+        std::string text = sentence[ent.idx_t];
+        // fix for terminal operations
+        if (ent.term == "OPERATION") {
+            mode = StringValue::Mode::BinaryOperator;
+            if (text == "is") {
+                text = "=";
+            }
+        } else if (ent.term == "BINOPERATION") {
+            mode = StringValue::Mode::BinaryOperator;
+        } else if (ent.term == "JOIN") {
+            if (text == "and") {
+                text = "&&";
+                mode = StringValue::Mode::FlowAnd;
+            } else if (text == "&&") {
+                mode = StringValue::Mode::FlowAnd;
+            } else if (text == "or") {
+                text = "||";
+                mode = StringValue::Mode::FlowOr;
+            } else if (text == "||") {
+                mode = StringValue::Mode::FlowOr;
+            }
+        }
+        parent->append(new SyntaxNode(text,mode));
+        return nullptr;
+    }
+
+    if (ent.term == "OPERATION") {
+        std::vector<std::string> strs;
+        build_tree_text(sentence, table, idx, k,strs);
+        std::string text = (strs.size()>1)?strs[0]:"ERROR";
+        if (strs.size()==2 && strs[0] == "is" && strs[1] == "not") {
+            text = "!=";
+        }
+        return new SyntaxNode(text,StringValue::Mode::BinaryOperator);
+    }
+
+    if (ent.term == "BINOPERATION") {
+        std::vector<std::string> strs;
+        build_tree_text(sentence, table, idx, k,strs);
+        std::string text = (strs.size()>1)?strs[0]:"ERROR";
+        if (strs.size()==2 && strs[0] == "greater" && strs[1] == "than") {
+            text = ">";
+        } else if (strs.size()==2 && strs[0] == "less" && strs[1] == "than") {
+            text = "<";
+        }
+        return new SyntaxNode(text,StringValue::Mode::BinaryOperator);
+    }
+
+    SyntaxNode *nd=nullptr, *rnd=nullptr;
+    if (util::startswith(ent.term,"<") || util::startswith(ent.term,"SEARCHTERM"))
+        nd = parent;
+    else
+        rnd = nd = new SyntaxNode(ent.term,StringValue::Mode::Unknown);
+
+    SyntaxNode * tmp = nullptr;
+
+    tmp = build_tree(sentence, table, ent.idx_b,ent.idx_bk, nd);
+    if (tmp!=nullptr) {
+        nd->append(tmp);
+    }
+
+    tmp = build_tree(sentence, table, ent.idx_c,ent.idx_ck, nd);
+    if (tmp!=nullptr) {
+        nd->append(tmp);
+    }
+
+    return rnd;
+
+}
+
+void fixdate(SyntaxNode* nd)
+{
+    std::vector<SyntaxNode*>& children =nd->m_children;
+    if (children.size()>=2) {
+        // handle the left side of a date operation
+        if (children[0]->text() == "not" && children[1]->text() == "played") {
+            delete children[0];
+            delete children[1];
+            children.erase(children.begin());
+            children.erase(children.begin());
+            children.insert(children.begin(),new SyntaxNode("date",StringValue::Mode::Text));
+            nd->m_value.m_sValue = ">";// TODO
+            nd->m_value.m_mode = StringValue::Mode::BinaryOperator;
+        } else if (children[0]->text() == "last" && children[1]->text() == "played") {
+            delete children[0];
+            delete children[1];
+            children.erase(children.begin());
+            children.erase(children.begin());
+            children.insert(children.begin(),new SyntaxNode("date",StringValue::Mode::Text));
+            nd->m_value.m_sValue = "<"; //TODO
+            nd->m_value.m_mode = StringValue::Mode::BinaryOperator;
+        }
+
+        // handle the right side of a date operation
+        // for node
+        //  day   ->  0d or 1d;
+        //  week  -> 0w or 1w;
+        //  month -> 0m or 1m;
+        //  year  -? 0y or 1y;
+
+        // not played this year
+        //
+
+    }
+}
+
+
+void rebalance_tree(SyntaxNode* nd)
+{
+    for (SyntaxNode* child : nd->m_children) {
+        rebalance_tree(child);
+    }
+
+
+    // ----
+    // unary operators
+    for (int i=0; i<nd->m_children.size(); i++) {
+        SyntaxNode* child = nd->m_children[i];
+        if (child->text() == "DATEOPERATION") {
+            SyntaxNode* rhs = nd->m_children[i+1];
+            child->append( rhs );
+            nd->m_children.erase(nd->m_children.begin()+i+1);
+            fixdate(child);
+        }
+
+    }
+
+    // ----
+    // binary operators
+    for (int i=0; i<nd->m_children.size(); i++) {
+        SyntaxNode* child = nd->m_children[i];
+        if (child->mode()==StringValue::Mode::BinaryOperator) {
+            SyntaxNode* rhs = nd->m_children[i+1];
+            SyntaxNode* lhs = nd->m_children[i-1];
+            child->append( lhs );
+            child->append( rhs );
+            nd->m_children.erase(nd->m_children.begin()+i+1);
+            nd->m_children.erase(nd->m_children.begin()+i-1);
+            i++;
+        }
+    }
+
+    // ----
+    // flow operators
+    for (int i=nd->m_children.size()-1; i>=0; i--) {
+        SyntaxNode* child = nd->m_children[i];
+        if (child->mode()==StringValue::Mode::FlowAnd) {
+            SyntaxNode* rhs = nd->m_children[i+1];
+            SyntaxNode* lhs = nd->m_children[i-1];
+            child->append( lhs );
+            child->append( rhs );
+            nd->m_children.erase(nd->m_children.begin()+i+1);
+            nd->m_children.erase(nd->m_children.begin()+i-1);
+            i--;
+        }
+    }
+}
+
+SyntaxNode* build_tree(std::vector<std::string>& sentence, table_t& table, table_i idx, int k) {
+    /*
+    StringValue::Mode
+    Unknown,
+    Text,
+    BinaryOperator,
+    FlowNot,
+    FlowAnd,
+    FlowParens,
+    FlowOr,
+    UnknownOperator,
+
+
+    SyntaxNode(const char *str, StringValue::Mode::Text)
+
+    */
+
+    TableEntry& ent = table[idx][k];
+
+    /*
+    if (ent.idx_t >= 0) {
+        // TODO, i dont think this is possible?
+        // START is always at least :: START -> A <T:.>
+        return new SyntaxNode(ent.term,StringValue::Mode::Unknown);
+    }
+    */
+    SyntaxNode * nd = new SyntaxNode(ent.term,StringValue::Mode::Unknown);
+    SyntaxNode * tmp = nullptr;
+
+    tmp = build_tree(sentence, table, ent.idx_b,ent.idx_bk, nd);
+    if (tmp!=nullptr)
+        nd->append(tmp);
+
+    tmp = build_tree(sentence, table, ent.idx_c,ent.idx_ck, nd);
+    if (tmp!=nullptr)
+        nd->append(tmp);
+
+    rebalance_tree(nd);
+
+    return nd;
+
+
+
 
 }
 
@@ -386,18 +639,28 @@ void CYKParser::parse(std::vector<std::string> sentence) {
         }
     }
 
-    bool match = false;
+    int index = -1;
     std::pair<int,int> idx_a(0,N);
+    int i=0;
+
     for (TableEntry& ent : table[idx_a]) {
         if (ent.term == "START") {
-            std::cout << "START(";
-            print_tree(sentence,table,idx_a,0);
-            std::cout << ")" << std::endl;
-            match = true;
+            index = i;
         }
+        i++;
     }
 
-    std::cout << "Match: " << ((match)?"true":"false") << std::endl;
+    if (index >=0) {
+        print_tree(sentence,table,idx_a,index);
+        std::cout << std::endl;
+        //std::cout << build_tree_text(sentence,table,idx_a,index) << std::endl;
+        SyntaxNode *root = build_tree(sentence,table,idx_a,index);
+        root->pp();
+
+    } else {
+        std::cout << "no match" << std::endl;
+    }
+
 }
 
 } // namespace core
