@@ -2,6 +2,7 @@
 
 import sys
 from collections import defaultdict
+from collections import namedtuple
 from itertools import product
 import random
 import bisect
@@ -70,13 +71,6 @@ def read_grammar(path):
             nonterm[ terms[1] ].append( (int(terms[0]),terms[2:]) )
 
     return nonterm
-    #nonterm_weighted = defaultdict(list)
-    #for key,items in nonterm.items():
-    #    w = sum(map(lambda x:x[0],items))
-    #    nonterm_weighted[key] = [ (x[0]/w,x[1]) for x in items ]
-    #    nonterm_weighted[key].sort(reverse=True);
-
-    return nonterm_weighted
 
 def isTerm(grammar,key):
     return key not in grammar
@@ -91,18 +85,41 @@ def isCNF(grammar, prod):
         return not isTerm(grammar,seq[0]) and not isTerm(grammar,seq[1])
     return False;
 
+def print_grammar(grammar):
+    print("---")
+    fmtlen = 1+max(len(k) for k in grammar.keys())
+    fmt = "%%-%ds: %%s"%(fmtlen)
+    for key,prod in sorted(grammar.items()):
+        items = ["%.2f:%s"%(x[0],' '.join(x[1])) for x in prod]
+        msg = fmt%(key,items[0])
+        dirty = True;
+        for item in items[1:]:
+            if 2 + len(item) + len(msg) > 79:
+                print(msg)
+                dirty = False
+                msg = fmt%("",item)
+            else:
+                msg = msg + ", " + item
+                dirty = True
+        if dirty:
+            print(msg)
+    print("...")
+
 def CFGtoCNF(grammar):
 
     # START,TERM,BIN,DEL,UNIT
 
     cnf = defaultdict(list)
 
-
-    for key,prod in sorted(grammar.items()):
-        print(key + ": " + str(prod))
-    print("---")
+    print_grammar(grammar)
 
     # START: removing START on RHS not implemented
+
+    def append(key,w,prod):
+        for _, prod2 in cnf[key]:
+            if prod == prod2:
+                return
+        cnf[key].append( (w,prod) )
 
     # TERM, BIN
     for key,wprods in grammar.items():
@@ -117,23 +134,27 @@ def CFGtoCNF(grammar):
                     if isTerm(grammar,t):
                         t2 = "<T:%s>"%t
                         prod[i] = t2
-                        cnf[t2].append( (w, [t,]) )
+                        append(t2, w, [t,])
 
                 # BIN: binaraize productions
                 while len(prod) > 2:
                     tmp = prod[-2:]
-                    t = "<%s.%d>"%(key,counter)
+                    t = "<B:%s.%d>"%(key,counter)
                     counter += 1
-                    cnf[t].append( (w,tmp) )
+                    append(t,w,tmp)
                     prod = prod[:-2] + [t,]
-                cnf[key].append( (w,prod) )
+                append(key, w, prod)
 
             else:
                 # if this is a rule A ->B, it will be fixed in the UNIT step
-                cnf[key].append( (w,prod), )
+                append(key, w, prod)
 
     # DEL: remove epsilon productions not implemented
 
+    nrules = 0
+    for rules in cnf.values():
+        nrules += len(rules)
+    print("loaded %d cnf rules"%nrules)
     # UNIT
 
     for key,wprods in cnf.items():
@@ -157,9 +178,7 @@ def CFGtoCNF(grammar):
 
     # ---
 
-    for key,prod in sorted(cnf.items()):
-        print(key + ": " + str(prod))
-    print("---")
+    print_grammar(cnf)
 
     return cnf
 
@@ -187,6 +206,8 @@ def CKYParser(grammar,sentence):
         pointers are the indices of the table that produced that entry
 
     """
+
+
 
     N  = len(sentence)
 
@@ -233,6 +254,8 @@ def CKYParser(grammar,sentence):
 
     return table
 
+# these next few functions build and rebalance trees from the cyk results
+
 def build_tree(sentence, table, state ):
     i,j,k = state
     r = table[(i,j)]
@@ -240,24 +263,10 @@ def build_tree(sentence, table, state ):
         return []
     a,w,d= table[(i,j)][k]
     if isinstance(d,int):
-        tree = [sentence[d],]
+        tree = [a, sentence[d]]
     else:
         b,c = d
-        tree = []
-        b = build_tree(sentence, table, b)
-        c = build_tree(sentence, table, c)
-        # remove hidden labels (ones added by the grammar automatically)
-        # hoist like values
-        #if b[0].startswith("<") or b[0] == a:
-        #    tree = b[1:]
-        #else:
-        tree.append(b)
-        #if c[0].startswith("<") or c[0] == a:
-        #    tree += c[1:]
-        #else:
-        tree.append(c)
-        #tree = [b,c]
-    tree.insert(0,a)
+        tree = [a, build_tree(sentence, table, b), build_tree(sentence, table, c)]
     return tree
 
 def build_tree2(sentence, table, state ):
@@ -293,14 +302,107 @@ def build_tree2(sentence, table, state ):
             else:
                 tree.append(c)
 
-
-
     if "SEARCHTERM" in a and not a.startswith("<"):
         a = "SEARCHTERM"
 
     tree.insert(0,a)
 
     return tree
+
+
+def extract_expr(tree):
+    if not isinstance(tree,list):
+        return [tree,]
+    res = []
+    for child in tree[1:]:
+        res += extract_expr(child)
+    return res
+
+def rebalance_tree(tree):
+
+    i=0;
+    while i < len(tree) :
+        child = tree[i]
+        if child[0].startswith("<") or child[0].startswith("SEARCHTERM"):
+            tree.pop(i)
+            for j, item in enumerate(child[1:]):
+                tree.insert(i+j,item)
+        else:
+            i+= 1
+
+
+    for child in tree[1:]:
+        if isinstance(child,list):
+            rebalance_tree(child)
+
+    if tree[0] == "VALUE":
+        tree[0] = "TEXT"
+
+    i=1;
+    while i < len(tree):
+
+        child = tree[i]
+
+        # combine value and text into a single node, TEXT
+
+        if tree[0] == "COLUMN":
+
+            expr =' '.join(tree[1:])
+            print(len(tree))
+            while len(tree) > 1:
+                tree.pop()
+            tree.append(expr)
+            i += 1
+
+        elif tree[0] == "TEXT" and child[0] == "TEXT":
+            tree.pop(i)
+            for item in child[1:]:
+                tree.insert(i,item)
+                i+= 1
+
+        # combine ternary operations into binary nodes with the
+        # operation as the root
+        elif child[0] in ("OPERATION","BINOPERATION"):
+
+            expr = ' '.join(extract_expr(child)) # child.pop(1)
+            if expr == "greater than":
+                expr = ">"
+            elif expr == "less than":
+                expr = "<"
+            elif expr in ("equals","matches","is"):
+                expr = "="
+            elif expr == "is not":
+                expr = "!="
+            child[0] = expr
+            while len(child) > 1:
+                child.pop()
+            rhs = tree.pop(i+1)
+            lhs = tree.pop(i-1)
+            child.append(lhs)
+            child.append(rhs)
+
+        elif child[0] == "DATEOPERATION":
+            rhs = tree.pop(i+1)
+            rhs = ' '.join(extract_expr(rhs))
+            tree[i] = ["<", "date", rhs]
+
+        else:
+            i+=1
+
+
+    for terms in ( ("and","&&") , ("or","||")):
+        i=len(tree)-1;
+        while i >=1 :
+            child = tree[i]
+            if child[0] == "JOIN" and child[1] in terms:
+                child[0] = child.pop(1)
+                rhs = tree.pop(i+1)
+                lhs = tree.pop(i-1)
+                child.append(lhs)
+                child.append(rhs)
+            i-= 1
+
+
 
 def print_table(N,table):
     for i in range(N+1):
@@ -377,34 +479,46 @@ def main():
     grammar_path = "grammar.txt"
     grammar = read_grammar(grammar_path)
 
+    nrules = 0
+    for rules in grammar.values():
+        nrules += len(rules)
+    print("loaded %d cfg rules"%nrules)
+
     # penalize OOV words when matching.
     grammar_p = grammar.copy()
     grammar_p["TEXT"] = [(1000,p) for w,p in grammar_p["TEXT"]]
     grammar_p["VALUE"] = [(1000,p) for w,p in grammar_p["VALUE"]]
     cnf = CFGtoCNF(grammar_p)
 
+    nrules = 0
+    for rules in cnf.values():
+        nrules += len(rules)
+    print("loaded %d cnf rules"%nrules)
+
     for key,prod in sorted(cnf.items()):
         print(key,prod)
 
-
-    #sentence = "last played matches stone temple pilots .".split()
+    #sentence = "artist is blah and album is blah or ( play count < 5 ) .".split()
+    #sentence = "artist is blah blah and album is blah and title is blah .".split()
+    #sentence = "artist = blah and not played this month || artist = blah .".split()
+    #sentence = "play count greater than 5 and not played this week .".split()
+    sentence = "create playlist play count greater than 5 .".split()
     #sentence = "not played this year or artist matches s t p .".split()
     #sentence = "hack the planet .".split()
-    sentence = "play some music .".split()
 
     table, index = CKYRecognizer(cnf, sentence, "START")
     if index != None:
-        tree = build_tree2(sentence, table, index)
+        tree = build_tree(sentence, table, index)
+        print_tree(tree, 2, 80)
+        rebalance_tree(tree)
         print_tree(tree, 2, 80)
     else:
         print("no match")
 
-    grammar = read_grammar(grammar_path)
-    generate_sentences(5, cnf, grammar)
-
+    #generate_sentences(5, cnf, read_grammar(grammar_path))
 
 def generate_sentences(num_sentences, cnf, cfg):
-    grammar_path = "grammar.txt"
+    # normalize the cfg weights between 0 and 1
     cfgg = defaultdict(list)
     for key in cfg.keys():
         wprods = cfg[key]

@@ -3,6 +3,8 @@
 #include "yue/core/search/nlpgrammar.hpp"
 #include "yue/core/util/yuetest.h"
 
+#include <fstream>
+
 using namespace yue;
 using namespace yue::core;
 
@@ -23,10 +25,20 @@ YUE_TEST(nlpgrammar)
     //text.push_back(new SyntaxNode("not",StringValue::Mode::Text));
     //text.push_back(new SyntaxNode("marvel",StringValue::Mode::Text));
 
-    assert_true(true);
+    //assert_true(true);
 
-    std::vector<std::string> sentence = {"artist","is","audio","."};
-    cykparse(sentence);
+
+
+    CYKParser parser;
+
+    std::ifstream ifs ("grammar.txt");
+
+    if (ifs.is_open()) {
+        parser.load_cfg(ifs);
+    }
+
+    std::vector<std::string> sentence = {"artist","is","OOV","."};
+    parser.parse(sentence);
 
     YUE_TEST_END();
 }

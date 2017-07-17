@@ -1,5 +1,6 @@
 
 #include "yue/core/search/nlpgrammar.hpp"
+#include "yue/core/util/string.h"
 
 #include <map>
 #include <utility> // pair
@@ -9,62 +10,282 @@
 namespace yue {
 namespace core {
 
-NLPContext::NLPContext()
+namespace {
+
+void write_cfg(std::ostream& out, cfg_t& cfg) {
+    for (auto& kv : cfg) {
+        int counter = 1;
+        const std::string& term = kv.first;
+        std::vector<weightedproduction_t>& productions = kv.second;
+
+        for( weightedproduction_t& wprod : productions ) {
+
+            double weight = wprod.first;
+            std::vector<std::string>& prod = wprod.second;
+
+            out << weight << " " << term << " ->";
+
+            for (size_t i=0; i < prod.size(); i++)
+                out << " " << prod[i];
+
+            out << std::endl;
+        }
+    }
+}
+
+} // anonymous namespace
+
+
+CYKParser::CYKParser()
+    : m_cfg()
+    , m_cnf()
+    , m_lutnt()
+    , m_lutt()
 {
+}
+
+void CYKParser::load_cfg(std::istream& stream)
+{
+
+    std::string line;
+
+    while (stream.good()) {
+        std::getline(stream,line);
+
+        util::trim(line);
+
+        if (util::startswith(line,"#") || line.size() == 0) {
+            continue;
+        }
+
+
+        std::vector<std::string> items = util::split(line, ' ');
+
+        if (items.size() >= 3) {
+
+            std::string term = items[1];
+            double weight = 1; // TODO parse weight
+
+            items.erase(items.begin()); // remove weight
+            items.erase(items.begin()); // remove term
+
+            if (m_cfg.count(term) == 0) {
+                m_cfg[term] = std::vector<weightedproduction_t>();
+            }
+
+            m_cfg[term].push_back({weight,items});
+
+        } else {
+            std::cout << "poorly  formed input line: " << line << std::endl;
+        }
+
+    }
+
+    size_t nrules=0;
+    for (auto& kv : m_cfg) {
+        int counter = 1;
+        const std::string& term = kv.first;
+        std::vector<weightedproduction_t>& productions = kv.second;
+        nrules += productions.size();
+    }
+    std::cout << "loaded " << nrules << " cfg rules" << std::endl;
+
+    convert_cfg_tocnf();
+
+    invert_cnf();
 
 }
 
-// an index into the CYK table
-typedef std::pair<int,int> table_i;
-
-class TableEntry
+void CYKParser::convert_cfg_tocnf()
 {
-public:
-    // table entry for a nonterminal node (idx_t has no meaning)
-    // idx_b,idx_c point to indices in the table that generated this entry
-    TableEntry(std::string term_, double weight_,
-               table_i idx_b_, int bk,
-               table_i idx_c_, int ck)
-        : term(term_)
-        , weight(weight_)
-        , idx_b(idx_b_)
-        , idx_bk(bk)
-        , idx_c(idx_c_)
-        , idx_ck(ck)
-        , idx_t(-1) // default invalid
-    {}
-    // table entry for a terminal node (idx_t has meaning)
-    TableEntry(std::string term_, double weight_, int idx_)
-        : term(term_)
-        , weight(weight_)
-        , idx_t(idx_)
-    {}
-    ~TableEntry() {}
+    // 5 steps to voncert CFG to CNF : START,TERM,BIN,DEL,UNIT
+    // START and DEL are not implemented
 
-    std::string term;
-    double weight;
+    for (auto& kv : m_cfg) {
+        int counter = 1;
+        const std::string& term = kv.first;
+        std::vector<weightedproduction_t>& productions = kv.second;
 
-    int idx_t;
+        for( weightedproduction_t& wprod : productions ) {
 
-    table_i idx_b;
-    table_i idx_c;
+            double weight = wprod.first;
+            std::vector<std::string> prod = wprod.second;
 
-    int idx_bk;
-    int idx_ck;
+            if (prod.size() > 1) {
 
-};
+                // TERM: replace terminals with non terminals
+                for (size_t i=0; i < prod.size(); i++) {
+                    // if the production is Terminal, replace
+                    // it with a nonterminal
+                    if (m_cfg.count(prod[i])==0) {
+                        std::string temp = "<T:" + prod[i] + ">";
+                        add_cnf(temp, {weight, {prod[i],}});
+                        prod[i] = temp;
+                    }
 
-// the table holding possibly parse states
-typedef std::map<table_i,std::vector<TableEntry>> table_t;
-// for a rule, either A -> B C or A -> x, this type stores the
-// weight for following the rule A.
-typedef std::pair<double,std::string> weightedterm_t;
-// the reverse grammar is made up of two maps
-// nonterminal rules A -> B C  use a map taking a pair of names from the rhs
-// terminal rules A -> x use a map taking the name of the rhs.
-typedef std::pair<std::string,std::string> rcnfnt_i;
-typedef std::map<rcnfnt_i,std::vector<weightedterm_t>> rcnfnt_t;
-typedef std::map<std::string,std::vector<weightedterm_t>> rcnft_t;
+                }
+
+                // BIN: binarize productions
+                while (prod.size() > 2) {
+                    std::stringstream ss;
+                    ss << "<B:" << term << "." << counter << ">";
+                    counter ++;
+                    std::string temp = ss.str();
+
+                    size_t j = prod.size()-1;
+                    size_t i = j-1;
+                    add_cnf(temp, {weight, {prod[i],prod[j]}});
+
+                    prod.pop_back();
+                    prod.pop_back();
+                    prod.push_back( temp );
+                }
+
+                // add a rule of the form A -> B C
+                add_cnf(term, {weight, prod});
+
+            } else {
+                // rule is either A->B or A->x
+                add_cnf(term, wprod);
+            }
+        }
+
+    }
+
+    {
+        size_t nrules=0;
+        for (auto& kv : m_cnf) {
+            int counter = 1;
+            const std::string& term = kv.first;
+            std::vector<weightedproduction_t>& productions = kv.second;
+            nrules += productions.size();
+        }
+        std::cout << "loaded " << nrules << " cnf rules" << std::endl;
+    }
+
+    // UNIT: expand rules of the form A -> B to A -> x
+    // this can be done safely because at this point, all rules
+    // are either A -> B C, A -> x, or A -> B (the ones to fix)
+
+    for (auto& kv : m_cnf) {
+        int counter = 1;
+        const std::string& term = kv.first;
+        std::vector<weightedproduction_t>& productions = kv.second;
+
+        size_t i=0;
+        while (i < productions.size()) {
+            // if the rule produces a single non terminal output
+            // remove the rule, and add the productions from following
+            // the expansion of that rule.
+            if (productions[i].second.size()==1 &&
+                m_cnf.count(productions[i].second[0])>0) {
+
+                std::string rule = productions[i].second[0];
+                productions.erase(productions.begin()+i);
+                for (weightedproduction_t& wprod : m_cnf[rule]) {
+                    productions.push_back(wprod);
+                }
+            } else {
+                i += 1;
+            }
+        }
+    }
+
+    size_t nrules=0;
+    for (auto& kv : m_cnf) {
+        int counter = 1;
+        const std::string& term = kv.first;
+        std::vector<weightedproduction_t>& productions = kv.second;
+        nrules += productions.size();
+    }
+    std::cout << "loaded " << nrules << " cnf rules" << std::endl;
+
+    //write_cfg(std::cout, m_cnf);
+
+}
+
+// force copy of wprod
+void CYKParser::add_cnf(const std::string& key, weightedproduction_t prod)
+{
+    if (m_cnf.count(key) == 0) {
+        m_cnf[key] = std::vector<weightedproduction_t>();
+    }
+
+    std::vector<std::string>& prodb = prod.second;
+
+    for( weightedproduction_t& wprod : m_cnf[key] ) {
+        double weight = wprod.first;
+        std::vector<std::string>& proda = wprod.second;
+
+        // check to see if the production exists in the map already
+        // only compare the terms, not the weights.
+        // the length needs to be the same, and all strings must be equal.
+        if (proda.size() != prodb.size())
+            continue;
+
+        bool equal = true;
+        for (size_t i=0; i < prodb.size(); i++) {
+            if (proda[i] != prodb[i]) {
+                equal = false;
+                break;
+            }
+        }
+
+        if (equal) {
+            // found prod in the cnf under the given key, return and do nothing.
+            return;
+        }
+    }
+
+    m_cnf[key].push_back( prod );
+}
+
+void CYKParser::invert_cnf()
+{
+
+    for (auto& kv : m_cnf) {
+        int counter = 1;
+        const std::string& term = kv.first;
+        std::vector<weightedproduction_t>& productions = kv.second;
+
+        for( weightedproduction_t& wprod : productions ) {
+
+            double weight = wprod.first;
+            std::vector<std::string>& prod = wprod.second;
+
+            if (term == "VALUE") {
+                weight = 1000;
+            } else {
+                weight = 1;
+            }
+
+            if (prod.size() == 2) {
+                rcnfnt_i index{prod[0],prod[1]};
+
+                //std::cout << "invert " << weight << " " << prod[0] << "," << prod[1] << " -> " << term << std::endl;
+                if (m_lutnt.count(index)==0) {
+                    m_lutnt[index] = {{weight,term},};
+                } else {
+                    m_lutnt[index].push_back( {weight,term} );
+                }
+            } else {
+                std::string index = prod[0];
+                //std::cout << "invert " << weight << " " << prod[0] << " -> " << term << std::endl;
+                if (m_lutt.count(index)==0) {
+                    m_lutt[index] = {{weight,term},};
+                } else {
+                    m_lutt[index].push_back( {weight,term} );
+                }
+            }
+        }
+    }
+}
+
+NLPContext::NLPContext()
+{
+
+
+}
 
 void print_tree(std::vector<std::string>& sentence, table_t& table, table_i idx, int k) {
 
@@ -95,34 +316,33 @@ void table_append(table_t& table, std::pair<int,int> idx_a, TableEntry ent) {
     table[idx_a].push_back( ent );
     return;
 }
-void cykparse(std::vector<std::string> sentence) {
+
+void CYKParser::parse(std::vector<std::string> sentence) {
     // TODO: convert to use interned strings for fast comparisons
     //       and merge lutt/luttn
     // TODO: table entries are unique by TERM, with minimum weight.
 
     table_t table;
-    rcnfnt_t lutnt; // nonterminal lookup table
-    rcnft_t lutt; // terminal lookup table
 
     int N = sentence.size();
 
     // hand written reverse CNF grammar
-    lutt["artist"] = {{0,"COLUMN"},};
-    lutt["is"] = {{0,"OPERATION"},};
-    lutt["audio"] = {{0,"TEXT"},};
-    lutt["."] = {{0,"<.>"},};
-    lutnt[{"COLUMN","OPERATION"}] = {{0,"SEARCHTERM.1"},};
-    lutnt[{"SEARCHTERM.1","TEXT"}] = {{0,"SEARCHTERM"},};
-    lutnt[{"SEARCHTERM","<.>"}] = {{0,"START"},};
+    //lutt["artist"] = {{0,"COLUMN"},};
+    //lutt["is"] = {{0,"OPERATION"},};
+    //lutt["OOV"] = {{0,"TEXT"},};
+    //lutt["."] = {{0,"<.>"},};
+    //lutnt[{"COLUMN","OPERATION"}] = {{0,"SEARCHTERM.1"},};
+    //lutnt[{"SEARCHTERM.1","TEXT"}] = {{0,"SEARCHTERM"},};
+    //lutnt[{"SEARCHTERM","<.>"}] = {{0,"START"},};
 
     for (int j=1; j <= N; j++ ) {
         //std::cout << "j:" << j << std::endl;
         std::pair<int,int> idx_j(j-1,j);
         table[idx_j] = std::vector<TableEntry>();
-        for ( weightedterm_t wt : lutt[sentence[j-1]]) {
-            //std::cout << idx_j.first << ","
-            //          << idx_j.second << ": "
-            //          << wt.second << std::endl;
+        for ( weightedterm_t wt : m_lutt[sentence[j-1]]) {
+            std::cout << idx_j.first << ","
+                      << idx_j.second << ": "
+                      << wt.second << std::endl;
             table[idx_j].push_back(TableEntry(wt.second,wt.first,j-1));
         }
         for (int i=j-2; i>=0; i--) {
@@ -142,11 +362,11 @@ void cykparse(std::vector<std::string> sentence) {
                         TableEntry& b = lst_b[xi];
                         TableEntry& c = lst_c[xj];
                         rcnfnt_i idx_r(b.term,c.term);
-                        if (lutnt.count(idx_r) > 0) {
-                            for (weightedterm_t wt : lutnt[idx_r]) {
-                                //std::cout << idx_a.first << ","
-                                //          << idx_a.second << ": "
-                                //          << wt.second << std::endl;
+                        if (m_lutnt.count(idx_r) > 0) {
+                            for (weightedterm_t wt : m_lutnt[idx_r]) {
+                                std::cout << idx_a.first << ","
+                                          << idx_a.second << ": "
+                                          << wt.second << std::endl;
 
                                 table_append(table,idx_a,TableEntry(
                                     wt.second,
@@ -165,13 +385,19 @@ void cykparse(std::vector<std::string> sentence) {
             }
         }
     }
+
+    bool match = false;
     std::pair<int,int> idx_a(0,N);
     for (TableEntry& ent : table[idx_a]) {
         if (ent.term == "START") {
+            std::cout << "START(";
             print_tree(sentence,table,idx_a,0);
-            std::cout << std::endl;
+            std::cout << ")" << std::endl;
+            match = true;
         }
     }
+
+    std::cout << "Match: " << ((match)?"true":"false") << std::endl;
 }
 
 } // namespace core
