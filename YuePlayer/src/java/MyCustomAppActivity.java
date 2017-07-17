@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 import android.speech.RecognizerIntent;
 import android.content.ActivityNotFoundException;
+import android.widget.Toast;
 
 public class MyCustomAppActivity extends QtActivity {
 
@@ -43,6 +44,14 @@ public class MyCustomAppActivity extends QtActivity {
         super.onPause();
     }
 
+    public static void makeToast(String message) {
+        Toast.makeText(m_instance,
+            message,
+            Toast.LENGTH_SHORT).show();
+
+    }
+
+
     public static void promptSpeechInput() {
         m_instance.promptSpeechInputImpl();
     }
@@ -60,10 +69,9 @@ public class MyCustomAppActivity extends QtActivity {
         try {
             startActivityForResult(intent, REQ_CODE_SPEECH_INPUT);
         } catch (ActivityNotFoundException a) {
-            //Log.i("uhoh");
-            //Toast.makeText(getApplicationContext(),
-            //        getString(R.string.speech_not_supported),
-            //        Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(),
+                    "Speech not Supported",
+                    Toast.LENGTH_SHORT).show();
         }
     }
 

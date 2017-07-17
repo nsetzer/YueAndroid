@@ -9,9 +9,10 @@ MediaCtrlBase::MediaCtrlBase(QObject *parent) : QObject(parent)
 {
 
     connect(this,&MediaCtrlBase::doPlaySong,this,&MediaCtrlBase::playSong);
+    connect(this,&MediaCtrlBase::doSetCurrentPlaylist,this,&MediaCtrlBase::setCurrentPlaylist);
 }
 
-void MediaCtrlBase::setCurrentPlaylist(QList<yue::bell::Database::uid_t>& lst, bool autoplay/* = false*/)
+void MediaCtrlBase::setCurrentPlaylist(QList<yue::bell::Database::uid_t> lst, bool autoplay/* = false*/)
 {
     LOG_FUNCTION_TIME();
 

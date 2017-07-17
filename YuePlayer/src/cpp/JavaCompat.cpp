@@ -7,6 +7,11 @@
 #include "yue/bell/MediaCtrlBase.h"
 
 #ifdef Q_OS_ANDROID
+#include <QAndroidJniObject>
+#include <QAndroidJniEnvironment>
+#endif
+
+#ifdef Q_OS_ANDROID
 
 static void JNIActivitySTTResultCallback(JNIEnv *env, jobject obj, jstring jstra, jstring jstrb)
 {
@@ -22,10 +27,26 @@ static void JNIActivitySTTResultCallback(JNIEnv *env, jobject obj, jstring jstra
         if ( words.length() > 1 && words[0].toLower() == "play") {
             words.removeAt(0);
             QString query = words.join(" ");
-            qDebug() << "jni native call: play song " << query;
+            qDebug() << "jni native call: play song: " << query;
             QList<yue::bell::Database::uid_t> lst = yue::bell::Library::instance()->createPlaylist(query,1);
             if (lst.length()>0) {
                 yue::bell::MediaCtrlBase::instance()->doPlaySong(lst[0]);
+                return;
+            }
+        } else if ( words.length() > 1 && words[0].toLower() == "create") {
+            words.removeAt(0);
+            if (words.length() > 1 && (words[0].toLower() == "playlist" || words[0].toLower() == "playlists")) {
+                words.removeAt(0);
+            }
+            if (words.length() > 1 && words[0].toLower() == "with") {
+                words.removeAt(0);
+            }
+
+            QString query = words.join(" ");
+            qDebug() << "jni native call: create: " << query;
+            QList<yue::bell::Database::uid_t> lst = yue::bell::Library::instance()->createPlaylist(query);
+            if (lst.length()>0) {
+                yue::bell::MediaCtrlBase::instance()->doSetCurrentPlaylist(lst,true);
                 return;
             }
         } else {
@@ -34,6 +55,12 @@ static void JNIActivitySTTResultCallback(JNIEnv *env, jobject obj, jstring jstra
     }
 
     qDebug() << "jni native call: unable to recognise input";
+
+    QAndroidJniObject message = QAndroidJniObject::fromString("Unrecognized Input: "+ results[0]);
+    QAndroidJniObject::callStaticMethod<void>("org/github/nsetzer/example/MyCustomAppActivity",
+                                       "makeToast",
+                                       "(Ljava/lang/String;)V",
+                                       message.object<jstring>());
 
 }
 

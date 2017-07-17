@@ -43,6 +43,7 @@ int main(int argc, char *argv[])
     qRegisterMetaType<yue::qtcommon::ResourceCache::rid_t>("ResourceCache::rid_t");
     qRegisterMetaType<yue::bell::LibraryTreeNode>("LibraryTreeNode");
     qRegisterMetaType<QList<yue::bell::LibraryTreeNode*>>("QList<yue::bell::LibraryTreeNode*>");
+    qRegisterMetaType<QList<yue::bell::Database::uid_t>>("QList<yue::bell::Database::uid_t>");
 
     QSharedPointer<QRemoteObjectHost> srcNode;
     QSharedPointer<MediaCtrlRemoteServer> mcsvc;
