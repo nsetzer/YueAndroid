@@ -169,7 +169,13 @@ class Grammar {
     Grammar &operator=(const Grammar &) = delete;  // copy assignment operator
     Grammar &operator=(const Grammar &&) = delete; // move assignment operator
 
-    std::unique_ptr<SearchRule> ruleFromString(const std::string &text);
+    virtual std::unique_ptr<SearchRule> ruleFromString(const std::string &text);
+
+    SyntaxNode *tokens(void) {
+        return &m_state->m_root;
+    };
+
+protected:
 
     virtual void tokenize(std::string text);
     // these "public" private mehtods ...
@@ -177,11 +183,10 @@ class Grammar {
     virtual void postProcess(SyntaxNode *root) {
         _postProcess(root);
     }
-    SyntaxNode *tokens(void) {
-        return &m_state->m_root;
-    };
+    // TODO: should return type Rule
+    virtual std::unique_ptr<SearchRule> buildRule(SyntaxNode *node);
 
-  private:
+private:
     void _tokenize(std::string::const_iterator it,
                    std::string::const_iterator end);
 
@@ -194,8 +199,7 @@ class Grammar {
                            SyntaxNode *node,
                            StringValue::Mode mode);
 
-    // TODO: should return type Rule
-    std::unique_ptr<SearchRule> _buildRule(SyntaxNode *node);
+
     virtual std::unique_ptr<SearchRule> buildColumnRule(
         SyntaxNode *nd_op, SyntaxNode *nd_column, SyntaxNode *nd_text) = 0;
 

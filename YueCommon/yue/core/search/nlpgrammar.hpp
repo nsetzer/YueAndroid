@@ -82,7 +82,7 @@ public:
 
     void load_cfg(std::istream& stream);
 
-    void parse(std::vector<SyntaxNode*>& sentence);
+    SyntaxNode* parse(std::vector<SyntaxNode*>& sentence);
 
 private:
 
@@ -114,13 +114,15 @@ public:
     NLPSearchGrammar();
     ~NLPSearchGrammar() = default;
 
-    //virtual void tokenize(std::string text);
-    virtual void postProcess(SyntaxNode *root);
 
     void test(std::string s) {
         tokenize(s);
         postProcess(tokens());
     }
+
+protected:
+    //virtual void tokenize(std::string text);
+    virtual void postProcess(SyntaxNode *root);
 
 };
 

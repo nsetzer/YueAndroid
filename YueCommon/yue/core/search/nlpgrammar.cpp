@@ -348,6 +348,20 @@ SyntaxNode* build_tree(std::vector<SyntaxNode*>& sentence, table_t& table, table
         }
     }
 
+    if (ent.term == "DATEOPERATION" && ent.idx_t >= 0) {
+        std::cout << "build tree found a date operation" << std::endl;
+        SyntaxNode *nd = new SyntaxNode("DATEOPERATION",StringValue::Mode::Text);
+        nd->append(new SyntaxNode(sentence[ent.idx_t]->text(),StringValue::Mode::Text));
+        return nd;
+    }
+
+    if (ent.term == "DATETEXT" && ent.idx_t >= 0) {
+        std::cout << "build tree found a date operation" << std::endl;
+        SyntaxNode *nd = new SyntaxNode("DATETEXT",StringValue::Mode::Text);
+        nd->append(new SyntaxNode(sentence[ent.idx_t]->text(),StringValue::Mode::Text));
+        return nd;
+    }
+
     // process terminal nodes
     if (ent.idx_t >= 0) {
         StringValue::Mode mode = StringValue::Mode::Text;
@@ -399,6 +413,8 @@ SyntaxNode* build_tree(std::vector<SyntaxNode*>& sentence, table_t& table, table
         return new SyntaxNode(text,StringValue::Mode::BinaryOperator);
     }
 
+
+
     SyntaxNode *nd=nullptr, *rnd=nullptr;
     if (util::startswith(ent.term,"<") || util::startswith(ent.term,"SEARCHTERM"))
         nd = parent;
@@ -424,7 +440,7 @@ SyntaxNode* build_tree(std::vector<SyntaxNode*>& sentence, table_t& table, table
 void fixdate(SyntaxNode* nd)
 {
     std::vector<SyntaxNode*>& children =nd->m_children;
-    if (children.size()>=2) {
+    if (children.size()>2) {
         // handle the left side of a date operation
         if (children[0]->text() == "not" && children[1]->text() == "played") {
             delete children[0];
@@ -443,18 +459,49 @@ void fixdate(SyntaxNode* nd)
             nd->m_value.m_sValue = "<"; //TODO
             nd->m_value.m_mode = StringValue::Mode::BinaryOperator;
         }
-
-        // handle the right side of a date operation
-        // for node
-        //  day   ->  0d or 1d;
-        //  week  -> 0w or 1w;
-        //  month -> 0m or 1m;
-        //  year  -? 0y or 1y;
-
-        // not played this year
-        //
-
+    } else if (children.size()>1) {
+        if (children[0]->text() == "played") {
+            delete children[0];
+            children.erase(children.begin());
+            children.insert(children.begin(),new SyntaxNode("date",StringValue::Mode::Text));
+            nd->m_value.m_sValue = "<"; //TODO
+            nd->m_value.m_mode = StringValue::Mode::BinaryOperator;
+        }
     }
+
+    SyntaxNode* rhs = *(children.end()-1);
+    std::string text = "";
+    if (rhs->text() == "DATETEXT") {
+        // TODO what if the DATETEXT only contains a single word
+        std::string range = (*(rhs->m_children.begin()))->text();
+        std::string unit = (*(rhs->m_children.end()-1))->text();
+
+        if (range=="this")
+            range = "1";
+        else
+            range = "0";
+
+        if (unit=="day")
+            unit = "d";
+        else if (unit=="week")
+            unit = "w";
+        else if (unit=="month")
+            unit = "m";
+        else if (unit=="year")
+            unit = "y";
+        else if (unit=="today")
+            unit = "d";
+
+        text = range + unit;
+    } else {
+        // TODO
+        text = "0d";
+    }
+
+    delete rhs;
+    children.erase(children.end()-1);
+    nd->append(new SyntaxNode(text,StringValue::Mode::Text));
+
 }
 
 
@@ -470,11 +517,13 @@ void rebalance_tree(SyntaxNode* nd)
     for (int i=0; i<nd->m_children.size(); i++) {
         SyntaxNode* child = nd->m_children[i];
         if (child->text() == "DATEOPERATION") {
+            std::cout << "found a date operation" << std::endl;
             SyntaxNode* rhs = nd->m_children[i+1];
             child->append( rhs );
             nd->m_children.erase(nd->m_children.begin()+i+1);
             fixdate(child);
         }
+
 
     }
 
@@ -570,7 +619,7 @@ void table_append(table_t& table, std::pair<int,int> idx_a, TableEntry ent) {
     return;
 }
 
-void CYKParser::parse(std::vector<SyntaxNode*>& sentence) {
+SyntaxNode* CYKParser::parse(std::vector<SyntaxNode*>& sentence) {
     // TODO: convert to use interned strings for fast comparisons
     //       and merge lutt/luttn
     // TODO: table entries are unique by TERM, with minimum weight.
@@ -643,16 +692,14 @@ void CYKParser::parse(std::vector<SyntaxNode*>& sentence) {
 
     // -------
 
-    if (index >=0) {
-        print_tree(sentence,table,idx_a,index);
-        std::cout << std::endl;
-        //std::cout << build_tree_text(sentence,table,idx_a,index) << std::endl;
-        SyntaxNode *root = build_tree(sentence,table,idx_a,index);
-        root->pp();
+    if (index <0)
+        return nullptr;
 
-    } else {
-        std::cout << "no match" << std::endl;
-    }
+    print_tree(sentence,table,idx_a,index);
+    std::cout << std::endl;
+
+    //std::cout << build_tree_text(sentence,table,idx_a,index) << std::endl;
+    return build_tree(sentence,table,idx_a,index);
 
 }
 
@@ -667,6 +714,8 @@ NLPSearchGrammar::NLPSearchGrammar()
     m_char_classes[Grammar::CharacterClass::nest_end] = {};
     m_flow_not = {};
 
+    m_col_date.insert("date");
+
 
     std::ifstream ifs ("grammar.txt");
     if (ifs.is_open()) {
@@ -679,12 +728,44 @@ void NLPSearchGrammar::postProcess(SyntaxNode *root)
 {
     // root should be a wide tree of depth 2.
     // each child node represents a word in the sentence
-    root->pp();
+
 
     // add end of text marker to the input
     root->append(new SyntaxNode(".",StringValue::Mode::Unknown));
+    std::cout << "root:" << std::endl;
+    root->pp();
 
-    m_parser.parse(root->m_children);
+    SyntaxNode* tree = m_parser.parse(root->m_children);
+
+
+    if (tree != nullptr && tree->m_children.size()>=2) {
+        std::cout << "tree:" << std::endl;
+        tree->pp();
+
+        SyntaxNode * queryRoot = nullptr;
+        for (SyntaxNode* child : tree->m_children) {
+            if (child->text()=="QUERY") {
+                queryRoot = child->m_children[0];
+                break;
+            }
+        }
+
+        if (queryRoot != nullptr) {
+
+            std::cout << "root:" << std::endl;
+            queryRoot->pp();
+
+            try {
+                std::unique_ptr<SearchRule> rule = buildRule(queryRoot);
+                std::cout << rule->toSqlString() << std::endl;
+            } catch (ParseError& e ) {
+                std::cout << e.what() << std::endl;
+            }
+        } else {
+            std::cout << "no query found" << std::endl;
+        }
+    }
+
 }
 
 } // namespace core

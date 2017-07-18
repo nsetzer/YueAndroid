@@ -44,7 +44,7 @@ YUE_TEST(nlpgrammar)
 
 
     NLPSearchGrammar grammar;
-    grammar.test("artist is OOV and not played this month");
+    grammar.test("artist is OOV and played today");
 
     YUE_TEST_END();
 }

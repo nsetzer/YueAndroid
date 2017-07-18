@@ -13,6 +13,8 @@ StringValue::mode(StringValue::Mode value) {
     switch (value) {
     case StringValue::Mode::Text:
         return "Text";
+    case StringValue::Mode::TextGroup:
+        return "Group";
     case StringValue::Mode::BinaryOperator:
         return "Binary";
     case StringValue::Mode::FlowNot:
@@ -170,7 +172,7 @@ Grammar::ruleFromString(const std::string &text) {
     /*
     walk the parse tree and generate rules
     */
-    std::unique_ptr<SearchRule> rule = _buildRule(&m_state->m_root);
+    std::unique_ptr<SearchRule> rule = buildRule(&m_state->m_root);
     // if null, no error, return BlankSearch
     return rule;
 }
@@ -399,13 +401,13 @@ Grammar::_postProcessBinary(std::set<std::string> &op,
 }
 
 std::unique_ptr<SearchRule>
-Grammar::_buildRule(SyntaxNode *node) {
+Grammar::buildRule(SyntaxNode *node) {
     if (node->mode() == StringValue::Mode::FlowAnd ||
         node->mode() == StringValue::Mode::FlowParens ||
         node->mode() == StringValue::Mode::FlowOr) {
         SearchRule::SearchRuleList rules;
         for (SyntaxNode *nd : node->m_children) {
-            std::unique_ptr<SearchRule> rule = _buildRule(nd);
+            std::unique_ptr<SearchRule> rule = buildRule(nd);
             if (rule)
                 rules.push_back(std::move(rule));
         }
@@ -422,7 +424,7 @@ Grammar::_buildRule(SyntaxNode *node) {
     } else if (node->mode() == StringValue::Mode::FlowNot) {
         // make the child node for logical not
         SyntaxNode *child = node->m_children.front();
-        std::unique_ptr<SearchRule> rule = _buildRule(child);
+        std::unique_ptr<SearchRule> rule = buildRule(child);
         return std::unique_ptr<SearchRule>(new NotSearchRule(std::move(rule)));
     } else if (node->mode() == StringValue::Mode::BinaryOperator) {
         SyntaxNode *left = node->m_children.front();

@@ -29,6 +29,7 @@
 1 JOIN ||
 1 JOIN &&
 
+1 DATEOPERATION played
 1 DATEOPERATION last played
 1 DATEOPERATION not played
 1 DATETEXT today
