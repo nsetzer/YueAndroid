@@ -166,7 +166,7 @@ Grammar::ruleFromString(const std::string &text) {
     and create new nodes in the parse tree as needed to fill in gaps.
     check for errors when a token does not make sense in the given context
     */
-    postProcess();
+    postProcess(&m_state->m_root);
     /*
     walk the parse tree and generate rules
     */

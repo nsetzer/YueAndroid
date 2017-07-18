@@ -287,13 +287,13 @@ NLPContext::NLPContext()
 
 }
 
-void print_tree(std::vector<std::string>& sentence, table_t& table, table_i idx, int k) {
+void print_tree(std::vector<SyntaxNode*>& sentence, table_t& table, table_i idx, int k) {
 
     TableEntry& ent = table[idx][k];
 
     if (util::startswith(ent.term,"<")) {
         if (ent.idx_t >=0) {
-            std::cout << sentence[ent.idx_t];
+            std::cout << sentence[ent.idx_t]->text();
         } else {
             print_tree(sentence,table, ent.idx_b,ent.idx_bk);
             std::cout << ", ";
@@ -301,7 +301,7 @@ void print_tree(std::vector<std::string>& sentence, table_t& table, table_i idx,
         }
     } else {
         if (ent.idx_t >=0) {
-            std::cout << ent.term << "(" << sentence[ent.idx_t] << ")";
+            std::cout << ent.term << "(" << sentence[ent.idx_t]->text() << ")";
         } else {
             std::cout << ent.term << "(";
             print_tree(sentence,table, ent.idx_b,ent.idx_bk);
@@ -314,7 +314,7 @@ void print_tree(std::vector<std::string>& sentence, table_t& table, table_i idx,
 
 void
 build_tree_text(
-    std::vector<std::string>& sentence,
+    std::vector<SyntaxNode*>& sentence,
     table_t& table,
     table_i idx,
     int k,
@@ -322,14 +322,14 @@ build_tree_text(
 
     TableEntry& ent = table[idx][k];
     if (ent.idx_t >=0) {
-        results.push_back(sentence[ent.idx_t]);
+        results.push_back(sentence[ent.idx_t]->text());
     } else {
         build_tree_text(sentence, table, ent.idx_b,ent.idx_bk,results);
         build_tree_text(sentence, table, ent.idx_c,ent.idx_ck,results);
     }
 }
 
-SyntaxNode* build_tree(std::vector<std::string>& sentence, table_t& table, table_i idx, int k, SyntaxNode* parent) {
+SyntaxNode* build_tree(std::vector<SyntaxNode*>& sentence, table_t& table, table_i idx, int k, SyntaxNode* parent) {
 
     TableEntry& ent = table[idx][k];
 
@@ -351,7 +351,7 @@ SyntaxNode* build_tree(std::vector<std::string>& sentence, table_t& table, table
     // process terminal nodes
     if (ent.idx_t >= 0) {
         StringValue::Mode mode = StringValue::Mode::Text;
-        std::string text = sentence[ent.idx_t];
+        std::string text = sentence[ent.idx_t]->text();
         // fix for terminal operations
         if (ent.term == "OPERATION") {
             mode = StringValue::Mode::BinaryOperator;
@@ -509,7 +509,10 @@ void rebalance_tree(SyntaxNode* nd)
     }
 }
 
-SyntaxNode* build_tree(std::vector<std::string>& sentence, table_t& table, table_i idx, int k) {
+/*
+note: currently copies the nodes given in the sentence
+*/
+SyntaxNode* build_tree(std::vector<SyntaxNode*>& sentence, table_t& table, table_i idx, int k) {
     /*
     StringValue::Mode
     Unknown,
@@ -550,9 +553,6 @@ SyntaxNode* build_tree(std::vector<std::string>& sentence, table_t& table, table
 
     return nd;
 
-
-
-
 }
 
 void table_append(table_t& table, std::pair<int,int> idx_a, TableEntry ent) {
@@ -570,7 +570,7 @@ void table_append(table_t& table, std::pair<int,int> idx_a, TableEntry ent) {
     return;
 }
 
-void CYKParser::parse(std::vector<std::string> sentence) {
+void CYKParser::parse(std::vector<SyntaxNode*>& sentence) {
     // TODO: convert to use interned strings for fast comparisons
     //       and merge lutt/luttn
     // TODO: table entries are unique by TERM, with minimum weight.
@@ -589,13 +589,9 @@ void CYKParser::parse(std::vector<std::string> sentence) {
     //lutnt[{"SEARCHTERM","<.>"}] = {{0,"START"},};
 
     for (int j=1; j <= N; j++ ) {
-        //std::cout << "j:" << j << std::endl;
         std::pair<int,int> idx_j(j-1,j);
         table[idx_j] = std::vector<TableEntry>();
-        for ( weightedterm_t wt : m_lutt[sentence[j-1]]) {
-            std::cout << idx_j.first << ","
-                      << idx_j.second << ": "
-                      << wt.second << std::endl;
+        for ( weightedterm_t wt : m_lutt[sentence[j-1]->text()]) {
             table[idx_j].push_back(TableEntry(wt.second,wt.first,j-1));
         }
         for (int i=j-2; i>=0; i--) {
@@ -617,20 +613,15 @@ void CYKParser::parse(std::vector<std::string> sentence) {
                         rcnfnt_i idx_r(b.term,c.term);
                         if (m_lutnt.count(idx_r) > 0) {
                             for (weightedterm_t wt : m_lutnt[idx_r]) {
-                                std::cout << idx_a.first << ","
-                                          << idx_a.second << ": "
-                                          << wt.second << std::endl;
+                                //std::cout << idx_a.first << ","
+                                //          << idx_a.second << ": "
+                                //          << wt.second << std::endl;
 
                                 table_append(table,idx_a,TableEntry(
                                     wt.second,
                                     wt.first + b.weight + c.weight,
                                     idx_b,xi,
                                     idx_c,xj ));
-                                //table[idx_a].push_back(TableEntry(
-                                //    wt.second,
-                                //    wt.first + b.weight + c.weight,
-                                //    idx_b,xi,
-                                //    idx_c,xj ));
                             }
                         }
                     }
@@ -650,6 +641,8 @@ void CYKParser::parse(std::vector<std::string> sentence) {
         i++;
     }
 
+    // -------
+
     if (index >=0) {
         print_tree(sentence,table,idx_a,index);
         std::cout << std::endl;
@@ -661,6 +654,37 @@ void CYKParser::parse(std::vector<std::string> sentence) {
         std::cout << "no match" << std::endl;
     }
 
+}
+
+
+
+NLPSearchGrammar::NLPSearchGrammar()
+    : SearchGrammar()
+    , m_parser()
+{
+
+    m_char_classes[Grammar::CharacterClass::nest_begin] = {};
+    m_char_classes[Grammar::CharacterClass::nest_end] = {};
+    m_flow_not = {};
+
+
+    std::ifstream ifs ("grammar.txt");
+    if (ifs.is_open()) {
+        m_parser.load_cfg(ifs);
+    }
+
+}
+
+void NLPSearchGrammar::postProcess(SyntaxNode *root)
+{
+    // root should be a wide tree of depth 2.
+    // each child node represents a word in the sentence
+    root->pp();
+
+    // add end of text marker to the input
+    root->append(new SyntaxNode(".",StringValue::Mode::Unknown));
+
+    m_parser.parse(root->m_children);
 }
 
 } // namespace core

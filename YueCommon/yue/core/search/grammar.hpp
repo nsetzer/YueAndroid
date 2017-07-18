@@ -171,11 +171,11 @@ class Grammar {
 
     std::unique_ptr<SearchRule> ruleFromString(const std::string &text);
 
-    void tokenize(std::string text);
+    virtual void tokenize(std::string text);
     // these "public" private mehtods ...
-    // create a friend test class....†Ω
-    void postProcess(void) {
-        _postProcess(&m_state->m_root);
+    // create a friend test class....
+    virtual void postProcess(SyntaxNode *root) {
+        _postProcess(root);
     }
     SyntaxNode *tokens(void) {
         return &m_state->m_root;

@@ -32,16 +32,19 @@ YUE_TEST(nlpgrammar)
     CYKParser parser;
 
     std::ifstream ifs ("grammar.txt");
-
     if (ifs.is_open()) {
         parser.load_cfg(ifs);
     }
 
     //std::vector<std::string> sentence = {"artist","is","OOV","OOV","and", "title", "is", "OOV","."};
     //std::vector<std::string> sentence = {"artist","is","OOV","OOV","and", "title", "is", "not", "OOV","."};
-    std::vector<std::string> sentence = {"artist","is","OOV","OOV","and", "not", "played", "this","month","."};
+    //std::vector<std::string> sentence = {"artist","is","OOV","OOV","and", "not", "played", "this","month","."};
     //std::vector<std::string> sentence = {"(", "title", "is", "OOV",")","."};
-    parser.parse(sentence);
+    //parser.parse(sentence);
+
+
+    NLPSearchGrammar grammar;
+    grammar.test("artist is OOV and not played this month");
 
     YUE_TEST_END();
 }

@@ -7,6 +7,7 @@
 #include "yue/core/search/grammar.hpp"
 
 #include <istream>
+#include <fstream>
 
 namespace yue {
 namespace core {
@@ -81,7 +82,7 @@ public:
 
     void load_cfg(std::istream& stream);
 
-    void parse(std::vector<std::string> sentence);
+    void parse(std::vector<SyntaxNode*>& sentence);
 
 private:
 
@@ -103,7 +104,27 @@ public:
 };
 
 
-void cykparse(std::vector<std::string> sentence);
+
+class NLPSearchGrammar : public SearchGrammar
+{
+
+    CYKParser m_parser;
+
+public:
+    NLPSearchGrammar();
+    ~NLPSearchGrammar() = default;
+
+    //virtual void tokenize(std::string text);
+    virtual void postProcess(SyntaxNode *root);
+
+    void test(std::string s) {
+        tokenize(s);
+        postProcess(tokens());
+    }
+
+};
+
+
 
 } // namespace core
 } // namespace yue
