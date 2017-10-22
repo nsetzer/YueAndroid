@@ -29,8 +29,16 @@ void MediaPlayerQt::load(QString path)
 {
     // this does not fail, look for error signals
     // to see if the load content failed.
-    QMediaContent content(QUrl::fromLocalFile(path));
-    m_player.setMedia(content);
+    QFileInfo file(path);
+    if (file.exists() && file.isFile()) {
+        QMediaContent content(QUrl::fromLocalFile(path));
+        m_player.setMedia(content);
+    } else {
+        qCritical() << "Attempted to load non existent file `" << path << "`";
+        m_player.setMedia(QMediaContent());
+        m_currentStatus = MediaPlayerQt::Status::Error;
+        emit statusChanged(m_currentStatus);
+    }
 }
 
 void MediaPlayerQt::play()
@@ -99,6 +107,8 @@ void MediaPlayerQt::onStatusChanged(QMediaPlayer::MediaStatus status)
         m_currentStatus = MediaPlayerQt::Status::Ended;
         break;
     case QMediaPlayer::InvalidMedia:
+        qCritical() << "Qt Media Player has entered invalid state: "
+                    << m_player.errorString();
         m_currentStatus = MediaPlayerQt::Status::Error;
         break;
     case QMediaPlayer::UnknownMediaStatus:

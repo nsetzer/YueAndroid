@@ -28,6 +28,7 @@ PageBase {
             ListElement {  name: "Genre: Visual"; query: "(\"visual kei\" || genre=j-metal ||(genre =j-rock && genre = \"nu metal\"))" }
             ListElement {  name: "John Garcia"; query: "John Garcia" }
             ListElement {  name: "Gothic Emily"; query: "album = \"gothic emily\"" }
+            ListElement {  name: "[tai]"; query: "[tai]" }
 
 
         }

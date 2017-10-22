@@ -5,6 +5,7 @@
 #include <QMediaPlayer>
 #include <QMediaContent>
 #include <QObject>
+#include <QFileInfo>
 #include "yue/global.h"
 #include "yue/bell/MediaPlayerBase.h"
 
