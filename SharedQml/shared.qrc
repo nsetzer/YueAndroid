@@ -65,5 +65,6 @@
         <file>SwipeListDemo.qml</file>
         <file>IconButton.qml</file>
         <file>constants.js</file>
+        <file>PageReorderablePlayListOld.qml</file>
     </qresource>
 </RCC>

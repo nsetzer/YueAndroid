@@ -17,6 +17,9 @@ ApplicationWindow {
     //width: 640
     //height: 360
 
+    property var initialIndex: 0
+    property string initialPage: "qrc:/shared/PageNowPlaying.qml"
+
     visible: true
 
     property var onLoadCallback: null
@@ -253,7 +256,7 @@ ApplicationWindow {
 
     Component.onCompleted: {
 
-        currentPage = "qrc:/shared/PageNowPlaying.qml"
-        mainMenu.currentItem = 1
+        currentPage = initialPage
+        mainMenu.currentItem = initialIndex
     }
 }

@@ -187,6 +187,7 @@ void SongListModel::remove(int index)
     beginRemoveRows(QModelIndex(),index,index);
     int cidx = m_lst.currentIndex();
     m_lst.remove(index);
+    m_playlist->remove(index); // TODO revist removing
     if (cidx != m_lst.currentIndex())
         emit currentIndexChanged(m_lst.currentIndex());
     endRemoveRows();

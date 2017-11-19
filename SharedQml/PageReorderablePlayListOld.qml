@@ -84,7 +84,6 @@ PageBase {
     property int autoScrollIncrements: 0
     property var autoScrollTarget: null
 
-
     Timer {
         id: timerAutoScroll
         interval: 33//max(25,150/(autoScrollIncrements+5)/5)
@@ -94,13 +93,11 @@ PageBase {
             var rate = autoScrollDirection * autoScrollStep
             view.contentY =  min(view.contentHeight,max(0,view.contentY+rate))
 
-
             if (autoScrollTarget!==null) {
                 autoScrollTarget.onAutoScrollCheckMouse()
             }
         }
     }
-
 
     function enableAutoScrollUp(bFast) {
         if (autoScrollDirection>=0) {
@@ -138,6 +135,8 @@ PageBase {
 
     Popup {
         id: popup
+        //x: 0 //parent.verticalCenter - height/2
+        //y: 0 // parent.width - width
 
         leftPadding: parent.width/3
         rightPadding: gDevice.textHeight
@@ -158,53 +157,68 @@ PageBase {
         }
     }
 
-    /*
-    Component {
-        id: itemContent
-
-        Rectangle {
-            anchors {
-                horizontalCenter: parent.horizontalCenter
-                verticalCenter: parent.verticalCenter
-            }
-
-            width: parent.width;
-            height: gDevice.textHeight * 3
-
-
-
-            Rectangle {
-                anchors.bottom: parent.bottom;
-                height: 2
-                width: parent.width
-                color: "#33777777"
-            }
-        }
-    }
-    */
-
-
     Component {
         id: dragDelegate
+
 
         MouseArea {
             id: dragArea
 
             property bool held: false
+            property bool swipe_: false
 
+            property int swipeTreshold: 32
+            property bool ready: false
+            property point _origin
             property point _position
+            property int xoffset: 0
+            property int yoffset: 0
 
-            anchors { left: parent.left; right: parent.right }
+            readonly property string dirUp:     "up"
+            readonly property string dirDown:   "down"
+            readonly property string dirLeft:   "left"
+            readonly property string dirRight: "right"
+
+            signal move(int x, int y)
+            signal swipeRight(int distance)
+            signal swipeLeft(int distance)
+            signal swipeUp(int distance)
+            signal swipeDown(int distance)
+
+            //anchors.left: parent.left
+            //anchors.right: parent.right
+            width: view.width
             height: content.height
 
             drag.target: held ? content : undefined
             drag.axis: Drag.YAxis
 
-            onPressAndHold: held = true
-            onReleased: held = false
+            /*
+            onPressAndHold: {
+                held = true
+            }
+            */
+            Timer {
+                id: timerPressAndHold
+                repeat: false
+                interval: pressAndHoldDuration;
+                onTriggered: {
+                    held = true
+                }
+            }
+
+            onPressed: {
+                drag.axis = Drag.XAndYAxis
+                //drag.axis = Drag.YAxis
+                _origin = Qt.point(mouse.x, mouse.y)
+                disableAutoScroll()
+
+                timerPressAndHold.start()
+            }
 
             onPositionChanged: {
                 _position = Qt.point(mouse.x, mouse.y)
+                timerPressAndHold.stop()
                 if (held) {
                     var view_y = globalPosition(view).y;
                     var drag_y = globalPosition(dragArea).y + mouse.y;
@@ -223,31 +237,94 @@ PageBase {
                         //console.log("disable auto scroll")
                     }
                 }
+
+                switch (drag.axis) {
+                    case Drag.XAndYAxis:
+                        if (Math.abs(mouse.x - _origin.x) > swipeTreshold) {
+                            drag.axis = Drag.XAxis
+                            swipe_ = true
+                            held=true
+                            timerPressAndHold.stop()
+                        } else if (Math.abs(mouse.y - _origin.y) > swipeTreshold) {
+                            drag.axis = Drag.YAxis
+                        }
+                        break
+
+                    case Drag.XAxis: {
+                        xoffset = mouse.x - _origin.x;
+                        move(xoffset, 0);
+                        break
+                    }
+                    case Drag.YAxis: {
+                        yoffset = mouse.y - _origin.y;
+                        move(0, yoffset);
+                        break
+                    }
+
+                }
+
+
+            }
+
+            onReleased: {
+                timerPressAndHold.stop()
+                held = false
+                swipe_= false;
+                disableAutoScroll()
+
+                var distance;
+                switch (drag.axis) {
+                case Drag.XAndYAxis: canceled(mouse) ; break
+                case Drag.XAxis: {
+                    distance = mouse.x - _origin.x
+                    console.log("swipe distance LR: " + distance + " width: " + parent.width)
+                    if (Math.abs(distance)/parent.width < 1/3)
+                        return
+                    if ( distance < 0) {
+                        swipeLeft(Math.abs(distance))
+                        console.log("left")
+                    } else {
+                        swipeRight(Math.abs(distance))
+                        console.log("right")
+                    }
+                    break
+                }
+                case Drag.YAxis: {
+                    distance = mouse.y - _origin.y
+
+                    //swipedir(dir, Math.abs(mouse.y-_origin.y)) ; break
+                    console.log("swipe distance UD: " + distance + " width: " + parent.height)
+                    if ( distance < 0) {
+                        swipeUp(Math.abs(distance))
+                    } else {
+                        swipeDown(Math.abs(distance))
+                    }
+                    break
+                }
+                }
             }
 
             Rectangle {
                 id: content
-//![0]
                 anchors {
                     horizontalCenter: parent.horizontalCenter
                     verticalCenter: parent.verticalCenter
                 }
+
                 width: dragArea.width;
                 height: gDevice.textHeight * 3
 
-                border.width: 1
-                border.color: "lightsteelblue"
+                //border.width: 1
+                //border.color: "lightsteelblue"
 
-                color: dragArea.held ? "lightsteelblue" : "white"
+                color: (dragArea.held ? ((Math.abs(xoffset)/parent.width > 1/3)?"orangered":"lightsteelblue") : "white")
                 Behavior on color { ColorAnimation { duration: 100 } }
 
                 radius: 2
-//![1]
                 Drag.active: dragArea.held
                 Drag.source: dragArea
                 Drag.hotSpot.x: width / 2
                 Drag.hotSpot.y: height / 2
-//![1]
                 states: State {
                     when: dragArea.held
 
@@ -259,7 +336,7 @@ PageBase {
                 }
 
                 PlaylistItemDelegate {
-                    id: playlistDelegate
+                    id: delegate
                     anchors.fill: parent
                     indexWidth: textMetricsIndex.width
                     currentIndex: listModel.currentIndex
@@ -274,9 +351,10 @@ PageBase {
 
                     Menu {
                         id: menu
-                        y: playlistDelegate.height
-                        x: playlistDelegate.width - menu.width
+                        y: delegate.height
+                        x: delegate.width - menu.width
                         width: view.width / 2
+
 
                         MenuItem {
                             text: "Play Song"
@@ -298,13 +376,6 @@ PageBase {
                         }
                         MenuItem {
                             height: visible? gDevice.textHeight*2:0
-                            text: "Remove Song"
-                            onTriggered: {
-                                listModel.remove(index)
-                            }
-                        }
-                        MenuItem {
-                            height: visible? gDevice.textHeight*2:0
                             text: "Search For Artist"
                             onTriggered: {
                                 openLibrarySearchArtist(artist)
@@ -317,20 +388,26 @@ PageBase {
                                 openLibrarySearchAlbum(artist, album)
                             }
                         }
-
                     } // end menu
 
-                } // end delegate playlist view
-//![2]
+                }
+
+                Rectangle {
+                    anchors.bottom: parent.bottom;
+                    height: 2
+                    width: parent.width
+                    color: "#33777777"
+                }
             }
-//![3]
+
             DropArea {
-                anchors { fill: parent; margins: 10 }
+
+                anchors { fill: parent; }
 
                 onEntered: {
-                    listModel.move(
-                            drag.source.DelegateModel.itemsIndex,
-                            dragArea.DelegateModel.itemsIndex)
+                   listModel.move(
+                        drag.source.DelegateModel.itemsIndex,
+                        dragArea.DelegateModel.itemsIndex);
                 }
             }
 
@@ -349,18 +426,18 @@ PageBase {
                 }
 
             }
-//![3]
+
+            onSwipeRight: {
+                listModel.remove( dragArea.DelegateModel.itemsIndex );
+            }
+            onSwipeLeft: {
+                listModel.remove( dragArea.DelegateModel.itemsIndex );
+            }
+
+
         }
-    }
-//![2]
-//![4]
-    DelegateModel {
-        id: visualModel
 
-        model: listModel
-        delegate: dragDelegate
     }
-
 
     ListView {
         id: view
@@ -370,7 +447,9 @@ PageBase {
         anchors.left: parent.left;
         anchors.right: parent.right;
 
-        model: visualModel
+        //model: visualModel
+        model: listModel
+        delegate: dragDelegate
 
         maximumFlickVelocity: 4000*gDevice.dp
 
@@ -390,6 +469,24 @@ PageBase {
         }
 
         ScrollBar.vertical: ScrollBar { }
+        /*
+        DropArea {
+            anchors.top: view.top
+            anchors.left: view.left
+            anchors.right: view.right
+            height: gDevice.textHeight * 2
+
+            Rectangle {
+                anchors.fill: parent
+                color: "#22FF0000"
+            }
+
+            onEntered: {
+                console.log("updrop")
+            }
+        }
+        */
+
     }
 
     MediaBar {

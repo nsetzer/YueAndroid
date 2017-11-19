@@ -367,6 +367,7 @@ bool Playlist::_remove_one(int idx)
     q.prepare("UPDATE playlists SET size=size-1 WHERE uid=?");
     q.addBindValue(toQVariant(m_plid));
     q.exec();
+    qDebug() << "remove index " << idx;
     return true;
 }
 
