@@ -280,7 +280,7 @@ PageBase {
 
                         MenuItem {
                             text: "Play Song"
-                            visible: index !== MediaPlayer.currentIndex
+                            visible: index !== listModel.currentIndex
                             height: visible? gDevice.textHeight*2:0
                             onTriggered: {
                                 MediaPlayer.playIndex(index)
@@ -288,16 +288,17 @@ PageBase {
                         }
                         MenuItem {
                             text: "Play Song Next"
-                            visible: index !== MediaPlayer.currentIndex
+                            visible: index !== listModel.currentIndex && index !== (1+listModel.currentIndex)
                             height: visible? gDevice.textHeight*2:0
                             onTriggered: {
-                                if (index !== MediaPlayer.currentIndex) {
-                                    listModel.move(index,MediaPlayer.currentIndex+1)
+                                if (index !== listModel.currentIndex) {
+                                    listModel.move(index,listModel.currentIndex+1)
                                 }
                             }
                         }
                         MenuItem {
                             height: visible? gDevice.textHeight*2:0
+                            visible: index !== listModel.currentIndex
                             text: "Remove Song"
                             onTriggered: {
                                 listModel.remove(index)

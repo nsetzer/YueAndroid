@@ -67,8 +67,14 @@ SongListModel::SongListModel(QObject* parent/*= nullptr*/)
     connect(&m_mvUpdateTimer,&QTimer::timeout,this,&SongListModel::onCommitMoveActions);
 
     auto ctrl = yue::bell::MediaCtrlBase::instance( );
+    // when the current index changes, update this widget
     connect(ctrl.data(),&yue::bell::MediaCtrlBase::currentIndexChanged,
             this, &SongListModel::onCtrlIndexChanged);
+    // when the playlist is modified notify that the index has changed.
+    // TODO: this causes a segfault
+    //connect(this, &SongListModel::currentIndexChanged,
+    //        ctrl.data(),&yue::bell::MediaCtrlBase::currentIndexChanged);
+
 
     m_thread.start();
 }
@@ -175,6 +181,9 @@ void SongListModel::move(int src, int tgt)
     int cidx = m_lst.currentIndex();
     m_lst.move(src,tgt);
 
+    //TODO: this is a bug, the MediaPlayer current index is changed
+    //      but no signal is emitted for the index to be changed.
+    //      Note: this may have been fixed by sending signals in the constructor
     if (cidx != m_lst.currentIndex())
         emit currentIndexChanged(m_lst.currentIndex());
     //m_mvActions.move(src,tgt);
