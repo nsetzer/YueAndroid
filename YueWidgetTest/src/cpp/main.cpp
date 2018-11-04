@@ -62,8 +62,8 @@ int main(int argc, char *argv[])
 
 #ifdef Q_OS_ANDROID
 
-    QString dirPath =yue::qtcommon::Device::getDirectory(yue::qtcommon::Device::DIRECTORY_MUSIC);
-    QDir dirMusic(dirPath);
+    //QString dirPath =yue::qtcommon::Device::getDirectory(yue::qtcommon::Device::DIRECTORY_MUSIC);
+    //QDir dirMusic(dirPath);
     //QString libPath = dirMusic.absoluteFilePath("yue-library.v1.sqlitedb");
     //QString libPath = "/mnt/sdcard/Music/yue-library.v1.sqlitedb";
     QString libPath = ":memory:";

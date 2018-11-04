@@ -63,7 +63,10 @@ bool LibraryTreeListModel::createPlaylist(bool shuffle/* = true*/)
 
 void LibraryTreeListModel::search(QString query)
 {
-    QtConcurrent::run(this,&LibraryTreeListModel::searchImpl, query);
+    //QtConcurrent::run(this,&LibraryTreeListModel::searchImpl, query);
+    // TODO: move this to a thread, but open a new database connection in that thread
+    // http://doc.qt.io/qt-5/qsqldatabase.html#setDatabaseName
+    searchImpl(query);
 }
 
 void LibraryTreeListModel::searchImpl(QString query) {

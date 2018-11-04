@@ -67,7 +67,7 @@ QVariant TreeListModelBase::data(const QModelIndex &index, int role/* = Qt::Disp
         return QVariant();
 
     if (role == TreeListModelBase::CheckRole)
-        return (int)m_tabledata[index.row()]->getCheckState();
+        return static_cast<int>(m_tabledata[index.row()]->getCheckState());
 
     if (role == TreeListModelBase::ExpandedRole)
         return m_tabledata[index.row()]->isExpanded();
@@ -117,6 +117,8 @@ void TreeListModelBase::setNewData(QList<yue::bell::LibraryTreeNode*> lst)
 {
     emit beginResetModel();
     // free any memory allocated from the previous search
+    qDebug() << m_forest.size();
+
     if (m_forest.size()>0) {
         m_tabledata.clear();
         while (m_forest.size()>0) {

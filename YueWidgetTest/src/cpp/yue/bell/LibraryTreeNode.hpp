@@ -26,7 +26,7 @@ public:
     LibraryTreeNode(Database::uid_t uid, QString text, int depth, LibraryTreeNode* parent = nullptr);
     ~LibraryTreeNode();
 
-    QString text( void ) { return m_text; }
+    QString text( void ) {return m_text;}
     void setCheckState(Qt::CheckState state);
     Qt::CheckState getCheckState( void ) { return m_checkstate; }
 

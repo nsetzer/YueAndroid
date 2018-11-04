@@ -328,6 +328,8 @@ QList<LibraryTreeNode*> Library::queryToForest(QString querystr)
 {
     LOG_FUNCTION_TIME();
 
+    QList<yue::bell::LibraryTreeNode*> forest;
+
     typedef yue::core::Song Song;
     QSqlQuery query = m_grammar.buildQuery(QStringList() << Song::artist
                           << Song::album
@@ -341,12 +343,18 @@ QList<LibraryTreeNode*> Library::queryToForest(QString querystr)
                           "album_index, "
                           "title COLLATE NOCASE ASC");
 
-    if (!query.exec())
+    if (!query.exec()) {
         qWarning() << "error executing query";
-    if (query.lastError().isValid())
         qWarning() << query.lastError();
+        return forest;
+    }
 
-    QList<yue::bell::LibraryTreeNode*> forest;
+    if (query.lastError().isValid()) {
+        qWarning() << query.lastError();
+        return forest;
+    }
+
+
     yue::bell::LibraryTreeNode* nd_art = nullptr;
     yue::bell::LibraryTreeNode* nd_alb = nullptr;
     while (query.next()) {
