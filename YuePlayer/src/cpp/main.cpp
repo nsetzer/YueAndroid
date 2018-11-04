@@ -58,7 +58,9 @@ int main(int argc, char *argv[])
 
     QString dirPath =yue::qtcommon::Device::getDirectory(yue::qtcommon::Device::DIRECTORY_MUSIC);
     QDir dirMusic(dirPath);
-    QString libPath = dirMusic.absoluteFilePath("yue-library.v1.sqlitedb");
+    //QString libPath = dirMusic.absoluteFilePath("yue-library.v1.sqlitedb");
+    //QString libPath = "/mnt/sdcard/Music/yue-library.v1.sqlitedb";
+    QString libPath = ":memory:";
     db->connect(libPath);
 
 

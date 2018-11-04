@@ -1,9 +1,9 @@
-package org.github.nsetzer.example;
+package org.github.nsetzer.yueapp2;
 
-import org.github.nsetzer.example.R;
+import org.github.nsetzer.yueapp2.R;
 import org.qtproject.qt5.android.bindings.QtActivity;
 import org.qtproject.qt5.android.bindings.QtService;
-import org.github.nsetzer.example.MyCustomAppService;
+import org.github.nsetzer.yueapp2.MyCustomAppService;
 import android.content.Intent;
 import android.util.Log;
 import android.os.Bundle;

@@ -1,7 +1,10 @@
 
 TEMPLATE = subdirs
-SUBDIRS = YueCommon YueExplorer YuePlayer Demo \
-    Test TagLib \
-    YueWidgetTest
-Demo.depends = YueCommon
-YueExplorer.depends = YueCommon
+
+# a project can only have one java package
+# this package is com.github.nsetzer.yueapp2
+#SUBDIRS = YueCommon Test TagLib YueWidgetTest
+SUBDIRS = YueWidgetTest
+#YueCommon.depends = TagLib
+#YuePlayer.depends = YueCommon
+#YueWidgetTest.depends = YueCommon

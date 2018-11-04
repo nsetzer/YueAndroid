@@ -57,7 +57,7 @@ static void JNIActivitySTTResultCallback(JNIEnv *env, jobject obj, jstring jstra
     qDebug() << "jni native call: unable to recognise input";
 
     QAndroidJniObject message = QAndroidJniObject::fromString("Unrecognized Input: "+ results[0]);
-    QAndroidJniObject::callStaticMethod<void>("org/github/nsetzer/example/MyCustomAppActivity",
+    QAndroidJniObject::callStaticMethod<void>("org/github/nsetzer/yueapp2/MyCustomAppActivity",
                                        "makeToast",
                                        "(Ljava/lang/String;)V",
                                        message.object<jstring>());
@@ -124,7 +124,7 @@ int JavaCompat::RegisterNatives() {
     QAndroidJniEnvironment env;
     jclass javaClass;
 
-    javaClass = env->FindClass("org/github/nsetzer/example/MyCustomAppActivity");
+    javaClass = env->FindClass("org/github/nsetzer/yueapp2/MyCustomAppActivity");
     if(!javaClass)
         return JNI_ERR;
     if(env->RegisterNatives(javaClass, ActivityArray,
@@ -132,7 +132,7 @@ int JavaCompat::RegisterNatives() {
         return JNI_ERR;
 
 
-    javaClass = env->FindClass("org/github/nsetzer/example/MyCustomAppService");
+    javaClass = env->FindClass("org/github/nsetzer/yueapp2/MyCustomAppService");
     if(!javaClass)
         return JNI_ERR;
     if(env->RegisterNatives(javaClass, ServiceArray,

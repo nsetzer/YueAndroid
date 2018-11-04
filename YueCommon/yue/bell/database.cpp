@@ -19,6 +19,7 @@ if (!db.open()) {
 }
 */
 
+#include <QtDebug>
 
 namespace yue {
 namespace bell {
@@ -53,6 +54,8 @@ void Database::connect(QString path)
     QSqlDatabase m_db = QSqlDatabase::addDatabase("QSQLITE");
     m_db.setDatabaseName(path);
     if (!m_db.open()) {
+        QString err_text = m_db.lastError().text();
+        qDebug() << err_text;
         throw std::runtime_error("failed to connect to database");
         return;
     }

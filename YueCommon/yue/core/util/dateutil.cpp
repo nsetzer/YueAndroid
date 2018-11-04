@@ -172,7 +172,7 @@ ydate_t dateDelta(const ydate_t& date, long dy, long dm, long dd)
 
 ydate_t dateDelta(const ydate_t& date, long dd)
 {
-    long y,m,d;
+    //long y,m,d;
     long g = dateDayNumber(date);
     ydate_t newDate = dateFromDayNumber(g+dd);
     return newDate;

@@ -97,7 +97,7 @@ void MediaCtrlRemoteServer::sendNotification()
     const jbyte *bytes = reinterpret_cast<const jbyte*>(m_current_art.constData());
     env->SetByteArrayRegion(coverart, 0, m_current_art.size(), bytes);
 
-    QAndroidJniObject::callStaticMethod<void>("org/github/nsetzer/example/MyCustomAppService",
+    QAndroidJniObject::callStaticMethod<void>("org/github/nsetzer/yueapp2/MyCustomAppService",
                                        "showNotification",
                                        "([BZLjava/lang/String;Ljava/lang/String;)V",
                                        coverart,

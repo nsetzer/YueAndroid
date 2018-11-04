@@ -108,7 +108,7 @@ void MediaCtrlRemoteClient::onServiceStateChanged(int state)
 void MediaCtrlRemoteClient::tts()
 {
 #ifdef Q_OS_ANDROID
-    QAndroidJniObject::callStaticMethod<void>("org/github/nsetzer/example/MyCustomAppActivity",
+    QAndroidJniObject::callStaticMethod<void>("org/github/nsetzer/yueapp2/MyCustomAppActivity",
                                        "promptSpeechInput",
                                        "()V");
 #endif

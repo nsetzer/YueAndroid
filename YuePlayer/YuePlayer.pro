@@ -1,5 +1,6 @@
 TEMPLATE = app
 QT += core qml quick webview multimedia remoteobjects svg sql concurrent
+
 android{
     QT += androidextras
 }
@@ -42,7 +43,7 @@ DISTFILES += \
 
 android {
     ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
-    ANDROID_JAVA_SOURCES.path = /src/org/github/nsetzer/example
+    ANDROID_JAVA_SOURCES.path = /src/org/github/nsetzer/yueapp2
     ANDROID_JAVA_SOURCES.files = $$files($$PWD/src/java/*.java)
     INSTALLS += ANDROID_JAVA_SOURCES
 }

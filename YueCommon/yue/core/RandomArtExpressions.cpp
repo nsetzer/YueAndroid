@@ -27,6 +27,7 @@ public:
         : Expr()
     {}
     virtual float eval(float x, float y) {
+        (void)y;
         return x;
     }
     virtual int size(void) {
@@ -41,6 +42,7 @@ public:
         : Expr()
     {}
     virtual float eval(float x, float y) {
+        (void) x;
         return y;
     }
     virtual int size(void) {

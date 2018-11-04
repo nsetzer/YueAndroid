@@ -1,4 +1,4 @@
-package org.github.nsetzer.example;
+package org.github.nsetzer.yueapp2;
 
 import android.content.res.Resources;
 import android.content.Context;
@@ -6,7 +6,7 @@ import android.app.Notification;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
-import org.github.nsetzer.example.R;
+import org.github.nsetzer.yueapp2.R;
 import android.app.Service;
 import android.os.IBinder;
 import android.content.Intent;
@@ -28,9 +28,9 @@ public class MyCustomAppService extends QtService {
 
    private static MyCustomAppService m_instance;
 
-   public static final String ACTION_PLAYBACK_NEXT = "org.github.nsetzer.example.NEXT";
-   public static final String ACTION_PLAYBACK_PREV = "org.github.nsetzer.example.PREV";
-   public static final String ACTION_PLAYBACK_PLAYPAUSE = "org.github.nsetzer.example.PLAYPAUSE";
+   public static final String ACTION_PLAYBACK_NEXT = "org.github.nsetzer.yueapp2.NEXT";
+   public static final String ACTION_PLAYBACK_PREV = "org.github.nsetzer.yueapp2.PREV";
+   public static final String ACTION_PLAYBACK_PLAYPAUSE = "org.github.nsetzer.yueapp2.PLAYPAUSE";
 
    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
 
