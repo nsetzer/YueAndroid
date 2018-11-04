@@ -3,8 +3,8 @@
 
 #include <QMainWindow>
 
-namespace Ui {
-class MainWindow;
+namespace UI {
+    class MainWindow;
 }
 
 class MainWindow : public QMainWindow
@@ -16,7 +16,7 @@ public:
     ~MainWindow();
 
 private:
-    Ui::MainWindow *ui;
+    QScopedPointer<UI::MainWindow> m_ui;
 };
 
 #endif // MAINWINDOW_H

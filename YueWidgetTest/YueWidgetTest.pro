@@ -93,8 +93,8 @@ HEADERS += \
 # src/cpp/yue/qtcommon/AlbumArtImage.h
 
 
-FORMS += \
-    src/cpp/mainwindow.ui
+#FORMS += \
+#    src/cpp/mainwindow.ui
 
 REPC_REPLICA += src/cpp/rpc/MediaControl.rep
 REPC_SOURCE  += src/cpp/rpc/MediaControl.rep
