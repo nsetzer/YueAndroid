@@ -59,7 +59,7 @@ QImage AlbumArt::loadAlbumArtFromPath(QString imagePath, int width)
 
 //static
 QImage AlbumArt::loadAlbumArt(QString imagePath, int width)
-{\
+{
     QImage image = QImage(imagePath);
     if (!image.isNull())
         return image.scaled(width, width, Qt::KeepAspectRatio, Qt::SmoothTransformation);
@@ -74,7 +74,8 @@ QImage AlbumArt::createDefaultAlbumArt(Database::uid_t albumid, int width)
     int size = width/2;
 
     yue::core::Random rnd;
-    rnd.seed(albumid);
+    // TODO: hash the value (int64, or str) into int32
+    rnd.seed(static_cast<unsigned int>(albumid));
     yue::core::art::Expr* expr_r = yue::core::art::Expr::create(rnd);
     yue::core::art::Expr* expr_g = yue::core::art::Expr::create(rnd);
     yue::core::art::Expr* expr_b = yue::core::art::Expr::create(rnd);
@@ -91,9 +92,9 @@ QImage AlbumArt::createDefaultAlbumArt(Database::uid_t albumid, int width)
             float g = expr_g->eval(x,y);
             float b = expr_b->eval(x,y);
 
-            int ir = static_cast<int>(r * 127.5 + 127.5);
-            int ig = static_cast<int>(g * 127.5 + 127.5);
-            int ib = static_cast<int>(b * 127.5 + 127.5);
+            int ir = static_cast<int>(r * 127.5F + 127.5F);
+            int ig = static_cast<int>(g * 127.5F + 127.5F);
+            int ib = static_cast<int>(b * 127.5F + 127.5F);
 
             //buffer[4 * (px * width + py)    ] = ir;
             //buffer[4 * (px * width + py) + 1] = ig;

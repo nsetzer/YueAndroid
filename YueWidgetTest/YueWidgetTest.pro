@@ -38,7 +38,17 @@ SOURCES += \
     src/cpp/yue/core/search/grammar.cpp \
     src/cpp/yue/core/search/rules.cpp \
     src/cpp/yue/core/song.cpp \
-    src/cpp/yue/core/util/dateutil.cpp
+    src/cpp/yue/core/util/dateutil.cpp \
+    src/cpp/yue/qtcommon/DirectoryListModel.cpp \
+    src/cpp/yue/qtcommon/examples/BasicListModel.cpp \
+    src/cpp/yue/qtcommon/examples/SwipeListModel.cpp \
+    src/cpp/yue/qtcommon/LibraryTreeListModel.cpp \
+    src/cpp/yue/qtcommon/PlaylistModel.cpp \
+    src/cpp/yue/qtcommon/ResourceCache.cpp \
+    src/cpp/yue/qtcommon/SongListModel.cpp \
+    src/cpp/yue/qtcommon/TreeListModelBase.cpp
+
+# src/cpp/yue/qtcommon/AlbumArtImage.cpp
 
 HEADERS += \
     src/cpp/mainwindow.h \
@@ -70,7 +80,18 @@ HEADERS += \
     src/cpp/yue/core/util/dateutil.h \
     src/cpp/yue/core/util/random.h \
     src/cpp/yue/util/logging.h \
-    src/cpp/yue/global.h
+    src/cpp/yue/global.h \
+    src/cpp/yue/qtcommon/DirectoryListModel.hpp \
+    src/cpp/yue/qtcommon/examples/BasicListModel.hpp \
+    src/cpp/yue/qtcommon/examples/SwipeListModel.hpp \
+    src/cpp/yue/qtcommon/LibraryTreeListModel.hpp \
+    src/cpp/yue/qtcommon/PlaylistModel.h \
+    src/cpp/yue/qtcommon/ResourceCache.h \
+    src/cpp/yue/qtcommon/SongListModel.h \
+    src/cpp/yue/qtcommon/TreeListModelBase.hpp \
+
+# src/cpp/yue/qtcommon/AlbumArtImage.h
+
 
 FORMS += \
     src/cpp/mainwindow.ui

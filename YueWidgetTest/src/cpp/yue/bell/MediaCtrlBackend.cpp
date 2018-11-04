@@ -40,7 +40,7 @@ void MediaCtrlBackend::load()
         auto pair = pl->current();
         load(pair.first);
 
-        emit currentIndexChanged(pair.second);
+        emit currentIndexChanged(static_cast<int>(pair.second));
 
     } catch (std::runtime_error& e) {
         qWarning() << "Error Loading Song: " << e.what();
@@ -70,7 +70,7 @@ void MediaCtrlBackend::next()
         auto pair = pl->next();
         load(pair.first);
         m_pPlayer->play();
-        emit currentIndexChanged(pair.second);
+        emit currentIndexChanged(static_cast<int>(pair.second));
     } catch (std::runtime_error& e) {
         qWarning() << e.what();
     }
@@ -83,7 +83,7 @@ void MediaCtrlBackend::prev()
         auto pair = pl->prev();
         load(pair.first);
         m_pPlayer->play();
-        emit currentIndexChanged(pair.second);
+        emit currentIndexChanged(static_cast<int>(pair.second));
     } catch (std::runtime_error& e) {
         qWarning() << e.what();
     }
