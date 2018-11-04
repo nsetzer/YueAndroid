@@ -2,9 +2,9 @@
 #include "MediaCtrlRemoteServer.h"
 #include <QCoreApplication>
 
-#include "yue/bell/database.hpp"
-#include "yue/bell/library.hpp"
-#include "yue/bell/MediaCtrlBase.h"
+//#include "yue/bell/database.hpp"
+//#include "yue/bell/library.hpp"
+//#include "yue/bell/MediaCtrlBase.h"
 
 #ifdef Q_OS_ANDROID
 #include <QAndroidJniObject>
@@ -28,11 +28,11 @@ static void JNIActivitySTTResultCallback(JNIEnv *env, jobject obj, jstring jstra
             words.removeAt(0);
             QString query = words.join(" ");
             qDebug() << "jni native call: play song: " << query;
-            QList<yue::bell::Database::uid_t> lst = yue::bell::Library::instance()->createPlaylist(query,1);
-            if (lst.length()>0) {
-                yue::bell::MediaCtrlBase::instance()->doPlaySong(lst[0]);
-                return;
-            }
+            //QList<yue::bell::Database::uid_t> lst = yue::bell::Library::instance()->createPlaylist(query,1);
+            //if (lst.length()>0) {
+            //    yue::bell::MediaCtrlBase::instance()->doPlaySong(lst[0]);
+            //    return;
+            //}
         } else if ( words.length() > 1 && words[0].toLower() == "create") {
             words.removeAt(0);
             if (words.length() > 1 && (words[0].toLower() == "playlist" || words[0].toLower() == "playlists")) {
@@ -44,11 +44,11 @@ static void JNIActivitySTTResultCallback(JNIEnv *env, jobject obj, jstring jstra
 
             QString query = words.join(" ");
             qDebug() << "jni native call: create: " << query;
-            QList<yue::bell::Database::uid_t> lst = yue::bell::Library::instance()->createPlaylist(query);
-            if (lst.length()>0) {
-                yue::bell::MediaCtrlBase::instance()->doSetCurrentPlaylist(lst,true);
-                return;
-            }
+            //QList<yue::bell::Database::uid_t> lst = yue::bell::Library::instance()->createPlaylist(query);
+            //if (lst.length()>0) {
+            //    yue::bell::MediaCtrlBase::instance()->doSetCurrentPlaylist(lst,true);
+            //    return;
+            //}
         } else {
             qDebug() << "jni native call: default: " << result;
         }
@@ -57,7 +57,7 @@ static void JNIActivitySTTResultCallback(JNIEnv *env, jobject obj, jstring jstra
     qDebug() << "jni native call: unable to recognise input";
 
     QAndroidJniObject message = QAndroidJniObject::fromString("Unrecognized Input: "+ results[0]);
-    QAndroidJniObject::callStaticMethod<void>("org/github/nsetzer/example/MyCustomAppActivity",
+    QAndroidJniObject::callStaticMethod<void>("org/github/nsetzer/yueapp2/YueAppActivity",
                                        "makeToast",
                                        "(Ljava/lang/String;)V",
                                        message.object<jstring>());
@@ -124,7 +124,7 @@ int JavaCompat::RegisterNatives() {
     QAndroidJniEnvironment env;
     jclass javaClass;
 
-    javaClass = env->FindClass("org/github/nsetzer/example/MyCustomAppActivity");
+    javaClass = env->FindClass("org/github/nsetzer/yueapp2/YueAppActivity");
     if(!javaClass)
         return JNI_ERR;
     if(env->RegisterNatives(javaClass, ActivityArray,
@@ -132,7 +132,7 @@ int JavaCompat::RegisterNatives() {
         return JNI_ERR;
 
 
-    javaClass = env->FindClass("org/github/nsetzer/example/MyCustomAppService");
+    javaClass = env->FindClass("org/github/nsetzer/yueapp2/YueAppService");
     if(!javaClass)
         return JNI_ERR;
     if(env->RegisterNatives(javaClass, ServiceArray,

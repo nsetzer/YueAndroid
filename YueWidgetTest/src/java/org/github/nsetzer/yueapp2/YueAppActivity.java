@@ -3,7 +3,7 @@ package org.github.nsetzer.yueapp2;
 import org.github.nsetzer.yueapp2.R;
 import org.qtproject.qt5.android.bindings.QtActivity;
 import org.qtproject.qt5.android.bindings.QtService;
-import org.github.nsetzer.yueapp2.MyCustomAppService;
+import org.github.nsetzer.yueapp2.YueAppService;
 import android.content.Intent;
 import android.util.Log;
 import android.os.Bundle;
@@ -14,12 +14,12 @@ import android.speech.RecognizerIntent;
 import android.content.ActivityNotFoundException;
 import android.widget.Toast;
 
-public class MyCustomAppActivity extends QtActivity {
+public class YueAppActivity extends QtActivity {
 
-    private static MyCustomAppActivity m_instance;
+    private static YueAppActivity m_instance;
     private final int REQ_CODE_SPEECH_INPUT = 100;
 
-    public MyCustomAppActivity()
+    public YueAppActivity()
     {
         m_instance = this;
     }
@@ -28,7 +28,7 @@ public class MyCustomAppActivity extends QtActivity {
     public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
         Log.i("Activity", "Starting service!");
-        Intent serviceIntent = new Intent(this, MyCustomAppService.class);
+        Intent serviceIntent = new Intent(this, YueAppService.class);
         startService(serviceIntent);
     }
     @Override
@@ -112,7 +112,7 @@ public class MyCustomAppActivity extends QtActivity {
         // https://developer.android.com/reference/android/app/Activity.html
         //https://stackoverflow.com/questions/19568315/how-to-handle-code-when-app-is-killed-by-swiping-in-android/26882533#26882533
         Log.i("Activity", "Service: on Destroy Activity");
-        Intent intent = new Intent(MyCustomAppActivity.this, MyCustomAppService.class);
+        Intent intent = new Intent(YueAppActivity.this, YueAppService.class);
         stopService(intent);
 
         super.onDestroy();

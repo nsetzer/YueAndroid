@@ -24,9 +24,9 @@ import android.media.session.MediaSession;
 
 //import android.support.annotation.MainThread;
 
-public class MyCustomAppService extends QtService {
+public class YueAppService extends QtService {
 
-   private static MyCustomAppService m_instance;
+   private static YueAppService m_instance;
 
    public static final String ACTION_PLAYBACK_NEXT = "org.github.nsetzer.yueapp2.NEXT";
    public static final String ACTION_PLAYBACK_PREV = "org.github.nsetzer.yueapp2.PREV";
@@ -49,7 +49,7 @@ public class MyCustomAppService extends QtService {
       }
    };
 
-   public MyCustomAppService()
+   public YueAppService()
    {
        m_instance = this;
 
@@ -168,7 +168,7 @@ public class MyCustomAppService extends QtService {
                 .setLargeIcon(cover);
 
          // open the application when the notification is clicked
-         Intent appIntent = new Intent(ctx, MyCustomAppActivity.class);
+         Intent appIntent = new Intent(ctx, YueAppActivity.class);
          PendingIntent appPendingIntent = PendingIntent.getActivity(
                                           ctx, 0, appIntent,
                                           Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -194,7 +194,7 @@ public class MyCustomAppService extends QtService {
                 //.setMediaSession(mMediaSession.getSessionToken()));
 
          Log.i("Service", "display notification");
-         //startService(new Intent(ctx, MyCustomAppService.class));
+         //startService(new Intent(ctx, YueAppService.class));
          //if (playing) {
          startForeground(3, builder.build());
          //} else {

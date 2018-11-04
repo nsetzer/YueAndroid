@@ -4,6 +4,8 @@
 #
 #-------------------------------------------------
 
+# MyCustomAppService
+# MyCustomAppActivity
 TEMPLATE = app
 QT += core gui widgets webview multimedia remoteobjects svg sql concurrent
 
@@ -15,13 +17,22 @@ CONFIG += c++11
 
 SOURCES += \
     src/cpp/main.cpp \
-    src/cpp/mainwindow.cpp
+    src/cpp/mainwindow.cpp \
+    src/cpp/MediaCtrlRemoteClient.cpp \
+    src/cpp/MediaCtrlRemoteServer.cpp \
+    src/cpp/JavaCompat.cpp
 
 HEADERS += \
-    src/cpp/mainwindow.h
+    src/cpp/mainwindow.h \
+    src/cpp/MediaCtrlRemoteClient.h \
+    src/cpp/MediaCtrlRemoteServer.h \
+    src/cpp/JavaCompat.h
 
 FORMS += \
     src/cpp/mainwindow.ui
+
+REPC_REPLICA += src/cpp/MediaControl.rep
+REPC_SOURCE  += src/cpp/MediaControl.rep
 
 DISTFILES += \
     android/AndroidManifest.xml \
