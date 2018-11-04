@@ -1,4 +1,4 @@
-#include "MediaCtrlRemoteClient.h"
+#include "rpc/MediaCtrlRemoteClient.h"
 
 #ifdef Q_OS_ANDROID
 #include <QAndroidJniObject>
@@ -26,7 +26,7 @@ MediaCtrlRemoteClient::MediaCtrlRemoteClient()
         //m_rep.clear();
     }
 
-    //loadCurrentSongInfo();
+    loadCurrentSongInfo();
 }
 
 void MediaCtrlRemoteClient::load()
@@ -79,30 +79,30 @@ void MediaCtrlRemoteClient::setProgress(float progress)
 
 void MediaCtrlRemoteClient::onServiceProgressChanged(float progress)
 {
-    //m_progress = progress;
-    //emit progressChanged(progress);
+    m_progress = progress;
+    emit progressChanged(progress);
 }
 
 void MediaCtrlRemoteClient::onServiceCurrentIndexChanged(int index)
 {
-    //loadCurrentSongInfo();
-    //emit currentIndexChanged(index);
+    loadCurrentSongInfo();
+    emit currentIndexChanged(index);
 }
 
 void MediaCtrlRemoteClient::onServiceStatusChanged(int status)
 {
 
-    //auto s = static_cast<yue::bell::MediaPlayerBase::Status>(status);
-    //m_status = s;
-    //emit statusChanged(s);
+    auto s = static_cast<yue::bell::MediaPlayerBase::Status>(status);
+    m_status = s;
+    emit statusChanged(s);
 }
 
 void MediaCtrlRemoteClient::onServiceStateChanged(int state)
 {
 
-    //auto s = static_cast<yue::bell::MediaPlayerBase::State>(state);
-    //m_state = s;
-    //emit stateChanged(s);
+    auto s = static_cast<yue::bell::MediaPlayerBase::State>(state);
+    m_state = s;
+    emit stateChanged(s);
 }
 
 void MediaCtrlRemoteClient::tts()

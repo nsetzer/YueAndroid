@@ -1,5 +1,5 @@
-#include "JavaCompat.h"
-#include "MediaCtrlRemoteServer.h"
+#include "rpc/JavaCompat.h"
+#include "rpc/MediaCtrlRemoteServer.h"
 #include <QCoreApplication>
 
 //#include "yue/bell/database.hpp"

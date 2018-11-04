@@ -1,5 +1,5 @@
-#ifndef JAVACOMPAT_H
-#define JAVACOMPAT_H
+#ifndef RPC_JAVACOMPAT_H
+#define RPC_JAVACOMPAT_H
 
 #include <QDebug>
 

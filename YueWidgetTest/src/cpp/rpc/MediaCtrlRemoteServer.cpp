@@ -1,13 +1,13 @@
-#include "MediaCtrlRemoteServer.h"
+#include "rpc/MediaCtrlRemoteServer.h"
 
 #include <QDebug>
 #include <QBuffer>
 #include <QByteArray>
 
-//#include "yue/bell/database.hpp"
-//#include "yue/bell/library.hpp"
-//#include "yue/bell/playlist.hpp"
-//#include "yue/bell/AlbumArt.h"
+#include "yue/bell/database.hpp"
+#include "yue/bell/library.hpp"
+#include "yue/bell/playlist.hpp"
+#include "yue/bell/AlbumArt.h"
 
 #ifdef Q_OS_ANDROID
 #include <QAndroidJniObject>
@@ -18,12 +18,11 @@ QSharedPointer<MediaCtrlRemoteServer> MediaCtrlRemoteServer::m_instance(nullptr)
 
 MediaCtrlRemoteServer::MediaCtrlRemoteServer()
     : MediaControlSource()
-    //, m_pBackend(new yue::bell::MediaCtrlBackend(this))
+    , m_pBackend(new yue::bell::MediaCtrlBackend(this))
     , m_index(0)
-    //, m_status(yue::bell::MediaPlayerBase::Status::Unknown)
-    //, m_state(yue::bell::MediaPlayerBase::State::Unknown)
+    , m_status(yue::bell::MediaPlayerBase::Status::Unknown)
+    , m_state(yue::bell::MediaPlayerBase::State::Unknown)
 {
-    /*
     connect(m_pBackend.data(),&yue::bell::MediaCtrlBackend::progressChanged,
             this,&MediaCtrlRemoteServer::onProgressChanged);
 
@@ -41,7 +40,6 @@ MediaCtrlRemoteServer::MediaCtrlRemoteServer()
     } catch (std::runtime_error& e) {
         qWarning() << "Error Loading Song: " << e.what();
     }
-    */
 }
 
 void MediaCtrlRemoteServer::onProgressChanged(float progress)
@@ -52,7 +50,7 @@ void MediaCtrlRemoteServer::onCurrentIndexChanged(int index)
 {
     m_index = index;
     emit currentIndexChanged(index);
-/*
+
     try {
         yue::bell::Database::uid_t uid = yue::bell::PlaylistManager::instance()->openCurrent()->current().first;
         QImage art = yue::bell::AlbumArt::getAlbumArt(yue::bell::Library::instance(), uid, QSize(128,128));
@@ -70,22 +68,20 @@ void MediaCtrlRemoteServer::onCurrentIndexChanged(int index)
         qWarning() << "Error Loading Song Information for notification: " << e.what();
         return;
     }
-*/
+
     sendNotification();
 }
-/*
 void MediaCtrlRemoteServer::onStatusChanged(yue::bell::MediaPlayerBase::Status status)
 {
     m_status = status;
-    emit statusChanged(static_cast<int>(status));
+    emit statusChanged(status);
 }
 void MediaCtrlRemoteServer::onStateChanged(yue::bell::MediaPlayerBase::State state)
 {
     m_state = state;
-    emit stateChanged(static_cast<int>(state));
+    emit stateChanged(state);
     sendNotification();
 }
-*/
 
 void MediaCtrlRemoteServer::sendNotification()
 {
@@ -94,14 +90,14 @@ void MediaCtrlRemoteServer::sendNotification()
     QAndroidJniEnvironment env;
     QAndroidJniObject title = QAndroidJniObject::fromString(m_title);
     QAndroidJniObject message = QAndroidJniObject::fromString(m_message);
-    jboolean playing = true; // m_state == yue::bell::MediaPlayerBase::State::Playing;
+    jboolean playing = m_state == yue::bell::MediaPlayerBase::State::Playing;
 
     jbyteArray coverart = env->NewByteArray(m_current_art.size());
     // char to signed char requires reinterpret cast
     const jbyte *bytes = reinterpret_cast<const jbyte*>(m_current_art.constData());
     env->SetByteArrayRegion(coverart, 0, m_current_art.size(), bytes);
 
-    QAndroidJniObject::callStaticMethod<void>("org/github/nsetzer/yueapp2/MyCustomAppService",
+    QAndroidJniObject::callStaticMethod<void>("org/github/nsetzer/yueapp2/YueAppService",
                                        "showNotification",
                                        "([BZLjava/lang/String;Ljava/lang/String;)V",
                                        coverart,
