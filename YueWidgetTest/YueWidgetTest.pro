@@ -19,7 +19,8 @@ INCLUDEPATH += src/cpp
 
 SOURCES += \
     src/cpp/main.cpp \
-    src/cpp/mainwindow.cpp \
+    src/cpp/ui/mainwindow.cpp \
+    src/cpp/ui/page_library.cpp \
     src/cpp/rpc/JavaCompat.cpp \
     src/cpp/rpc/MediaCtrlRemoteServer.cpp \
     src/cpp/rpc/MediaCtrlRemoteClient.cpp \
@@ -51,7 +52,8 @@ SOURCES += \
 # src/cpp/yue/qtcommon/AlbumArtImage.cpp
 
 HEADERS += \
-    src/cpp/mainwindow.h \
+    src/cpp/ui/mainwindow.h \
+    src/cpp/ui/page_library.h \
     src/cpp/rpc/JavaCompat.h \
     src/cpp/rpc/MediaCtrlRemoteClient.h \
     src/cpp/rpc/MediaCtrlRemoteServer.h \

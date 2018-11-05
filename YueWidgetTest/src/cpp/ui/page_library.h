@@ -1,20 +1,18 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef UI_PAGE_LIBRARY_H
+#define UI_PAGE_LIBRARY_H
 
-#include <QMainWindow>
+#include <QLineEdit>
+#include <QGesture>
+#include <QListView>
+#include <QStyledItemDelegate>
 #include <QPainter>
 #include <QVariant>
-#include <QStyledItemDelegate>
-#include <QScopedPointer>
 #include <QVBoxLayout>
-#include <QPushButton>
-#include <QTreeView>
-#include <QListView>
+#include <QHBoxLayout>
+#include <QToolButton>
 
 #include "yue/qtcommon/TreeListModelBase.hpp"
 #include "yue/qtcommon/LibraryTreeListModel.hpp"
-
-namespace UI {
 
 class TestDelegate: public QStyledItemDelegate
 {
@@ -52,7 +50,6 @@ protected:
         } else {
             QListView::mouseReleaseEvent(event);
         }
-
     }
 public slots:
 
@@ -66,40 +63,47 @@ public slots:
         return;
     }
 
+    bool event(QEvent *event)
+    {
+        if (event->type() == QEvent::Gesture) {
+            return gestureEvent(static_cast<QGestureEvent*>(event));
+        }
+        return QWidget::event(event);
+    }
+
+    bool gestureEvent(QGestureEvent *event)
+    {
+        qDebug() << "gestureEvent():" << event;
+        if (QGesture *swipe = event->gesture(Qt::SwipeGesture))
+            qDebug() << "swipe";
+        else if (QGesture *pan = event->gesture(Qt::PanGesture))
+            qDebug() << "pan";
+        if (QGesture *pinch = event->gesture(Qt::PinchGesture))
+            qDebug() << "pinch";
+        return true;
+    }
 
 };
 
-class MainWindow : public QObject
+namespace UI {
+
+class uiPageLibrary;
+
+} // namespace UI
+
+class PageLibrary : public QWidget
 {
     Q_OBJECT
-
-    QWidget *m_centralWidget;
-    QVBoxLayout *m_centralLayout;
-    QPushButton *m_button;
-    LibraryView *m_view;
-
-
-
-public:
-    explicit MainWindow(QMainWindow *parent = nullptr);
-    ~MainWindow();
-};
-
-}
-
-class MainWindow : public QMainWindow
-{
-    Q_OBJECT
-
-public:
-    explicit MainWindow(QWidget *parent = nullptr);
-    ~MainWindow();
 
 private:
-    QScopedPointer<UI::MainWindow> m_ui;
 
+public:
 
+    PageLibrary(QWidget *parent = nullptr);
+    ~PageLibrary();
 
+private:
+    QScopedPointer<UI::uiPageLibrary> m_ui;
 };
 
-#endif // MAINWINDOW_H
+#endif // UI_PAGE_LIBRARY_H

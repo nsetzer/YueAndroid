@@ -1,11 +1,5 @@
-#include "mainwindow.h"
 
-
-
-
-
-
-namespace UI {
+#include "ui/page_library.h"
 
 void TestDelegate::paint(
     QPainter *painter,
@@ -60,9 +54,16 @@ void TestDelegate::paint(
     painter->drawText(rect, Qt::AlignVCenter|Qt::AlignLeft, text);
 }
 
+
 LibraryView::LibraryView(QWidget *parent)
   : QListView(parent)
 {
+    // Qt::DontStartGestureOnChildren
+    // Qt::ReceivePartialGestures
+    // Qt::IgnoredGesturesPropagateToParent
+    grabGesture(Qt::SwipeGesture, Qt::ReceivePartialGestures);
+    grabGesture(Qt::PinchGesture, Qt::ReceivePartialGestures);
+    grabGesture(Qt::PanGesture, Qt::ReceivePartialGestures);
 
     m_delegate = new TestDelegate(this);
     m_model = new yue::qtcommon::LibraryTreeListModel(this);
@@ -83,39 +84,67 @@ LibraryView::LibraryView(QWidget *parent)
 }
 
 
-MainWindow::MainWindow(QMainWindow *parent)
-    : QObject(parent)
+namespace UI {
+
+class uiPageLibrary
 {
-    m_centralWidget = new QWidget(parent);
-    parent->setCentralWidget(m_centralWidget);
 
-    m_centralLayout = new QVBoxLayout();
-    m_centralWidget->setLayout(m_centralLayout);
+public:
 
-    m_button = new QPushButton("Click Me", m_centralWidget);
+    QVBoxLayout *m_layoutCentral;
+    QHBoxLayout *m_layoutSearch;
+    QHBoxLayout *m_layoutCreate;
+    QLineEdit *m_editSearch;
+    QToolButton *m_btnSearch;
+
+    QToolButton *m_btnCreate1;
+    QToolButton *m_btnCreate2;
+    QToolButton *m_btnCreate3;
+
+    LibraryView *m_view;
 
 
-    m_view = new LibraryView(m_centralWidget);
+    uiPageLibrary(QWidget *parent = nullptr);
+    ~uiPageLibrary();
 
-    m_centralLayout->addWidget(m_button);
-    m_centralLayout->addWidget(m_view);
+};
 
+uiPageLibrary::uiPageLibrary(QWidget *parent) {
+    m_layoutCentral = new QVBoxLayout();
+    m_layoutSearch = new QHBoxLayout();
+    m_layoutCreate = new QHBoxLayout();
 
-    return;
+    m_editSearch = new QLineEdit(parent);
+    m_btnSearch = new QToolButton(parent);
+    m_btnCreate1 = new QToolButton(parent);
+    m_btnCreate2 = new QToolButton(parent);
+    m_btnCreate3 = new QToolButton(parent);
+
+    m_view = new LibraryView(parent);
+
+    m_layoutSearch->addWidget(m_editSearch);
+    m_layoutSearch->addWidget(m_btnSearch);
+
+    m_layoutCreate->addWidget(m_btnCreate1);
+    m_layoutCreate->addWidget(m_btnCreate2);
+    m_layoutCreate->addWidget(m_btnCreate3);
+
+    m_layoutCentral->addLayout(m_layoutSearch);
+    m_layoutCentral->addWidget(m_view);
+    m_layoutCentral->addLayout(m_layoutCreate);
+    parent->setLayout(m_layoutCentral);
 }
 
-MainWindow::~MainWindow() {
+uiPageLibrary::~uiPageLibrary() {
 }
 
 } // namespace UI
 
-MainWindow::MainWindow(QWidget *parent)
-  : QMainWindow(parent)
-  , m_ui(new UI::MainWindow(this))
+PageLibrary::PageLibrary(QWidget *parent)
+    : QWidget(parent)
+    , m_ui(new UI::uiPageLibrary(this)) {
 
-{
 }
 
-MainWindow::~MainWindow()
-{
+PageLibrary::~PageLibrary() {
 }
