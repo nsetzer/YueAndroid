@@ -65,6 +65,17 @@ LibraryView::LibraryView(QWidget *parent)
     grabGesture(Qt::PinchGesture, Qt::ReceivePartialGestures);
     grabGesture(Qt::PanGesture, Qt::ReceivePartialGestures);
 
+    // enable one finger scrolling
+    QScroller::grabGesture(this->viewport(), QScroller::LeftMouseButtonGesture);
+
+    this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    #if defined (Q_OS_ANDROID)
+       // this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    #endif
+    // space at the bottom for better touching the lowest widgets
+    // TODO: scale this value to 1x font size
+    setContentsMargins(0, 0, 0, 20);
+
     m_delegate = new TestDelegate(this);
     m_model = new yue::qtcommon::LibraryTreeListModel(this);
 

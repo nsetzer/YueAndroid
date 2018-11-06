@@ -10,6 +10,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QToolButton>
+#include <QScroller>
 
 #include "yue/qtcommon/TreeListModelBase.hpp"
 #include "yue/qtcommon/LibraryTreeListModel.hpp"
@@ -38,6 +39,7 @@ public:
     ~LibraryView() {}
 
 protected:
+
     virtual void mouseReleaseEvent(QMouseEvent *event) {
         const QModelIndex index = indexAt(event->pos());
         const QSize size = sizeHintForIndex(index);
@@ -51,6 +53,7 @@ protected:
             QListView::mouseReleaseEvent(event);
         }
     }
+
 public slots:
 
     void onDoubleClick(const QModelIndex &index) {

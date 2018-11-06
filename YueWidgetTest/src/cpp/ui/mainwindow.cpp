@@ -4,6 +4,9 @@
 
 #include "ui/mainwindow.h"
 #include "ui/page_library.h"
+#include "ui/page_player.h"
+
+
 
 namespace UI {
 
@@ -13,7 +16,10 @@ private:
 
     QWidget *m_centralWidget;
     QVBoxLayout *m_centralLayout;
-    PageLibrary *m_view;
+
+    QTabWidget *m_tabPages;
+    PageLibrary *m_pageLibrary;
+    PagePlayer *m_pagePlayer;
 
 public:
     explicit MainWindow(QMainWindow *parent = nullptr);
@@ -28,9 +34,18 @@ MainWindow::MainWindow(QMainWindow *parent)
     m_centralLayout = new QVBoxLayout();
     m_centralWidget->setLayout(m_centralLayout);
 
-    m_view = new PageLibrary(parent);
+    m_tabPages = new QTabWidget(parent);
 
-    m_centralLayout->addWidget(m_view);
+    m_pagePlayer = new PagePlayer(parent);
+    m_pageLibrary = new PageLibrary(parent);
+    m_tabPages->addTab(m_pageLibrary, "library");
+
+    m_tabPages->addTab(new QWidget(parent), "playlist");
+    m_tabPages->addTab(new QWidget(parent), "files");
+    m_tabPages->addTab(new QWidget(parent), "settings");
+
+    m_centralLayout->addWidget(m_pagePlayer);
+    m_centralLayout->addWidget(m_tabPages);
 
     return;
 }
