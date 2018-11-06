@@ -21,9 +21,11 @@ SOURCES += \
     src/cpp/main.cpp \
     src/cpp/ui/mainwindow.cpp \
     src/cpp/ui/page_explorer.cpp \
+    src/cpp/ui/page_dynamic.cpp \
     src/cpp/ui/page_library.cpp \
     src/cpp/ui/page_player.cpp \
     src/cpp/ui/page_queue.cpp \
+    src/cpp/ui/page_settings.cpp \
     src/cpp/rpc/JavaCompat.cpp \
     src/cpp/rpc/MediaCtrlRemoteServer.cpp \
     src/cpp/rpc/MediaCtrlRemoteClient.cpp \
@@ -57,9 +59,11 @@ SOURCES += \
 HEADERS += \
     src/cpp/ui/mainwindow.h \
     src/cpp/ui/page_explorer.h \
+    src/cpp/ui/page_dynamic.h \
     src/cpp/ui/page_library.h \
     src/cpp/ui/page_player.h \
     src/cpp/ui/page_queue.h \
+    src/cpp/ui/page_settings.h \
     src/cpp/rpc/JavaCompat.h \
     src/cpp/rpc/MediaCtrlRemoteClient.h \
     src/cpp/rpc/MediaCtrlRemoteServer.h \

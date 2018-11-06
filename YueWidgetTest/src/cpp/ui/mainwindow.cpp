@@ -7,6 +7,14 @@
 #include "ui/page_queue.h"
 #include "ui/page_player.h"
 #include "ui/page_explorer.h"
+#include "ui/page_settings.h"
+#include "ui/page_dynamic.h"
+
+/**
+create a custom icon button
+ - on the resize event, resize to (min, min)
+    - keep the aspect ratio square
+*/
 
 namespace UI {
 
@@ -22,6 +30,8 @@ private:
     PagePlayer *m_pagePlayer;
     PageQueue *m_pageQueue;
     PageExplorer *m_pageExplorer;
+    PageSettings *m_pageSettings;
+    PageDynamic *m_pageDynamic;
 
 public:
     explicit MainWindow(QMainWindow *parent = nullptr);
@@ -42,13 +52,14 @@ MainWindow::MainWindow(QMainWindow *parent)
     m_pagePlayer = new PagePlayer(parent);
     m_pageLibrary = new PageLibrary(parent);
     m_pageExplorer = new PageExplorer(parent);
+    m_pageSettings = new PageSettings(parent);
+    m_pageDynamic = new PageDynamic(parent);
 
     m_tabPages->addTab(m_pageQueue, "queue");
     m_tabPages->addTab(m_pageLibrary, "library");
-
-    m_tabPages->addTab(new QWidget(parent), "playlist");
+    m_tabPages->addTab(m_pageDynamic, "dynamic");
     m_tabPages->addTab(m_pageExplorer, "files");
-    m_tabPages->addTab(new QWidget(parent), "settings");
+    m_tabPages->addTab(m_pageSettings, "settings");
 
     m_centralLayout->addWidget(m_pagePlayer);
     m_centralLayout->addWidget(m_tabPages);

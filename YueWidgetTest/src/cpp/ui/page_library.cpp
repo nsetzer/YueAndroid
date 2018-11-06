@@ -154,6 +154,8 @@ uiPageLibrary::uiPageLibrary(QWidget *parent) {
     m_layoutCentral->addLayout(m_layoutSearch);
     m_layoutCentral->addWidget(m_view);
     m_layoutCentral->addLayout(m_layoutCreate);
+
+    m_editSearch->setPlaceholderText("Search Library");
     parent->setLayout(m_layoutCentral);
 }
 
