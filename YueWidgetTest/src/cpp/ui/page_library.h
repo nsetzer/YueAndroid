@@ -12,8 +12,8 @@
 #include <QToolButton>
 #include <QScroller>
 
-#include "yue/qtcommon/TreeListModelBase.hpp"
-#include "yue/qtcommon/LibraryTreeListModel.hpp"
+#include "yue/qtcommon/TreeListModelBase.h"
+#include "yue/qtcommon/LibraryTreeListModel.h"
 
 class LibraryTreeDelegate: public QStyledItemDelegate
 {

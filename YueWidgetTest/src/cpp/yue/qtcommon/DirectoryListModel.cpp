@@ -3,7 +3,7 @@
 #include <QDesktopServices>
 #include <QUrl>
 
-#include "yue/qtcommon/DirectoryListModel.hpp"
+#include "yue/qtcommon/DirectoryListModel.h"
 
 namespace yue {
 namespace qtcommon {

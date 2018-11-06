@@ -20,6 +20,7 @@ INCLUDEPATH += src/cpp
 SOURCES += \
     src/cpp/main.cpp \
     src/cpp/ui/mainwindow.cpp \
+    src/cpp/ui/page_explorer.cpp \
     src/cpp/ui/page_library.cpp \
     src/cpp/ui/page_player.cpp \
     src/cpp/ui/page_queue.cpp \
@@ -55,6 +56,7 @@ SOURCES += \
 
 HEADERS += \
     src/cpp/ui/mainwindow.h \
+    src/cpp/ui/page_explorer.h \
     src/cpp/ui/page_library.h \
     src/cpp/ui/page_player.h \
     src/cpp/ui/page_queue.h \
@@ -87,14 +89,14 @@ HEADERS += \
     src/cpp/yue/core/util/random.h \
     src/cpp/yue/util/logging.h \
     src/cpp/yue/global.h \
-    src/cpp/yue/qtcommon/DirectoryListModel.hpp \
+    src/cpp/yue/qtcommon/DirectoryListModel.h \
     src/cpp/yue/qtcommon/examples/BasicListModel.hpp \
     src/cpp/yue/qtcommon/examples/SwipeListModel.hpp \
-    src/cpp/yue/qtcommon/LibraryTreeListModel.hpp \
+    src/cpp/yue/qtcommon/LibraryTreeListModel.h \
     src/cpp/yue/qtcommon/PlaylistModel.h \
     src/cpp/yue/qtcommon/ResourceCache.h \
     src/cpp/yue/qtcommon/SongListModel.h \
-    src/cpp/yue/qtcommon/TreeListModelBase.hpp \
+    src/cpp/yue/qtcommon/TreeListModelBase.h \
 
 # src/cpp/yue/qtcommon/AlbumArtImage.h
 

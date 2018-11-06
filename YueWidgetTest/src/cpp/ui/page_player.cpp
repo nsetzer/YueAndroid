@@ -2,8 +2,6 @@
 
 #include "ui/page_player.h"
 
-
-
 namespace UI {
 
 class uiPagePlayer
@@ -14,6 +12,7 @@ public:
     QVBoxLayout *m_layoutCentral;
     QHBoxLayout *m_layoutDisplay;
 
+    QToolButton *m_btnMenu;
     QToolButton *m_btnPlayPause;
     QToolButton *m_btnNext;
     QProgressBar *m_barPosition;
@@ -30,13 +29,15 @@ uiPagePlayer::uiPagePlayer(QWidget *parent)
 {
     m_layoutCentral = new QVBoxLayout();
     m_layoutDisplay = new QHBoxLayout();
+    m_btnMenu = new QToolButton(parent);
     m_btnPlayPause = new QToolButton(parent);
     m_btnNext = new QToolButton(parent);
     m_barPosition = new QProgressBar(parent);
     m_barPosition->setTextVisible(false);
-    m_lblSongInfo = new QLabel("TITILE - ARTIST", parent);
+    m_lblSongInfo = new QLabel("TITLE - ARTIST", parent);
     m_lblSongInfo->setAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
 
+    m_layoutDisplay->addWidget(m_btnMenu);
     m_layoutDisplay->addWidget(m_btnPlayPause);
     m_layoutDisplay->addWidget(m_btnNext);
     m_layoutDisplay->addWidget(m_barPosition);
