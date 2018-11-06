@@ -11,7 +11,8 @@ int PlaylistModel::AlbumRole = Qt::UserRole+4;
 int PlaylistModel::TitleRole = Qt::UserRole+5;
 int PlaylistModel::LengthRole = Qt::UserRole+6;
 
-PlaylistModel::PlaylistModel()
+PlaylistModel::PlaylistModel(QObject *parent)
+    : QSqlQueryModel(parent)
 {
 
 }
@@ -19,6 +20,9 @@ PlaylistModel::PlaylistModel()
 void PlaylistModel::refresh()
 {
     LOG_FUNCTION_TIME();
+    if (m_playlist==nullptr) {
+        throw std::runtime_error("playlist is null");
+    }
 
     QSqlQuery query = m_playlist->select();
     query.exec();
@@ -38,6 +42,13 @@ QVariant PlaylistModel::data(const QModelIndex &index, int role/* = Qt::DisplayR
     }
     else
     {
+        // using the default query:
+        // Qt::UserRole + 1 : p.song_id : PlaylistModel::SongIdRole
+        // Qt::UserRole + 2 : p.idx     : PlaylistModel::IndexRole
+        // Qt::UserRole + 3 : l.artist  : PlaylistModel::ArtistRole
+        // Qt::UserRole + 4 : l.album   : PlaylistModel::AlbumRole
+        // Qt::UserRole + 5 : l.title   : PlaylistModel::TitleRole
+        // Qt::UserRole + 6 : l.length  : PlaylistModel::LengthRole
         int columnIdx = role - Qt::UserRole - 1;
         QModelIndex modelIndex = this->index(index.row(), columnIdx);
         value = QSqlQueryModel::data(modelIndex, Qt::DisplayRole);

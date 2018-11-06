@@ -15,15 +15,17 @@
 #include "yue/qtcommon/TreeListModelBase.hpp"
 #include "yue/qtcommon/LibraryTreeListModel.hpp"
 
-class TestDelegate: public QStyledItemDelegate
+class LibraryTreeDelegate: public QStyledItemDelegate
 {
     Q_OBJECT
 
 public:
-    TestDelegate(QObject *parent = nullptr) : QStyledItemDelegate(parent) {}
+    LibraryTreeDelegate(QObject *parent = nullptr) : QStyledItemDelegate(parent) {}
 
     void paint(QPainter *painter, const QStyleOptionViewItem &option,
         const QModelIndex &index) const override;
+
+    QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 };
 
 
@@ -32,7 +34,7 @@ class LibraryView : public QListView
     Q_OBJECT
 private:
     yue::qtcommon::LibraryTreeListModel *m_model;
-    TestDelegate *m_delegate;
+    LibraryTreeDelegate *m_delegate;
 
 public:
     LibraryView(QWidget *parent = nullptr);

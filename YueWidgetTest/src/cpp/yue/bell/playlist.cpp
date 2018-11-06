@@ -493,7 +493,8 @@ bool Playlist::_move_one(int src, int tgt)
  * the playlist to the user.
  */
 QSqlQuery Playlist::select() {
-    QSqlQuery q(m_db->db());
+    //m_db->db()
+    QSqlQuery q;
     QString s = "SELECT p.song_id, p.idx, l.artist, l.album, l.title, l.length "
             "FROM playlist_songs AS p "
             "INNER JOIN library AS l ON l.uid == p.song_id "

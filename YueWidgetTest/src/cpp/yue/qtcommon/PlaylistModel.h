@@ -30,7 +30,7 @@ public:
     static int TitleRole;
     static int LengthRole;
 
-    PlaylistModel();
+    PlaylistModel(QObject *parent = nullptr);
     ~PlaylistModel() {}
 
     void refresh();

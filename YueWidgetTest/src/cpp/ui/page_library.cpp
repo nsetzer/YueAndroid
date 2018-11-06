@@ -1,7 +1,7 @@
 
 #include "ui/page_library.h"
 
-void TestDelegate::paint(
+void LibraryTreeDelegate::paint(
     QPainter *painter,
     const QStyleOptionViewItem &option,
     const QModelIndex &index) const
@@ -54,6 +54,17 @@ void TestDelegate::paint(
     painter->drawText(rect, Qt::AlignVCenter|Qt::AlignLeft, text);
 }
 
+QSize LibraryTreeDelegate::sizeHint(
+    const QStyleOptionViewItem &option,
+    const QModelIndex &index) const
+{
+
+    QFontMetrics fm(option.font);
+    fm.height();
+    int w = -1;
+    int h = 2*fm.height();
+    return QSize(w, h);
+}
 
 LibraryView::LibraryView(QWidget *parent)
   : QListView(parent)
@@ -76,7 +87,7 @@ LibraryView::LibraryView(QWidget *parent)
     // TODO: scale this value to 1x font size
     setContentsMargins(0, 0, 0, 20);
 
-    m_delegate = new TestDelegate(this);
+    m_delegate = new LibraryTreeDelegate(this);
     m_model = new yue::qtcommon::LibraryTreeListModel(this);
 
     this->setModel(m_model);

@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+#include "ui/mainwindow.h"
 #include <QApplication>
 #include <QGuiApplication>
 #include <QDebug>
@@ -115,6 +115,14 @@ int main(int argc, char *argv[])
 #else
         mccli = QSharedPointer<yue::bell::MediaCtrlBase>(new yue::bell::MediaCtrlLocal());
 #endif
+        {
+            auto pl = yue::bell::PlaylistManager::instance()->openCurrent();
+            if (pl->size()==0) {
+                pl->set( yue::bell::Library::instance()->createPlaylist("", 100) );
+            }
+            qDebug() << "playlist size " << pl->size();
+        }
+
         window = QSharedPointer<MainWindow>(new MainWindow());
 
         window->show();

@@ -4,6 +4,7 @@
 
 #include "ui/mainwindow.h"
 #include "ui/page_library.h"
+#include "ui/page_queue.h"
 #include "ui/page_player.h"
 
 
@@ -20,6 +21,7 @@ private:
     QTabWidget *m_tabPages;
     PageLibrary *m_pageLibrary;
     PagePlayer *m_pagePlayer;
+    PageQueue *m_pageQueue;
 
 public:
     explicit MainWindow(QMainWindow *parent = nullptr);
@@ -36,8 +38,11 @@ MainWindow::MainWindow(QMainWindow *parent)
 
     m_tabPages = new QTabWidget(parent);
 
+    m_pageQueue = new PageQueue(parent);
     m_pagePlayer = new PagePlayer(parent);
     m_pageLibrary = new PageLibrary(parent);
+
+    m_tabPages->addTab(m_pageQueue, "queue");
     m_tabPages->addTab(m_pageLibrary, "library");
 
     m_tabPages->addTab(new QWidget(parent), "playlist");
