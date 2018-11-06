@@ -2,7 +2,6 @@
 #define UI_PAGE_LIBRARY_H
 
 #include <QLineEdit>
-#include <QGesture>
 #include <QListView>
 #include <QStyledItemDelegate>
 #include <QPainter>
@@ -10,7 +9,6 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QToolButton>
-#include <QScroller>
 
 #include "yue/qtcommon/TreeListModelBase.h"
 #include "yue/qtcommon/LibraryTreeListModel.h"
@@ -47,7 +45,6 @@ protected:
         const QSize size = sizeHintForIndex(index);
         int depth = index.data(yue::qtcommon::TreeListModelBase::DepthRole).toInt();
         int count = index.data(yue::qtcommon::TreeListModelBase::ChildCountRole).toInt();
-        qDebug() << size.height() << event->pos();
 
         if (count>0 && event->pos().x() < (1+depth)*size.height()) {
             onDoubleClick(index);
@@ -66,26 +63,6 @@ public slots:
     void onClick(const QModelIndex &index) {
         m_model->toggleCheckState(index.row());
         return;
-    }
-
-    bool event(QEvent *event)
-    {
-        if (event->type() == QEvent::Gesture) {
-            return gestureEvent(static_cast<QGestureEvent*>(event));
-        }
-        return QWidget::event(event);
-    }
-
-    bool gestureEvent(QGestureEvent *event)
-    {
-        qDebug() << "gestureEvent():" << event;
-        if (QGesture *swipe = event->gesture(Qt::SwipeGesture))
-            qDebug() << "swipe";
-        else if (QGesture *pan = event->gesture(Qt::PanGesture))
-            qDebug() << "pan";
-        if (QGesture *pinch = event->gesture(Qt::PinchGesture))
-            qDebug() << "pinch";
-        return true;
     }
 
 };

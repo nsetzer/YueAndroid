@@ -115,6 +115,8 @@ int main(int argc, char *argv[])
 #else
         mccli = QSharedPointer<yue::bell::MediaCtrlBase>(new yue::bell::MediaCtrlLocal());
 #endif
+        yue::bell::MediaCtrlBase::registerInstance(mccli);
+
         {
             auto pl = yue::bell::PlaylistManager::instance()->openCurrent();
             if (pl->size()==0) {

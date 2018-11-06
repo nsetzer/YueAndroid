@@ -1,6 +1,8 @@
 
 
 #include "ui/page_player.h"
+#include "yue/bell/MediaCtrlBase.h"
+
 
 namespace UI {
 
@@ -57,9 +59,20 @@ uiPagePlayer::~uiPagePlayer()
 
 PagePlayer::PagePlayer(QWidget *parent)
     : QWidget(parent)
-    , m_ui(new UI::uiPagePlayer(this)) {
+    , m_ui(new UI::uiPagePlayer(this))
+{
 
+    connect(m_ui->m_btnPlayPause, &QToolButton::clicked,
+        this, &PagePlayer::onPlayPauseClicked);
 }
 
 PagePlayer::~PagePlayer() {
+}
+
+void PagePlayer::onPlayPauseClicked(bool checked)
+{
+    auto inst = yue::bell::MediaCtrlBase::instance();
+    inst->loadIndex(0);
+    auto info = inst->currentSong();
+    inst->playpause();
 }

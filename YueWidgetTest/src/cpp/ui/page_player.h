@@ -25,6 +25,10 @@ public:
     PagePlayer(QWidget *parent = nullptr);
     ~PagePlayer();
 
+protected:
+
+    void onPlayPauseClicked(bool checked=false);
+
 private:
     QScopedPointer<UI::uiPagePlayer> m_ui;
 };

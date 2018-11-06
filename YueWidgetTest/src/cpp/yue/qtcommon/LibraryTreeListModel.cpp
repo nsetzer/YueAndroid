@@ -1,7 +1,7 @@
 
 #include <QDir>
 #include <QDebug>
-#include "yue/qtcommon/LibraryTreeListModel.hpp"
+#include "yue/qtcommon/LibraryTreeListModel.h"
 #include "yue/bell/MediaCtrlBase.h"
 #include <QtConcurrent>
 

@@ -8,6 +8,10 @@ void LibraryTreeDelegate::paint(
 {
     // https://doc.qt.io/archives/qt-4.8/qstyle.html#StateFlag-enum
 
+    if (!painter->isActive()) {
+        return;
+    }
+
     int check = index.data(yue::qtcommon::TreeListModelBase::CheckRole).toInt();
     int expand = index.data(yue::qtcommon::TreeListModelBase::ExpandedRole).toInt();
     int depth = index.data(yue::qtcommon::TreeListModelBase::DepthRole).toInt();
@@ -69,15 +73,6 @@ QSize LibraryTreeDelegate::sizeHint(
 LibraryView::LibraryView(QWidget *parent)
   : QListView(parent)
 {
-    // Qt::DontStartGestureOnChildren
-    // Qt::ReceivePartialGestures
-    // Qt::IgnoredGesturesPropagateToParent
-    grabGesture(Qt::SwipeGesture, Qt::ReceivePartialGestures);
-    grabGesture(Qt::PinchGesture, Qt::ReceivePartialGestures);
-    grabGesture(Qt::PanGesture, Qt::ReceivePartialGestures);
-
-    // enable one finger scrolling
-    QScroller::grabGesture(this->viewport(), QScroller::LeftMouseButtonGesture);
 
     this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     #if defined (Q_OS_ANDROID)
@@ -100,7 +95,6 @@ LibraryView::LibraryView(QWidget *parent)
 
     connect(this ,SIGNAL(clicked(const QModelIndex)),
                 this, SLOT(onClick(const QModelIndex)));
-
 
     m_model->search("");
 }

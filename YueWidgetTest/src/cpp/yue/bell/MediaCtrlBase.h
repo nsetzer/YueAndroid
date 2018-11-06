@@ -54,8 +54,6 @@ public:
     int currentIndex();
     SongInfo currentSong() { return m_currentSong; }
 
-
-
     Q_INVOKABLE MediaPlayerBase::Status getStatus() { return m_status; }
     Q_INVOKABLE MediaPlayerBase::State getState() { return m_state; }
     Q_INVOKABLE float getProgress() { return m_progress; }

@@ -60,12 +60,20 @@ void PlaylistDelegate::paint(
     rectBottom.setRight(rectBottom.right() - 6 * fm.averageCharWidth());
 
     painter->drawRect(option.rect.x()+2, option.rect.y()+2, option.rect.height() - 4, option.rect.height() - 4);
-    font.setPixelSize(static_cast<int>(option.font.pixelSize() * 1.1));
-    painter->setFont(font);
+    int size = option.font.pixelSize();
+    if (size > 0) {
+        // TODO: revisit font sizing on windows
+        font.setPixelSize( qMax(6, static_cast<int>(size * 1.1)));
+        painter->setFont(font);
+    }
     painter->drawText(rectTop, Qt::AlignVCenter|Qt::AlignLeft, song_title);
-    font.setPixelSize(static_cast<int>(option.font.pixelSize() * 0.8));
-    painter->setFont(font);
+
+    if (size > 0) {
+        font.setPixelSize( qMax(6, static_cast<int>(size * 0.8)));
+        painter->setFont(font);
+    }
     painter->drawText(rectBottom, Qt::AlignVCenter|Qt::AlignLeft, song_artist);
+
     painter->setFont(font);
     painter->drawText(rectBottomTime, Qt::AlignVCenter|Qt::AlignRight, song_duration);
 
