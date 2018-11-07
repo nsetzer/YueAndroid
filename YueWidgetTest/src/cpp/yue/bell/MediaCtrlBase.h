@@ -61,6 +61,7 @@ public:
     Q_INVOKABLE virtual void tts() { qDebug() << "tts not implemented"; }
 
 signals:
+    //  TODO: document exactly what these do here
     // signals emitted by the base class
     void playlistReset();
 

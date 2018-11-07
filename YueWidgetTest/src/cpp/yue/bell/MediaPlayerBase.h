@@ -36,6 +36,9 @@ public:
     virtual float position() const = 0;
     virtual void setPosition(float seconds) = 0;
 
+    static QString statusToString(Status status);
+    static QString stateToString(State state);
+
 signals:
 
     void progressChanged(float progress); // as float, 0.0 to 1.0
@@ -63,6 +66,13 @@ protected:
 
 } // bell
 } // yue
+
+QDebug& operator << (QDebug& os, const yue::bell::MediaPlayerBase::State& state);
+QDebug& operator << (QDebug& os, const yue::bell::MediaPlayerBase::Status& status);
+
+std::ostream& operator << (std::ostream& os, const yue::bell::MediaPlayerBase::State& type);
+std::ostream& operator << (std::ostream& os, const yue::bell::MediaPlayerBase::Status& type);
+
 
 // declare outside the namespace, so that it will build on linux
 Q_DECLARE_METATYPE(yue::bell::MediaPlayerBase::State)

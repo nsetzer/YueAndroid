@@ -117,13 +117,15 @@ int main(int argc, char *argv[])
 #endif
         yue::bell::MediaCtrlBase::registerInstance(mccli);
 
-        {
+        auto pl = yue::bell::PlaylistManager::instance()->openCurrent();
+        pl->set( yue::bell::Library::instance()->createPlaylist("", 100) );
+        /*{
             auto pl = yue::bell::PlaylistManager::instance()->openCurrent();
             if (pl->size()==0) {
                 pl->set( yue::bell::Library::instance()->createPlaylist("", 100) );
             }
             qDebug() << "playlist size " << pl->size();
-        }
+        }*/
 
         window = QSharedPointer<MainWindow>(new MainWindow());
 

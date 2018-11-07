@@ -28,6 +28,9 @@ public:
 protected:
 
     void onPlayPauseClicked(bool checked=false);
+    void onNextSongClicked(bool checked=false);
+    void onProgressChanged(float progress);
+    void onCurrentIndexChanged(int index=-1);
 
 private:
     QScopedPointer<UI::uiPagePlayer> m_ui;

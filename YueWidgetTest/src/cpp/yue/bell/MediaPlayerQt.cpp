@@ -29,6 +29,7 @@ void MediaPlayerQt::load(QString path)
 {
     // this does not fail, look for error signals
     // to see if the load content failed.
+    qDebug() << "Loading Media" << path;
     QFileInfo file(path);
     if (file.exists() && file.isFile()) {
         QMediaContent content(QUrl::fromLocalFile(path));
@@ -118,6 +119,8 @@ void MediaPlayerQt::onStatusChanged(QMediaPlayer::MediaStatus status)
         break;
     }
 
+    qDebug() << "player current state: " << m_currentStatus;
+
     emit statusChanged(m_currentStatus);
 }
 
@@ -136,8 +139,11 @@ void MediaPlayerQt::onStateChanged(QMediaPlayer::State state)
         break;
     }
 
+    qDebug() << "player current state: " << m_currentState;
     emit stateChanged(m_currentState);
 }
 
 } // bell
 } // yue
+
+
