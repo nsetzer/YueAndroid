@@ -38,6 +38,10 @@ public:
     LibraryView(QWidget *parent = nullptr);
     ~LibraryView() {}
 
+    void setQuery(QString query);
+    void toggleChecked();
+    void createPlaylist();
+
 protected:
 
     virtual void mouseReleaseEvent(QMouseEvent *event) {
@@ -77,12 +81,15 @@ class PageLibrary : public QWidget
 {
     Q_OBJECT
 
-private:
-
 public:
 
     PageLibrary(QWidget *parent = nullptr);
     ~PageLibrary();
+
+protected:
+    void onEditingFinished();
+    void onToggleSelection(bool checked);
+    void onCreatePlaylist(bool checked);
 
 private:
     QScopedPointer<UI::uiPageLibrary> m_ui;

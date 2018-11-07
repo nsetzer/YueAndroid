@@ -99,6 +99,25 @@ LibraryView::LibraryView(QWidget *parent)
     m_model->search("");
 }
 
+void LibraryView::setQuery(QString query)
+{
+     m_model->search(query);
+}
+
+void LibraryView::toggleChecked()
+{
+    if (m_model->anySelected()) {
+        m_model->checkAll(false);
+    } else {
+        m_model->checkAll(true);
+    }
+}
+
+void LibraryView::createPlaylist()
+{
+    m_model->createPlaylist();
+    m_model->checkAll(false);
+}
 
 namespace UI {
 
@@ -113,12 +132,11 @@ public:
     QLineEdit *m_editSearch;
     QToolButton *m_btnSearch;
 
-    QToolButton *m_btnCreate1;
+    QToolButton *m_btnToggleSelection;
     QToolButton *m_btnCreate2;
-    QToolButton *m_btnCreate3;
+    QToolButton *m_btnCreatePlaylist;
 
     LibraryView *m_view;
-
 
     uiPageLibrary(QWidget *parent = nullptr);
     ~uiPageLibrary();
@@ -132,18 +150,18 @@ uiPageLibrary::uiPageLibrary(QWidget *parent) {
 
     m_editSearch = new QLineEdit(parent);
     m_btnSearch = new QToolButton(parent);
-    m_btnCreate1 = new QToolButton(parent);
+    m_btnToggleSelection = new QToolButton(parent);
     m_btnCreate2 = new QToolButton(parent);
-    m_btnCreate3 = new QToolButton(parent);
+    m_btnCreatePlaylist = new QToolButton(parent);
 
     m_view = new LibraryView(parent);
 
     m_layoutSearch->addWidget(m_editSearch);
     m_layoutSearch->addWidget(m_btnSearch);
 
-    m_layoutCreate->addWidget(m_btnCreate1);
+    m_layoutCreate->addWidget(m_btnToggleSelection);
     m_layoutCreate->addWidget(m_btnCreate2);
-    m_layoutCreate->addWidget(m_btnCreate3);
+    m_layoutCreate->addWidget(m_btnCreatePlaylist);
 
     m_layoutCentral->addLayout(m_layoutSearch);
     m_layoutCentral->addWidget(m_view);
@@ -151,6 +169,7 @@ uiPageLibrary::uiPageLibrary(QWidget *parent) {
 
     m_editSearch->setPlaceholderText("Search Library");
     parent->setLayout(m_layoutCentral);
+
 }
 
 uiPageLibrary::~uiPageLibrary() {
@@ -160,9 +179,34 @@ uiPageLibrary::~uiPageLibrary() {
 
 PageLibrary::PageLibrary(QWidget *parent)
     : QWidget(parent)
-    , m_ui(new UI::uiPageLibrary(this)) {
+    , m_ui(new UI::uiPageLibrary(this))
+{
+    connect(m_ui->m_editSearch, &QLineEdit::editingFinished,
+            this, &PageLibrary::onEditingFinished);
 
+    connect(m_ui->m_btnToggleSelection, &QToolButton::clicked,
+            this, &PageLibrary::onToggleSelection);
+
+    connect(m_ui->m_btnCreatePlaylist, &QToolButton::clicked,
+            this, &PageLibrary::onCreatePlaylist);
 }
 
 PageLibrary::~PageLibrary() {
+}
+
+void PageLibrary::onEditingFinished()
+{
+    m_ui->m_view->setQuery(m_ui->m_editSearch->text());
+}
+
+void PageLibrary::onToggleSelection(bool checked)
+{
+    Q_UNUSED(checked);
+    m_ui->m_view->toggleChecked();
+}
+
+void PageLibrary::onCreatePlaylist(bool checked)
+{
+    Q_UNUSED(checked);
+    m_ui->m_view->createPlaylist();
 }
