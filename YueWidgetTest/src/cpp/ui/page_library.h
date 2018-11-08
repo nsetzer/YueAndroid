@@ -9,6 +9,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QToolButton>
+#include <QPushButton>
 
 #include "yue/qtcommon/TreeListModelBase.h"
 #include "yue/qtcommon/LibraryTreeListModel.h"

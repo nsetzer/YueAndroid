@@ -134,7 +134,7 @@ public:
 
     QToolButton *m_btnToggleSelection;
     QToolButton *m_btnCreate2;
-    QToolButton *m_btnCreatePlaylist;
+    QPushButton *m_btnCreatePlaylist;
 
     LibraryView *m_view;
 
@@ -149,15 +149,13 @@ uiPageLibrary::uiPageLibrary(QWidget *parent) {
     m_layoutCreate = new QHBoxLayout();
 
     m_editSearch = new QLineEdit(parent);
-    m_btnSearch = new QToolButton(parent);
     m_btnToggleSelection = new QToolButton(parent);
     m_btnCreate2 = new QToolButton(parent);
-    m_btnCreatePlaylist = new QToolButton(parent);
+    m_btnCreatePlaylist = new QPushButton(QIcon(":/res/playlist.svg"), "", parent);
 
     m_view = new LibraryView(parent);
 
     m_layoutSearch->addWidget(m_editSearch);
-    m_layoutSearch->addWidget(m_btnSearch);
 
     m_layoutCreate->addWidget(m_btnToggleSelection);
     m_layoutCreate->addWidget(m_btnCreate2);

@@ -17,6 +17,8 @@ CONFIG += c++11
 
 INCLUDEPATH += src/cpp
 
+RESOURCES = resource.qrc
+
 SOURCES += \
     src/cpp/main.cpp \
     src/cpp/ui/mainwindow.cpp \

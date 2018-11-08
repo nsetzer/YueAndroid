@@ -2,6 +2,13 @@
 
 #include "ui/page_explorer.h"
 
+ExplorerDelegate::ExplorerDelegate(QObject *parent)
+    : QStyledItemDelegate(parent)
+{
+    m_icoFile = QIcon(":/res/file.svg");
+    m_icoFolder = QIcon(":/res/folder.svg");
+}
+
 void ExplorerDelegate::paint(
     QPainter *painter,
     const QStyleOptionViewItem &option,
@@ -27,7 +34,17 @@ void ExplorerDelegate::paint(
 
     rectText.setLeft(rectText.left()+option.rect.height());
 
-    painter->drawRect(option.rect.x()+2, option.rect.y()+2, option.rect.height() - 4, option.rect.height() - 4);
+    int ico_h = static_cast<int>(option.rect.height() * .8);
+    int ico_x = (option.rect.height() - ico_h) / 2;
+    if (m_pixFile.height() != ico_h) {
+        // regenerate the icon for a resized element
+        // const cast so that the value can be cached
+        const_cast<ExplorerDelegate*>(this)->m_pixFile = m_icoFile.pixmap(QSize(ico_h, ico_h));
+        const_cast<ExplorerDelegate*>(this)->m_pixFolder = m_icoFolder.pixmap(QSize(ico_h, ico_h));
+    }
+
+    painter->drawRect(option.rect.left() + ico_x, option.rect.top() + ico_x, ico_h, ico_h);
+    painter->drawPixmap(option.rect.left() + ico_x, option.rect.top() + ico_x, ico_h, ico_h, (isDir)?m_pixFolder:m_pixFile);
     painter->drawText(rectText, Qt::AlignVCenter|Qt::AlignLeft, text);
 
 }
@@ -82,8 +99,10 @@ class uiPageExplorer
 public:
 
     QVBoxLayout *m_layoutCentral;
-    QHBoxLayout *m_layoutNav;
-    QToolButton *m_btnBack;
+    //QHBoxLayout *m_layoutNav;
+    QToolBar *m_barNav;
+    //QToolButton *m_btnHome;
+    //QToolButton *m_btnBack;
     ExplorerView *m_view;
 
 
@@ -98,13 +117,17 @@ uiPageExplorer::uiPageExplorer(QWidget *parent)
 {
     m_layoutCentral = new QVBoxLayout();
 
-    m_layoutNav = new QHBoxLayout();
-    m_btnBack = new QToolButton(parent);
+    //m_layoutNav = new QHBoxLayout();
+    m_barNav = new QToolBar();
+    //m_btnHome = new QPushButton("home", parent);
+    //m_btnBack = new QPushButton("back", parent);
 
     m_view = new ExplorerView(parent);
 
-    m_layoutNav->addWidget(m_btnBack);
-    m_layoutCentral->addLayout(m_layoutNav);
+    //m_layoutNav->addWidget(m_btnBack);
+    //m_layoutNav->addWidget(m_btnHome);
+    //m_layoutCentral->addLayout(m_layoutNav);
+    m_layoutCentral->addWidget(m_barNav);
     m_layoutCentral->addWidget(m_view);
     parent->setLayout(m_layoutCentral);
 }
@@ -122,8 +145,14 @@ PageExplorer::PageExplorer(QWidget *parent)
     , m_ui(new UI::uiPageExplorer(this))
 {
 
-    connect(m_ui->m_btnBack, &QToolButton::clicked,
+    //connect(m_ui->m_btnBack, &QToolButton::clicked,
+    //        this, &PageExplorer::onOpenParentDir);
+    QAction *action;
+
+    action = m_ui->m_barNav->addAction(QIcon(":/res/return.svg"), "");
+    connect(action, &QAction::triggered,
             this, &PageExplorer::onOpenParentDir);
+    action = m_ui->m_barNav->addAction(QIcon(":/res/return.svg"), "");
 }
 
 PageExplorer::~PageExplorer() {

@@ -12,6 +12,10 @@
 #include <QPainter>
 #include <QVariant>
 #include <QMouseEvent>
+#include <QIcon>
+#include <QPixmap>
+#include <QPushButton>
+#include <QToolBar>
 
 #include "yue/qtcommon/DirectoryListModel.h"
 
@@ -19,8 +23,14 @@ class ExplorerDelegate: public QStyledItemDelegate
 {
     Q_OBJECT
 
+private:
+    QIcon m_icoFile;
+    QPixmap m_pixFile;
+
+    QIcon m_icoFolder;
+    QPixmap m_pixFolder;
 public:
-    ExplorerDelegate(QObject *parent = nullptr) : QStyledItemDelegate(parent) {}
+    ExplorerDelegate(QObject *parent = nullptr);
 
     void paint(QPainter *painter, const QStyleOptionViewItem &option,
         const QModelIndex &index) const override;
