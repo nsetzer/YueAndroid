@@ -12,13 +12,13 @@ class MediaCtrlRemoteClient : public yue::bell::MediaCtrlBase
 public:
     MediaCtrlRemoteClient();
 
-    Q_INVOKABLE virtual void tts();
+    Q_INVOKABLE virtual void tts() override;
 
 signals:
-    void progressChanged(float progress);
-    void currentIndexChanged(int index);
-    void statusChanged(yue::bell::MediaPlayerBase::Status status);
-    void stateChanged(yue::bell::MediaPlayerBase::State state);
+    //void progressChanged(float progress);
+    //void currentIndexChanged(int index);
+    //void statusChanged(yue::bell::MediaPlayerBase::Status status);
+    //void stateChanged(yue::bell::MediaPlayerBase::State state);
 
 public slots:
 

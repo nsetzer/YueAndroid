@@ -1,6 +1,9 @@
 
+#include "yue/qtcommon/toolbar.h"
 
 #include "ui/page_explorer.h"
+
+#include <QApplication>
 
 ExplorerDelegate::ExplorerDelegate(QObject *parent)
     : QStyledItemDelegate(parent)
@@ -53,7 +56,7 @@ QSize ExplorerDelegate::sizeHint(
     const QStyleOptionViewItem &option,
     const QModelIndex &index) const
 {
-
+    Q_UNUSED(index);
     QFontMetrics fm(option.font);
     fm.height();
     int w = -1;
@@ -79,15 +82,24 @@ void ExplorerView::openParentDirectory()
     m_model->openParentDirectory();
 }
 
+void ExplorerView::openRoot()
+{
+    m_model->openRoot();
+}
+
 void ExplorerView::mouseReleaseEvent(QMouseEvent *event)
 {
     const QModelIndex index = indexAt(event->pos());
-    bool isDir = index.data(yue::qtcommon::DirectoryListModel::IsDirectoryRole).toBool();
-    if (isDir) {
-        m_model->changeDirectory(index.row());
-    } else {
-        m_model->openFile(index.row());
+
+    if (index.isValid()) {
+        bool isDir = index.data(yue::qtcommon::DirectoryListModel::IsDirectoryRole).toBool();
+        if (isDir) {
+            m_model->changeDirectory(index.row());
+        } else {
+            m_model->openFile(index.row());
+        }
     }
+
 }
 
 
@@ -100,12 +112,13 @@ public:
 
     QVBoxLayout *m_layoutCentral;
     //QHBoxLayout *m_layoutNav;
-    QToolBar *m_barNav;
-    //QToolButton *m_btnHome;
-    //QToolButton *m_btnBack;
+    QHBoxLayout *m_layoutNav;
+    yue::qtcommon::IconButton *m_btnHome;
+    yue::qtcommon::IconButton *m_btnBack;
+    yue::qtcommon::IconButton *m_btnScan;
+    QProgressBar *m_pbarScan;
+
     ExplorerView *m_view;
-
-
 
     uiPageExplorer(QWidget *parent = nullptr);
     ~uiPageExplorer();
@@ -116,18 +129,28 @@ public:
 uiPageExplorer::uiPageExplorer(QWidget *parent)
 {
     m_layoutCentral = new QVBoxLayout();
+    m_layoutNav = new QHBoxLayout();
 
-    //m_layoutNav = new QHBoxLayout();
-    m_barNav = new QToolBar();
-    //m_btnHome = new QPushButton("home", parent);
-    //m_btnBack = new QPushButton("back", parent);
+    m_btnBack = new yue::qtcommon::IconButton(QIcon(":/res/return.svg"), parent);
+    m_btnHome = new yue::qtcommon::IconButton(QIcon(":/res/home.svg"), parent);
+    m_btnScan = new yue::qtcommon::IconButton(QIcon(":/res/scan.svg"), parent);
+
+    m_pbarScan = new QProgressBar(parent);
+    m_pbarScan->setTextVisible(false);
 
     m_view = new ExplorerView(parent);
 
-    //m_layoutNav->addWidget(m_btnBack);
-    //m_layoutNav->addWidget(m_btnHome);
-    //m_layoutCentral->addLayout(m_layoutNav);
-    m_layoutCentral->addWidget(m_barNav);
+    m_layoutNav->addWidget(m_btnBack);
+    m_layoutNav->addWidget(m_btnHome);
+    m_layoutNav->addWidget(m_btnScan);
+    m_layoutNav->addWidget(m_pbarScan);
+    // TODO revist spacing,
+    // create a ReactiveUI class to handle desktop sizing
+    // no reason for any spacing on desktop
+    // spacing is required on android
+    m_layoutNav->setSpacing(m_btnBack->width() / 2);
+
+    m_layoutCentral->addLayout(m_layoutNav);
     m_layoutCentral->addWidget(m_view);
     parent->setLayout(m_layoutCentral);
 }
@@ -145,21 +168,23 @@ PageExplorer::PageExplorer(QWidget *parent)
     , m_ui(new UI::uiPageExplorer(this))
 {
 
-    //connect(m_ui->m_btnBack, &QToolButton::clicked,
-    //        this, &PageExplorer::onOpenParentDir);
-    QAction *action;
-
-    action = m_ui->m_barNav->addAction(QIcon(":/res/return.svg"), "");
-    connect(action, &QAction::triggered,
+    connect(m_ui->m_btnBack, &yue::qtcommon::IconButton::clicked,
             this, &PageExplorer::onOpenParentDir);
-    action = m_ui->m_barNav->addAction(QIcon(":/res/return.svg"), "");
+
+    connect(m_ui->m_btnHome, &yue::qtcommon::IconButton::clicked,
+            this, &PageExplorer::onOpenHome);
+
 }
 
 PageExplorer::~PageExplorer() {
 }
 
-void PageExplorer::onOpenParentDir(bool checked)
+void PageExplorer::onOpenParentDir()
 {
-    Q_UNUSED(checked);
     m_ui->m_view->openParentDirectory();
+}
+
+void PageExplorer::onOpenHome()
+{
+    m_ui->m_view->openRoot();
 }

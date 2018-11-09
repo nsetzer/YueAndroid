@@ -102,6 +102,14 @@ void DirectoryListModel::openParentDirectory()
     changeDirectory(path);
 }
 
+void DirectoryListModel::openRoot()
+{
+    if (QOperatingSystemVersion::current().type() == QOperatingSystemVersion::Windows)
+        changeDirectory("C:\\");
+    else
+        changeDirectory("/");
+}
+
 void DirectoryListModel::changeDirectory(int index)
 {
     if (m_tabledata[index].isDir())

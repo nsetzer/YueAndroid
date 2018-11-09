@@ -42,6 +42,7 @@ SOURCES += \
     src/cpp/yue/bell/MediaPlayerBase.cpp \
     src/cpp/yue/bell/MediaPlayerQt.cpp \
     src/cpp/yue/bell/playlist.cpp \
+    src/cpp/yue/bell/settings.cpp \
     src/cpp/yue/core/RandomArtExpressions.cpp \
     src/cpp/yue/core/search/grammar.cpp \
     src/cpp/yue/core/search/rules.cpp \
@@ -54,7 +55,8 @@ SOURCES += \
     src/cpp/yue/qtcommon/PlaylistModel.cpp \
     src/cpp/yue/qtcommon/ResourceCache.cpp \
     src/cpp/yue/qtcommon/SongListModel.cpp \
-    src/cpp/yue/qtcommon/TreeListModelBase.cpp
+    src/cpp/yue/qtcommon/TreeListModelBase.cpp \
+    src/cpp/yue/qtcommon/toolbar.cpp
 
 # src/cpp/yue/qtcommon/AlbumArtImage.cpp
 
@@ -85,6 +87,7 @@ HEADERS += \
     src/cpp/yue/bell/MediaPlayerQt.h \
     src/cpp/yue/bell/playlist.hpp \
     src/cpp/yue/bell/SongList.h \
+    src/cpp/yue/bell/settings.h \
     src/cpp/yue/core/lrucache.h \
     src/cpp/yue/core/RandomArtExpressions.h \
     src/cpp/yue/core/search/grammar.hpp \
@@ -103,6 +106,8 @@ HEADERS += \
     src/cpp/yue/qtcommon/ResourceCache.h \
     src/cpp/yue/qtcommon/SongListModel.h \
     src/cpp/yue/qtcommon/TreeListModelBase.h \
+    src/cpp/yue/qtcommon/toolbar.h \
+    src/cpp/yue/qtcommon/iconbutton.h
 
 # src/cpp/yue/qtcommon/AlbumArtImage.h
 

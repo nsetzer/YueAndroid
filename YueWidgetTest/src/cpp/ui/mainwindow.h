@@ -21,8 +21,12 @@ public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+public slots:
+    void onSearch(QString query);
+
 private:
     QScopedPointer<UI::MainWindow> m_ui;
+
 
 protected:
 

@@ -113,7 +113,7 @@ void LibraryView::toggleChecked()
     }
 }
 
-void LibraryView::createPlaylist()
+void LibraryView::createPlaylist(bool shuffle)
 {
     m_model->createPlaylist();
     m_model->checkAll(false);
@@ -206,5 +206,11 @@ void PageLibrary::onToggleSelection(bool checked)
 void PageLibrary::onCreatePlaylist(bool checked)
 {
     Q_UNUSED(checked);
-    m_ui->m_view->createPlaylist();
+    m_ui->m_view->createPlaylist(true);
+}
+
+void PageLibrary::setQuery(QString query)
+{
+    m_ui->m_editSearch->setText(query);
+    m_ui->m_view->setQuery(query);
 }

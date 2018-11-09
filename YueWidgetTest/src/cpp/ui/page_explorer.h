@@ -16,8 +16,14 @@
 #include <QPixmap>
 #include <QPushButton>
 #include <QToolBar>
+#include <QScreen>
+#include <QApplication>
+#include <QDesktopWidget>
+#include <QProgressBar>
 
 #include "yue/qtcommon/DirectoryListModel.h"
+#include "yue/qtcommon/iconbutton.h"
+
 
 class ExplorerDelegate: public QStyledItemDelegate
 {
@@ -35,7 +41,6 @@ public:
     void paint(QPainter *painter, const QStyleOptionViewItem &option,
         const QModelIndex &index) const override;
 
-
     QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 };
 
@@ -51,6 +56,7 @@ public:
     ~ExplorerView() {}
 
     void openParentDirectory();
+    void openRoot();
 
 protected:
     virtual void mouseReleaseEvent(QMouseEvent *event);
@@ -75,7 +81,8 @@ public:
     ~PageExplorer();
 
 public slots:
-    void onOpenParentDir(bool checked=false);
+    void onOpenParentDir();
+    void onOpenHome();
 private:
     QScopedPointer<UI::uiPageExplorer> m_ui;
 };

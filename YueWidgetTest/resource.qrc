@@ -1,16 +1,18 @@
 <RCC>
     <qresource prefix="">
         <file>res/album.svg</file>
+        <file>res/clear.svg</file>
+        <file>res/delete.svg</file>
         <file>res/disc.svg</file>
+        <file>res/documents.svg</file>
         <file>res/edit.svg</file>
         <file>res/edit_finished.svg</file>
-        <file>res/delete.svg</file>
-        <file>res/documents.svg</file>
         <file>res/equalizer.svg</file>
         <file>res/externalmedia.svg</file>
         <file>res/file.svg</file>
         <file>res/folder.svg</file>
         <file>res/genre.svg</file>
+        <file>res/home.svg</file>
         <file>res/media_error.svg</file>
         <file>res/media_next.svg</file>
         <file>res/media_pause.svg</file>
@@ -21,11 +23,11 @@
         <file>res/music_note.svg</file>
         <file>res/playlist.svg</file>
         <file>res/return.svg</file>
+        <file>res/scan.svg</file>
         <file>res/search.svg</file>
         <file>res/settings.svg</file>
         <file>res/shuffle.svg</file>
         <file>res/sort.svg</file>
-        <file>res/scan.svg</file>
         <file>res/stop.svg</file>
         <file>res/volume_0.svg</file>
         <file>res/volume_1.svg</file>

@@ -8,6 +8,8 @@
 #include <QProgressBar>
 #include <QLabel>
 
+#include "yue/bell/MediaPlayerBase.h"
+
 namespace UI {
 
 class uiPagePlayer;
@@ -27,10 +29,12 @@ public:
 
 protected:
 
-    void onPlayPauseClicked(bool checked=false);
-    void onNextSongClicked(bool checked=false);
+    void onPlayPauseClicked();
+    void onNextSongClicked();
     void onProgressChanged(float progress);
     void onCurrentIndexChanged(int index=-1);
+    void onStatusChanged(yue::bell::MediaPlayerBase::Status status);
+    void onStateChanged(yue::bell::MediaPlayerBase::State state);
 
 private:
     QScopedPointer<UI::uiPagePlayer> m_ui;

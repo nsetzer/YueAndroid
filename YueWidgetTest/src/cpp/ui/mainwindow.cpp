@@ -20,7 +20,7 @@ namespace UI {
 
 class MainWindow
 {
-private:
+public:
 
     QWidget *m_centralWidget;
     QVBoxLayout *m_centralLayout;
@@ -33,7 +33,6 @@ private:
     PageSettings *m_pageSettings;
     PageDynamic *m_pageDynamic;
 
-public:
     explicit MainWindow(QMainWindow *parent = nullptr);
     ~MainWindow();
 };
@@ -77,8 +76,16 @@ MainWindow::MainWindow(QWidget *parent)
   , m_ui(new UI::MainWindow(this))
 
 {
+    connect(m_ui->m_pageDynamic, &PageDynamic::search,
+            this, &MainWindow::onSearch);
 }
 
 MainWindow::~MainWindow()
 {
+}
+
+void MainWindow::onSearch(QString query)
+{
+    m_ui->m_tabPages->setCurrentWidget(m_ui->m_pageLibrary);
+    m_ui->m_pageLibrary->setQuery(query);
 }

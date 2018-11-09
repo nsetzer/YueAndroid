@@ -41,7 +41,7 @@ public:
 
     void setQuery(QString query);
     void toggleChecked();
-    void createPlaylist();
+    void createPlaylist(bool shuffle);
 
 protected:
 
@@ -86,6 +86,9 @@ public:
 
     PageLibrary(QWidget *parent = nullptr);
     ~PageLibrary();
+
+public slots:
+    void setQuery(QString query);
 
 protected:
     void onEditingFinished();

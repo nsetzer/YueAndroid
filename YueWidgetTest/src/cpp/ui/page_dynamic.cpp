@@ -1,17 +1,19 @@
 
 #include "ui/page_dynamic.h"
+#include "yue/bell/settings.h"
 
+#include <QApplication>
 
-
-DynamicQueryEditor::DynamicQueryEditor(QWidget *parent)
+DynamicQueryEditor::DynamicQueryEditor(int index, QWidget *parent)
     : QFrame(parent)
 {
     m_layoutCentral = new QVBoxLayout();
     m_layoutName = new QHBoxLayout();
 
     m_lblName = new QLabel(this);
+    m_lblIndex = new QLabel(this);
 
-    m_barOptions = new QToolBar(this);
+    m_barOptions = new yue::qtcommon::ToolBar(this);
     m_editName = new QLineEdit(this);
     m_editQuery = new QLineEdit(this);
 
@@ -19,11 +21,13 @@ DynamicQueryEditor::DynamicQueryEditor(QWidget *parent)
     // when the editing mode is toggeled. this allows for accidental double taps
     m_actRemove = m_barOptions->addAction(QIcon(":/res/delete.svg"), "");
     m_actEdit = m_barOptions->addAction(QIcon(":/res/edit.svg"), "");
+    m_actCreate = m_barOptions->addAction(QIcon(":/res/playlist.svg"), "");
 
     // --
     this->setLayout(m_layoutCentral);
     m_layoutCentral->addLayout(m_layoutName);
     m_layoutCentral->addWidget(m_editQuery);
+    m_layoutName->addWidget(m_lblIndex);
     m_layoutName->addWidget(m_lblName);
     m_layoutName->addWidget(m_editName);
     m_layoutName->addWidget(m_barOptions);
@@ -46,11 +50,18 @@ DynamicQueryEditor::DynamicQueryEditor(QWidget *parent)
     connect(m_actRemove, &QAction::triggered,
             this, &DynamicQueryEditor::onRemove);
 
+    connect(m_actCreate, &QAction::triggered,
+            this, &DynamicQueryEditor::onCreate);
+
     // --
 
-    setName("test");
-    setQuery("test");
     enableEditing(false);
+
+    if (index >= 0) {
+        m_lblIndex->setText(QString::number(index) + ":");
+    }
+
+    // --
 
 }
 
@@ -60,7 +71,7 @@ DynamicQueryEditor::~DynamicQueryEditor()
 }
 
 QString DynamicQueryEditor::name() const {
-    return m_lblName->text();
+    return m_editName->text();
 }
 
 QString DynamicQueryEditor::query() const {
@@ -86,6 +97,11 @@ void DynamicQueryEditor::enableEditing(bool enabled)
     m_actRemove->setVisible(enabled);
     m_editQuery->setVisible(enabled);
     qDebug() << enabled;
+
+    if(!enabled) {
+        m_lblName->setText(m_editName->text());
+        emit editingFinished();
+    }
 }
 
 bool DynamicQueryEditor::editing() const
@@ -103,6 +119,11 @@ void DynamicQueryEditor::onRemove()
     emit remove();
 }
 
+void DynamicQueryEditor::onCreate()
+{
+    emit create(query());
+}
+
 
 namespace UI {
 
@@ -117,7 +138,7 @@ public:
     QWidget *m_centralWidget;
     QVBoxLayout *m_layoutMain;
 
-    QToolBar *m_barActions;
+    yue::qtcommon::ToolBar *m_barActions;
 
     uiPageDynamic(QWidget *parent = nullptr);
     ~uiPageDynamic();
@@ -131,7 +152,7 @@ uiPageDynamic::uiPageDynamic(QWidget *parent)
     m_centralWidget = new QWidget(parent);
     m_layoutMain = new QVBoxLayout();
 
-    m_barActions = new QToolBar(parent);
+    m_barActions = new yue::qtcommon::ToolBar(2.0, parent);
 
     // -
     parent->setLayout(m_layoutCentral);
@@ -161,6 +182,8 @@ PageDynamic::PageDynamic(QWidget *parent)
     auto action = m_ui->m_barActions->addAction(QIcon(":/res/file.svg"), "");
     connect(action, &QAction::triggered,
             this, &PageDynamic::newEditor);
+
+    resetEditors();
 }
 
 PageDynamic::~PageDynamic() {
@@ -168,8 +191,15 @@ PageDynamic::~PageDynamic() {
 
 void PageDynamic::newEditor()
 {
+    createEditor("", "");
+}
+
+void PageDynamic::createEditor(QString name, QString query)
+{
     int idx = m_ui->m_layoutMain->count() - 1;
-    auto item = new DynamicQueryEditor();
+    auto item = new DynamicQueryEditor(1 + idx, this);
+    item->setName(name);
+    item->setQuery(query);
     m_ui->m_layoutMain->insertWidget(idx, item);
 
     connect(item, &DynamicQueryEditor::remove,
@@ -181,6 +211,12 @@ void PageDynamic::newEditor()
         item->setParent(nullptr);
         item->deleteLater();
     });
+
+    connect(item, &DynamicQueryEditor::editingFinished,
+            this, &PageDynamic::onEditingFinished);
+
+    connect(item, &DynamicQueryEditor::create,
+            this, &PageDynamic::onCreate);
 }
 
 void PageDynamic::resetEditors()
@@ -195,5 +231,30 @@ void PageDynamic::resetEditors()
         delete child;
     }
 
+    for (const auto& pair : yue::bell::Settings::instance()->dynamicLists()) {
+        createEditor(pair.first, pair.second);
+    }
+}
 
+void PageDynamic::onEditingFinished() {
+
+    QList<QPair<QString, QString>> lst;
+    for (int i=0; i < m_ui->m_layoutMain->count()-1; i++) {
+        auto item = m_ui->m_layoutMain->itemAt(i);
+
+        if (DynamicQueryEditor* edit = qobject_cast<DynamicQueryEditor*>(item->widget())) {
+            QString name = edit->name();
+            QString query = edit->query();
+            if (!name.isEmpty()) {
+                lst.append(QPair<QString, QString>(name, query));
+            }
+        }
+    }
+
+    yue::bell::Settings::instance()->setDynamicLists(lst);
+
+}
+
+void PageDynamic::onCreate(QString query) {
+    emit search(query);
 }

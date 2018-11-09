@@ -85,13 +85,14 @@ void MediaCtrlRemoteClient::onServiceProgressChanged(float progress)
 
 void MediaCtrlRemoteClient::onServiceCurrentIndexChanged(int index)
 {
+    qDebug() << "service event: index " << index;
     loadCurrentSongInfo();
     emit currentIndexChanged(index);
 }
 
 void MediaCtrlRemoteClient::onServiceStatusChanged(int status)
 {
-
+    qDebug() << "service event: status " << status;
     auto s = static_cast<yue::bell::MediaPlayerBase::Status>(status);
     m_status = s;
     emit statusChanged(s);
@@ -99,7 +100,7 @@ void MediaCtrlRemoteClient::onServiceStatusChanged(int status)
 
 void MediaCtrlRemoteClient::onServiceStateChanged(int state)
 {
-
+    qDebug() << "service event: state " << state;
     auto s = static_cast<yue::bell::MediaPlayerBase::State>(state);
     m_state = s;
     emit stateChanged(s);

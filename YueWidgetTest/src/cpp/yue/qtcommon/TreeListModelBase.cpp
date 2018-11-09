@@ -1,7 +1,7 @@
 
 #include <QDir>
 #include <QDebug>
-#include "yue/qtcommon/TreeListModelBase.hpp"
+#include "yue/qtcommon/TreeListModelBase.h"
 #include "yue/bell/database.hpp"
 #include "yue/bell/library.hpp"
 namespace yue {

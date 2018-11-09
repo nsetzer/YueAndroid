@@ -24,8 +24,8 @@ public:
 signals:
     //void progressChanged(float progress);
     //void currentIndexChanged(int index);
-    //void statusChanged(Status status);
-    //void stateChanged(State state);
+    //void statusChanged(MediaPlayerBase::Status status);
+    //void stateChanged(MediaPlayerBase::State state);
 
 public slots:
 

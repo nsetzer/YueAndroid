@@ -38,6 +38,7 @@ public:
     // --
 
     Q_INVOKABLE void openParentDirectory();
+    Q_INVOKABLE void openRoot();
     void changeDirectory(QString path);
     Q_INVOKABLE void changeDirectory(int index);
     Q_INVOKABLE void openFile(int index);

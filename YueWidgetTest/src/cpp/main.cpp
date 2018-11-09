@@ -10,6 +10,7 @@
 #include "yue/bell/database.hpp"
 #include "yue/bell/library.hpp"
 #include "yue/bell/playlist.hpp"
+#include "yue/bell/settings.h"
 #include "yue/bell/MediaCtrlBase.h"
 #include "yue/bell/MediaCtrlLocal.h"
 //#include "yue/device.h"
@@ -52,6 +53,14 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*)
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
+
+    app.setOrganizationName("nsetzer");
+    app.setOrganizationDomain("github.com");
+    app.setApplicationName("Yue");
+    app.setApplicationVersion("1.0");
+    app.setApplicationDisplayName("Yue");
+    app.setDesktopFileName("Yue");
+
     QSharedPointer<MainWindow> window;
 
     QSharedPointer<QRemoteObjectHost> srcNode;
@@ -90,11 +99,14 @@ int main(int argc, char *argv[])
 #endif
 #endif
 
+    yue::bell::Settings::create();
+
     qDebug() << "main: create library";
     yue::bell::Library::create();
     qDebug() << "main: create library complete. number of records:" << yue::bell::Library::instance()->size();
     qDebug() << "main: create playlist manager";
     yue::bell::PlaylistManager::create();
+
 
     if (QCoreApplication::arguments().count() > 1){
         qDebug() << "service application starting";
@@ -109,7 +121,6 @@ int main(int argc, char *argv[])
 
         qDebug() << "client application starting";
 
-
 #ifdef Q_OS_ANDROID
         mccli = QSharedPointer<yue::bell::MediaCtrlBase>(new MediaCtrlRemoteClient());
 #else
@@ -117,15 +128,13 @@ int main(int argc, char *argv[])
 #endif
         yue::bell::MediaCtrlBase::registerInstance(mccli);
 
-        auto pl = yue::bell::PlaylistManager::instance()->openCurrent();
-        pl->set( yue::bell::Library::instance()->createPlaylist("", 100) );
-        /*{
+        {
             auto pl = yue::bell::PlaylistManager::instance()->openCurrent();
             if (pl->size()==0) {
                 pl->set( yue::bell::Library::instance()->createPlaylist("", 100) );
             }
             qDebug() << "playlist size " << pl->size();
-        }*/
+        }
 
         window = QSharedPointer<MainWindow>(new MainWindow());
 

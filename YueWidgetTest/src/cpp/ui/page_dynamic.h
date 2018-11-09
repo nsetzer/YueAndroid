@@ -19,25 +19,26 @@
 #include <QResizeEvent>
 #include <QDebug>
 
+#include "yue/qtcommon/toolbar.h"
+
 class DynamicQueryEditor : public QFrame {
     Q_OBJECT
 
     QVBoxLayout *m_layoutCentral;
     QHBoxLayout *m_layoutName;
     QLabel *m_lblName;
-    QToolBar *m_barOptions;
+    QLabel *m_lblIndex;
+    yue::qtcommon::ToolBar *m_barOptions;
     QLineEdit *m_editName;
     QLineEdit *m_editQuery;
 
     QAction *m_actEdit;
     QAction *m_actRemove;
+    QAction *m_actCreate;
 
 public:
-    DynamicQueryEditor(QWidget *parent = nullptr);
+    DynamicQueryEditor(int index=-1, QWidget *parent = nullptr);
     virtual ~DynamicQueryEditor() override;
-
-    Q_PROPERTY(QString name READ name WRITE setName  NOTIFY nameChanged)
-    Q_PROPERTY(QString query READ query WRITE setQuery NOTIFY queryChanged)
 
     QString name() const;
     QString query() const;
@@ -52,10 +53,14 @@ signals:
     void nameChanged();
     void queryChanged();
     void remove();
+    void create(QString query);
+    void editingFinished();
 
 public slots:
     void onToggleEdit();
     void onRemove();
+    void onCreate();
+
 
 private:
 
@@ -78,11 +83,19 @@ public:
     PageDynamic(QWidget *parent = nullptr);
     ~PageDynamic();
 
+signals:
+    void search(QString query);
 
+public slots:
     void newEditor();
     void resetEditors();
+    void onEditingFinished();
+    void onCreate(QString query);
+
 private:
     QScopedPointer<UI::uiPageDynamic> m_ui;
+
+    void createEditor(QString name, QString query);
 };
 
 #endif
