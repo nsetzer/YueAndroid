@@ -61,9 +61,8 @@ public:
     Q_INVOKABLE virtual void tts() { qDebug() << "tts not implemented"; }
 
 signals:
-    //  TODO: document exactly what these do here
-    // signals emitted by the base class
-    void playlistReset();
+
+    void playlistReset(); // the current playlist is changed
 
     // signals emitted by the server
     void progressChanged(float progress);

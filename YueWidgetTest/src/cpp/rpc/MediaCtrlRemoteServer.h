@@ -29,10 +29,14 @@ public:
     }
 
 signals:
-    void progressChanged(float progress);
-    void currentIndexChanged(int index);
-    void stateChanged(yue::bell::MediaPlayerBase::State state);
-    void statusChanged(yue::bell::MediaPlayerBase::Status Status);
+    // NOTE: signals provided for easy reference
+    // DO NOT define signals here, but in the rep
+    // signals defiend here will override the remote object signals
+    // and prevent everything from working
+    //void progressChanged(float progress);
+    //void currentIndexChanged(int index);
+    //void stateChanged(int state);
+    //void statusChanged(int Status);
 
 public slots:
 

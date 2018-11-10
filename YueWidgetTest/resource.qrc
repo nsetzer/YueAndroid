@@ -20,11 +20,13 @@
         <file>res/media_prev.svg</file>
         <file>res/media_shuffle.svg</file>
         <file>res/microphone.svg</file>
+        <file>res/more.svg</file>
         <file>res/music_note.svg</file>
         <file>res/playlist.svg</file>
         <file>res/return.svg</file>
         <file>res/scan.svg</file>
         <file>res/search.svg</file>
+        <file>res/select.svg</file>
         <file>res/settings.svg</file>
         <file>res/shuffle.svg</file>
         <file>res/sort.svg</file>

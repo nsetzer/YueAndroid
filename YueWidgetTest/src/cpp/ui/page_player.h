@@ -22,6 +22,7 @@ class PagePlayer : public QWidget
 
 private:
 
+    yue::bell::MediaPlayerBase::Status m_status;
 public:
 
     PagePlayer(QWidget *parent = nullptr);

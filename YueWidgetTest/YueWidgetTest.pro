@@ -107,7 +107,8 @@ HEADERS += \
     src/cpp/yue/qtcommon/SongListModel.h \
     src/cpp/yue/qtcommon/TreeListModelBase.h \
     src/cpp/yue/qtcommon/toolbar.h \
-    src/cpp/yue/qtcommon/iconbutton.h
+    src/cpp/yue/qtcommon/iconbutton.h \
+    src/cpp/yue/qtcommon/svg.h
 
 # src/cpp/yue/qtcommon/AlbumArtImage.h
 

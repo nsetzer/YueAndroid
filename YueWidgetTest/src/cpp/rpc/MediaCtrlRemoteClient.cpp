@@ -11,11 +11,11 @@ MediaCtrlRemoteClient::MediaCtrlRemoteClient()
     m_repNode.connectToNode(QUrl(QStringLiteral("local:replica")));
     m_rep = QSharedPointer<MediaControlReplica>(m_repNode.acquire<MediaControlReplica>());
 
-    connect(m_rep.data(),&MediaControlReplica::progressChanged,this,&MediaCtrlRemoteClient::onServiceProgressChanged);
-    connect(m_rep.data(),&MediaControlReplica::currentIndexChanged,this,&MediaCtrlRemoteClient::onServiceCurrentIndexChanged);
+    QObject::connect(m_rep.data(),&MediaControlReplica::progressChanged,this,&MediaCtrlRemoteClient::onServiceProgressChanged);
+    QObject::connect(m_rep.data(),&MediaControlReplica::currentIndexChanged,this,&MediaCtrlRemoteClient::onServiceCurrentIndexChanged);
 
-    connect(m_rep.data(),&MediaControlReplica::stateChanged,this,&MediaCtrlRemoteClient::onServiceStateChanged);
-    connect(m_rep.data(),&MediaControlReplica::statusChanged,this,&MediaCtrlRemoteClient::onServiceStatusChanged);
+    QObject::connect(m_rep.data(),&MediaControlReplica::stateChanged,this,&MediaCtrlRemoteClient::onServiceStateChanged);
+    QObject::connect(m_rep.data(),&MediaControlReplica::statusChanged,this,&MediaCtrlRemoteClient::onServiceStatusChanged);
 
     qDebug() << "waiting for RPC source";
 
@@ -25,6 +25,8 @@ MediaCtrlRemoteClient::MediaCtrlRemoteClient()
         qCritical() << "failed to create RPC source";
         //m_rep.clear();
     }
+
+    qDebug() << "rep valid: " << m_rep->isInitialized() << m_rep->isReplicaValid();
 
     loadCurrentSongInfo();
 }

@@ -1,5 +1,6 @@
 
 #include "ui/page_library.h"
+#include "yue/qtcommon/iconbutton.h"
 
 void LibraryTreeDelegate::paint(
     QPainter *painter,
@@ -130,11 +131,12 @@ public:
     QHBoxLayout *m_layoutSearch;
     QHBoxLayout *m_layoutCreate;
     QLineEdit *m_editSearch;
-    QToolButton *m_btnSearch;
+    yue::qtcommon::IconButton *m_btnClearSearch;
+    yue::qtcommon::IconButton *m_btnSearch;
 
-    QToolButton *m_btnToggleSelection;
-    QToolButton *m_btnCreate2;
-    QPushButton *m_btnCreatePlaylist;
+    yue::qtcommon::IconButton *m_btnToggleSelection;
+    yue::qtcommon::IconButton *m_btnCreate2;
+    yue::qtcommon::IconButton *m_btnCreatePlaylist;
 
     LibraryView *m_view;
 
@@ -149,13 +151,15 @@ uiPageLibrary::uiPageLibrary(QWidget *parent) {
     m_layoutCreate = new QHBoxLayout();
 
     m_editSearch = new QLineEdit(parent);
-    m_btnToggleSelection = new QToolButton(parent);
-    m_btnCreate2 = new QToolButton(parent);
-    m_btnCreatePlaylist = new QPushButton(QIcon(":/res/playlist.svg"), "", parent);
+    m_btnClearSearch = new yue::qtcommon::IconButton(QIcon(":/res/clear.svg"), parent);
+    m_btnToggleSelection = new yue::qtcommon::IconButton(QIcon(":/res/select.svg"), parent);
+    m_btnCreate2 = new yue::qtcommon::IconButton(QIcon(":/res/shuffle.svg"), parent);
+    m_btnCreatePlaylist = new yue::qtcommon::IconButton(QIcon(":/res/playlist.svg"), parent);
 
     m_view = new LibraryView(parent);
 
     m_layoutSearch->addWidget(m_editSearch);
+    m_layoutSearch->addWidget(m_btnClearSearch);
 
     m_layoutCreate->addWidget(m_btnToggleSelection);
     m_layoutCreate->addWidget(m_btnCreate2);
@@ -182,11 +186,14 @@ PageLibrary::PageLibrary(QWidget *parent)
     connect(m_ui->m_editSearch, &QLineEdit::editingFinished,
             this, &PageLibrary::onEditingFinished);
 
-    connect(m_ui->m_btnToggleSelection, &QToolButton::clicked,
+    connect(m_ui->m_btnToggleSelection, &yue::qtcommon::IconButton::clicked,
             this, &PageLibrary::onToggleSelection);
 
-    connect(m_ui->m_btnCreatePlaylist, &QToolButton::clicked,
+    connect(m_ui->m_btnCreatePlaylist, &yue::qtcommon::IconButton::clicked,
             this, &PageLibrary::onCreatePlaylist);
+
+    connect(m_ui->m_btnClearSearch, &yue::qtcommon::IconButton::clicked,
+            this, &PageLibrary::onClearSearch);
 }
 
 PageLibrary::~PageLibrary() {
@@ -197,16 +204,20 @@ void PageLibrary::onEditingFinished()
     m_ui->m_view->setQuery(m_ui->m_editSearch->text());
 }
 
-void PageLibrary::onToggleSelection(bool checked)
+void PageLibrary::onToggleSelection()
 {
-    Q_UNUSED(checked);
     m_ui->m_view->toggleChecked();
 }
 
-void PageLibrary::onCreatePlaylist(bool checked)
+void PageLibrary::onCreatePlaylist()
 {
-    Q_UNUSED(checked);
     m_ui->m_view->createPlaylist(true);
+}
+
+void PageLibrary::onClearSearch()
+{
+    m_ui->m_editSearch->setText("");
+    m_ui->m_view->setQuery("");
 }
 
 void PageLibrary::setQuery(QString query)

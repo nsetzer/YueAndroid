@@ -33,15 +33,15 @@ uiPagePlayer::uiPagePlayer(QWidget *parent)
     m_layoutCentral = new QVBoxLayout();
     m_layoutDisplay = new QHBoxLayout();
     m_btnMenu = new yue::qtcommon::IconButton(
-                yue::qtcommon::IconButton::LARGE,
+                yue::qtcommon::IconButton::IconSize::LARGE,
                 QIcon(":/res/home.svg"),
                 parent);
     m_btnPlayPause = new yue::qtcommon::IconButton(
-                yue::qtcommon::IconButton::LARGE,
+                yue::qtcommon::IconButton::IconSize::LARGE,
                 QIcon(":/res/media_play.svg"),
                 parent);
     m_btnNext = new yue::qtcommon::IconButton(
-                yue::qtcommon::IconButton::LARGE,
+                yue::qtcommon::IconButton::IconSize::LARGE,
                 QIcon(":/res/media_next.svg"),
                 parent);
     m_barPosition = new QProgressBar(parent);
@@ -71,6 +71,7 @@ uiPagePlayer::~uiPagePlayer()
 PagePlayer::PagePlayer(QWidget *parent)
     : QWidget(parent)
     , m_ui(new UI::uiPagePlayer(this))
+    , m_status(yue::bell::MediaPlayerBase::Status::Unknown)
 {
 
     /*
@@ -142,10 +143,37 @@ void PagePlayer::onCurrentIndexChanged(int index)
 
 void PagePlayer::onStatusChanged(yue::bell::MediaPlayerBase::Status status)
 {
-    qDebug() << "new status" << status;
+    m_status = status;
+    switch(status) {
+    case yue::bell::MediaPlayerBase::Status::Ready:
+        break;
+    case yue::bell::MediaPlayerBase::Status::Loading:
+        break;
+    case yue::bell::MediaPlayerBase::Status::Ended:
+        break;
+    case yue::bell::MediaPlayerBase::Status::Error:
+        m_ui->m_btnPlayPause->setIcon(QIcon(":/res/media_error.svg"));
+        break;
+    default:
+        break;
+    }
 }
 void PagePlayer::onStateChanged(yue::bell::MediaPlayerBase::State state)
 {
-    qDebug() << "new state" << state;
+    if (m_status == yue::bell::MediaPlayerBase::Status::Error) {
+        m_ui->m_btnPlayPause->setIcon(QIcon(":/res/media_error.svg"));
+        return;
+    }
+
+    switch(state) {
+    case yue::bell::MediaPlayerBase::State::Playing:
+        m_ui->m_btnPlayPause->setIcon(QIcon(":/res/media_pause.svg"));
+        break;
+    case yue::bell::MediaPlayerBase::State::Paused:
+        m_ui->m_btnPlayPause->setIcon(QIcon(":/res/media_play.svg"));
+        break;
+    default:
+        break;
+    }
 }
 

@@ -121,6 +121,13 @@ int main(int argc, char *argv[])
 
         qDebug() << "client application starting";
 
+       // NOTE: to debug this, open 2 IDEs
+       // in Projects > MSVC2015 > Run > add a new runtime confiruration "backend"
+       // command line arguments: any single calue e.g. "$0 backend"
+       // in both IDEs click build
+       // in one IDE, start the backend
+       // in the other, start the frontend
+       // *** change the lines below to starta remote client on windows.
 #ifdef Q_OS_ANDROID
         mccli = QSharedPointer<yue::bell::MediaCtrlBase>(new MediaCtrlRemoteClient());
 #else

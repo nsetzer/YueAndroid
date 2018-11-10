@@ -92,8 +92,9 @@ public slots:
 
 protected:
     void onEditingFinished();
-    void onToggleSelection(bool checked);
-    void onCreatePlaylist(bool checked);
+    void onToggleSelection();
+    void onCreatePlaylist();
+    void onClearSearch();
 
 private:
     QScopedPointer<UI::uiPageLibrary> m_ui;

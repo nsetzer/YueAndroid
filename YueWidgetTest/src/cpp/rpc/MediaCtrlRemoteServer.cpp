@@ -45,11 +45,13 @@ MediaCtrlRemoteServer::MediaCtrlRemoteServer()
 void MediaCtrlRemoteServer::onProgressChanged(float progress)
 {
     emit progressChanged(progress);
+    qDebug() << "server: progress" << progress;
 }
 void MediaCtrlRemoteServer::onCurrentIndexChanged(int index)
 {
     m_index = index;
     emit currentIndexChanged(index);
+    qDebug() << "server: index changed" << index;
 
     try {
         yue::bell::Database::uid_t uid = yue::bell::PlaylistManager::instance()->openCurrent()->current().first;
@@ -74,13 +76,15 @@ void MediaCtrlRemoteServer::onCurrentIndexChanged(int index)
 void MediaCtrlRemoteServer::onStatusChanged(yue::bell::MediaPlayerBase::Status status)
 {
     m_status = status;
-    emit statusChanged(status);
+    emit statusChanged(static_cast<int>(status));
+    qDebug() << "server: status changed" << status;
 }
 void MediaCtrlRemoteServer::onStateChanged(yue::bell::MediaPlayerBase::State state)
 {
     m_state = state;
-    emit stateChanged(state);
+    emit stateChanged(static_cast<int>(state));
     sendNotification();
+    qDebug() << "server: state changed" << state;
 }
 
 void MediaCtrlRemoteServer::sendNotification()

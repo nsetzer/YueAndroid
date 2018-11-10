@@ -16,7 +16,7 @@ void MediaCtrlBase::setCurrentPlaylist(QList<yue::bell::Database::uid_t> lst, bo
 {
     LOG_FUNCTION_TIME();
 
-   auto pl = yue::bell::PlaylistManager::instance()->openCurrent();
+    auto pl = yue::bell::PlaylistManager::instance()->openCurrent();
     pl->set(lst);
 
     emit playlistReset();
@@ -24,6 +24,8 @@ void MediaCtrlBase::setCurrentPlaylist(QList<yue::bell::Database::uid_t> lst, bo
     if (autoplay) {
         playIndex(0);
     }
+
+    qDebug() << "new playlist set";
 
 }
 

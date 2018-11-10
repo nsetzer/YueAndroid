@@ -17,6 +17,12 @@ class IconButton : public QLabel
 public:
         //static int LargeButton;
         //static int MediumButton;
+
+    enum class IconSize {
+        DEFAULT=0,
+        LARGE=1,
+    };
+
 private:
 
     Q_OBJECT
@@ -24,30 +30,35 @@ private:
     int m_w;
     int m_h;
 
+    IconSize m_size;
 
 
 
 public:
 
-    enum {
-        DEFAULT=0,
-        LARGE=1,
-    };
+
 
     IconButton(const QIcon& ico, QWidget *parent = nullptr)
         : QLabel(parent)
         , m_ico(ico)
     {
-        init(0);
+        m_size = IconSize::DEFAULT;
+        init();
     }
 
-    IconButton(int size, const QIcon& ico, QWidget *parent = nullptr)
+    IconButton(IconSize size, const QIcon& ico, QWidget *parent = nullptr)
         : QLabel(parent)
         , m_ico(ico)
     {
-        init(size);
+        m_size = size;
+        init();
     }
 
+
+    void setIcon(const QIcon& ico) {
+        m_ico = ico;
+        init();
+    }
 
     virtual QSize sizeHint() const override {
         return QSize(m_w, m_h);
@@ -76,17 +87,16 @@ signals:
     void clicked();
 
 private:
-    void init(int size) {
+    void init() {
         // TODO: make size an enum
 
         auto desktop = QApplication::desktop();
-
 
 #ifdef Q_OS_ANDROID
         // this was chosen to make the buttons easier to hit
         // on android
         // for a large icon use  3 / 4
-        float factor = (size==0)?0.5F:0.75F;
+        float factor = (m_size==IconSize::DEFAULT)?0.5F:0.75F;
 #else
         // this was chosen be reading off the screen...
         // the defaul toolbutton size is about 32 px

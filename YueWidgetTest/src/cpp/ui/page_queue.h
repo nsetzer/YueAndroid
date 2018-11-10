@@ -1,4 +1,4 @@
-#ifndef UI_PAGE_QUEUE_H
+﻿#ifndef UI_PAGE_QUEUE_H
 #define UI_PAGE_QUEUE_H
 
 #include <QScopedPointer>
@@ -11,6 +11,8 @@
 #include <QStyledItemDelegate>
 #include <QPainter>
 #include <QVariant>
+#include <QDialog>
+#include <QPushButton>
 
 #include "yue/qtcommon/PlaylistModel.h"
 
@@ -18,14 +20,22 @@ class PlaylistDelegate: public QStyledItemDelegate
 {
     Q_OBJECT
 
+    QIcon m_icoMore;
+
+    int m_currentIndex;
 public:
-    PlaylistDelegate(QObject *parent = nullptr) : QStyledItemDelegate(parent) {}
+    PlaylistDelegate(QObject *parent = nullptr)
+        : QStyledItemDelegate(parent)
+        , m_icoMore(QIcon(":/res/more.svg"))
+    {}
 
     void paint(QPainter *painter, const QStyleOptionViewItem &option,
         const QModelIndex &index) const override;
 
 
     QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const override;
+
+    void setCurrentIndex(int index) {m_currentIndex = index;}
 };
 
 class PlaylistView : public QListView
@@ -35,9 +45,52 @@ private:
     yue::qtcommon::PlaylistModel *m_model;
     PlaylistDelegate *m_delegate;
 
+signals:
+    void more(QModelIndex index);
+
 public:
     PlaylistView(QWidget *parent = nullptr);
     ~PlaylistView() {}
+
+    virtual void mouseReleaseEvent(QMouseEvent *event) {
+        const QModelIndex index = indexAt(event->pos());
+        const QSize size = sizeHintForIndex(index);
+
+
+
+        if (event->pos().x() > (viewport()->width() - size.height())) {
+            emit more(index);
+        } else {
+            QListView::mouseReleaseEvent(event);
+        }
+    }
+
+    void refresh();
+    void setCurrentIndex(int index) {
+        m_delegate->setCurrentIndex(index);
+        viewport()->repaint();
+        qDebug() << "update" << index;
+    }
+};
+
+class QueueMoreDialog : public QDialog
+{
+    Q_OBJECT
+
+    QVBoxLayout *m_layoutCentral;
+    QPushButton *m_btnPlay;
+    QPushButton *m_btnPlayNext;
+    QPushButton *m_btnRemove;
+    QPushButton *m_btnCancel;
+
+public:
+    QueueMoreDialog(int row, int currentIndex, QWidget *parent=nullptr);
+
+public slots:
+    void onPlay();
+    void onPlayNext();
+    void onRemove();
+    void onCancel();
 
 };
 
@@ -57,6 +110,12 @@ public:
 
     PageQueue(QWidget *parent = nullptr);
     ~PageQueue();
+
+public slots:
+    void onMore(QModelIndex index);
+    void onPlaylistChanged();
+
+    void onCurrentIndexChanged(int index);
 
 private:
     QScopedPointer<UI::uiPageQueue> m_ui;

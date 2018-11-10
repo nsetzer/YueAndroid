@@ -1,6 +1,10 @@
 
 
 #include "ui/page_queue.h"
+#include "yue/bell/MediaCtrlBase.h"
+#include "yue/qtcommon/svg.h"
+
+#include <QSvgRenderer>
 
 void PlaylistDelegate::paint(
     QPainter *painter,
@@ -9,7 +13,7 @@ void PlaylistDelegate::paint(
 {
     painter->save();
 
-    QSize song_id = index.data(yue::qtcommon::PlaylistModel::SongIdRole).toSize();
+    //QSize song_id = index.data(yue::qtcommon::PlaylistModel::SongIdRole).toSize();
     int song_index = index.data(yue::qtcommon::PlaylistModel::IndexRole).toInt();
     QString song_artist = index.data(yue::qtcommon::PlaylistModel::ArtistRole).toString();
     QString song_album = index.data(yue::qtcommon::PlaylistModel::AlbumRole).toString();
@@ -33,7 +37,7 @@ void PlaylistDelegate::paint(
                 .arg(_s, 2, 10, QChar('0'));
     }
 
-    if (option.state & QStyle::State_Selected) {
+    if (m_currentIndex == index.row() || option.state & QStyle::State_Selected) {
         painter->fillRect(option.rect, option.palette.highlight());
         painter->setPen(Qt::white);
         painter->setBrush(option.palette.highlightedText());
@@ -47,19 +51,38 @@ void PlaylistDelegate::paint(
     QFont font = option.font;
     QFontMetrics fm(font);
 
+    QRect rectMain = option.rect;
+
+    // subtract area for an icon button
+    float icon_factor = 0.8F; // total area of icon to take up, including padding
+    float icon_factor2 = 0.8F; // percentage of total area, to use for the actual icon
+    rectMain.setRight(rectMain.right() - static_cast<int>(icon_factor * rectMain.height()));
+
+    int icon_size = static_cast<int>(icon_factor2 * icon_factor * rectMain.height());
+    icon_size = (icon_size/4) * 4;
+    // position a square on the right side of the delegate area
+    QRect rectIcon(option.rect.right() - icon_size - static_cast<int>((1.0F - icon_factor2) * icon_factor * rectMain.height()),
+                   option.rect.top() + ((option.rect.bottom() - option.rect.top())/2 - icon_size/2),
+                   icon_size, icon_size);
+
+    painter->drawRect(rectIcon);
+    //yue::qtcommon::SvgRender render;
+    //render.paint(":/res/more.svg", painter, rectIcon);
+    painter->drawPixmap(rectIcon, m_icoMore.pixmap(icon_size, icon_size));
+
     // create a rect covering the top half of the area
-    QRect rectTop = option.rect;
-    rectTop.setBottom(option.rect.top() + option.rect.height()/2);
-    rectTop.setLeft(rectTop.left()+option.rect.height());
+    QRect rectTop = rectMain;
+    rectTop.setBottom(rectMain.top() + rectMain.height()/2);
+    rectTop.setLeft(rectTop.left()+rectMain.height());
     // create a rect covering the bottom half of the area
-    QRect rectBottomTime = option.rect;
-    rectBottomTime.setTop(option.rect.top() + option.rect.height()/2);
-    rectBottomTime.setLeft(rectBottomTime.left()+option.rect.height());
+    QRect rectBottomTime = rectMain;
+    rectBottomTime.setTop(rectMain.top() + rectMain.height()/2);
+    rectBottomTime.setLeft(rectBottomTime.left()+rectMain.height());
     // leave space on the RHS for the duration
     QRect rectBottom = rectBottomTime;
     rectBottom.setRight(rectBottom.right() - 6 * fm.averageCharWidth());
 
-    painter->drawRect(option.rect.x()+2, option.rect.y()+2, option.rect.height() - 4, option.rect.height() - 4);
+    painter->drawRect(rectMain.x()+2, rectMain.y()+2, rectMain.height() - 4, rectMain.height() - 4);
     int size = option.font.pixelSize();
     if (size > 0) {
         // TODO: revisit font sizing on windows
@@ -84,6 +107,7 @@ QSize PlaylistDelegate::sizeHint(
     const QStyleOptionViewItem &option,
     const QModelIndex &index) const
 {
+    Q_UNUSED(index);
 
     QFontMetrics fm(option.font);
     fm.height();
@@ -102,9 +126,68 @@ PlaylistView::PlaylistView(QWidget *parent)
     this->setItemDelegate(m_delegate);
     this->setSelectionBehavior(QAbstractItemView::SelectRows);
     this->setSelectionMode(QAbstractItemView::NoSelection);
+    this->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
 
     m_model->setPlaylistName(":current:");
     m_model->refresh();
+}
+
+void PlaylistView::refresh()
+{
+    m_model->refresh();
+    qDebug() << "refresh";
+}
+
+QueueMoreDialog::QueueMoreDialog(int row, int currentIndex, QWidget *parent)
+    : QDialog(parent)
+{
+    m_layoutCentral = new QVBoxLayout();
+    setLayout(m_layoutCentral);
+
+    m_btnPlay = new QPushButton("Play");
+    m_btnPlayNext = new QPushButton("Play Next");
+    m_btnRemove = new QPushButton("Remove");
+    m_btnCancel = new QPushButton("Cancel");
+
+    if (currentIndex == row) {
+        m_btnPlay->setVisible(false);
+        m_btnPlayNext->setVisible(false);
+        m_btnRemove->setVisible(false);
+    }
+
+    m_layoutCentral->addWidget(m_btnPlay);
+    m_layoutCentral->addWidget(m_btnPlayNext);
+    m_layoutCentral->addWidget(m_btnRemove);
+    m_layoutCentral->addWidget(m_btnCancel);
+
+    connect(m_btnPlay, &QPushButton::clicked,
+            this, &QueueMoreDialog::onPlay);
+    connect(m_btnPlayNext, &QPushButton::clicked,
+            this, &QueueMoreDialog::onPlayNext);
+    connect(m_btnRemove, &QPushButton::clicked,
+            this, &QueueMoreDialog::onRemove);
+    connect(m_btnCancel, &QPushButton::clicked,
+            this, &QueueMoreDialog::onCancel);
+}
+
+void QueueMoreDialog::onPlay()
+{
+    accept();
+}
+
+void QueueMoreDialog::onPlayNext()
+{
+    accept();
+}
+
+void QueueMoreDialog::onRemove()
+{
+    accept();
+}
+
+void QueueMoreDialog::onCancel()
+{
+    reject();
 }
 
 
@@ -145,9 +228,45 @@ uiPageQueue::~uiPageQueue()
 
 PageQueue::PageQueue(QWidget *parent)
     : QWidget(parent)
-    , m_ui(new UI::uiPageQueue(this)) {
+    , m_ui(new UI::uiPageQueue(this))
+{
+
+    connect(m_ui->m_view, &PlaylistView::more,
+            this, &PageQueue::onMore);
+
+    auto inst = yue::bell::MediaCtrlBase::instance();
+
+
+    connect(inst.data(), &yue::bell::MediaCtrlBase::playlistReset,
+        this, &PageQueue::onPlaylistChanged);
+
+    connect(inst.data(), &yue::bell::MediaCtrlBase::currentIndexChanged,
+        this, &PageQueue::onCurrentIndexChanged);
+
+    m_ui->m_view->setCurrentIndex(inst->currentIndex());
 
 }
 
 PageQueue::~PageQueue() {
+}
+
+
+void PageQueue::onMore(QModelIndex index)
+{
+    qDebug() << index.row();
+    auto inst = yue::bell::MediaCtrlBase::instance();
+
+    QueueMoreDialog dialog(index.row(), inst->currentIndex(), this);
+
+    dialog.exec();
+}
+
+void PageQueue::onPlaylistChanged()
+{
+    m_ui->m_view->refresh();
+}
+
+void PageQueue::onCurrentIndexChanged(int index)
+{
+    m_ui->m_view->setCurrentIndex(index);
 }

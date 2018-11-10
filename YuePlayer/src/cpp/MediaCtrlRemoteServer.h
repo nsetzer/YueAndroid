@@ -29,10 +29,10 @@ public:
     }
 
 signals:
-    //void progressChanged(float progress);
-    //void currentIndexChanged(int index);
-    //void stateChanged(State state)
-    //void statusChanged(Status Status)
+    void progressChanged(float progress);
+    void currentIndexChanged(int index);
+    void stateChanged(State state);
+    void statusChanged(Status Status);
 
 public slots:
 
