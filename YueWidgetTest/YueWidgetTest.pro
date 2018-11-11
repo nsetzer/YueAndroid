@@ -15,22 +15,24 @@ android{
 
 CONFIG += c++11
 
-INCLUDEPATH += src/cpp
+INCLUDEPATH += src/cpp ../TagLib/include
+
+DEFINES += TAGLIB_STATIC
 
 RESOURCES = resource.qrc
 
 SOURCES += \
     src/cpp/main.cpp \
+    src/cpp/rpc/JavaCompat.cpp \
+    src/cpp/rpc/MediaCtrlRemoteClient.cpp \
+    src/cpp/rpc/MediaCtrlRemoteServer.cpp \
     src/cpp/ui/mainwindow.cpp \
-    src/cpp/ui/page_explorer.cpp \
     src/cpp/ui/page_dynamic.cpp \
+    src/cpp/ui/page_explorer.cpp \
     src/cpp/ui/page_library.cpp \
     src/cpp/ui/page_player.cpp \
     src/cpp/ui/page_queue.cpp \
     src/cpp/ui/page_settings.cpp \
-    src/cpp/rpc/JavaCompat.cpp \
-    src/cpp/rpc/MediaCtrlRemoteServer.cpp \
-    src/cpp/rpc/MediaCtrlRemoteClient.cpp \
     src/cpp/yue/bell/AlbumArt.cpp \
     src/cpp/yue/bell/database.cpp \
     src/cpp/yue/bell/library.cpp \
@@ -42,6 +44,7 @@ SOURCES += \
     src/cpp/yue/bell/MediaPlayerBase.cpp \
     src/cpp/yue/bell/MediaPlayerQt.cpp \
     src/cpp/yue/bell/playlist.cpp \
+    src/cpp/yue/bell/scanner.cpp \
     src/cpp/yue/bell/settings.cpp \
     src/cpp/yue/core/RandomArtExpressions.cpp \
     src/cpp/yue/core/search/grammar.cpp \
@@ -55,22 +58,22 @@ SOURCES += \
     src/cpp/yue/qtcommon/PlaylistModel.cpp \
     src/cpp/yue/qtcommon/ResourceCache.cpp \
     src/cpp/yue/qtcommon/SongListModel.cpp \
-    src/cpp/yue/qtcommon/TreeListModelBase.cpp \
-    src/cpp/yue/qtcommon/toolbar.cpp
+    src/cpp/yue/qtcommon/toolbar.cpp \
+    src/cpp/yue/qtcommon/TreeListModelBase.cpp
 
 # src/cpp/yue/qtcommon/AlbumArtImage.cpp
 
 HEADERS += \
+    src/cpp/rpc/JavaCompat.h \
+    src/cpp/rpc/MediaCtrlRemoteClient.h \
+    src/cpp/rpc/MediaCtrlRemoteServer.h \
     src/cpp/ui/mainwindow.h \
-    src/cpp/ui/page_explorer.h \
     src/cpp/ui/page_dynamic.h \
+    src/cpp/ui/page_explorer.h \
     src/cpp/ui/page_library.h \
     src/cpp/ui/page_player.h \
     src/cpp/ui/page_queue.h \
     src/cpp/ui/page_settings.h \
-    src/cpp/rpc/JavaCompat.h \
-    src/cpp/rpc/MediaCtrlRemoteClient.h \
-    src/cpp/rpc/MediaCtrlRemoteServer.h \
     src/cpp/yue/alien/utf8/utf8.h \
     src/cpp/yue/alien/utf8/utf8/checked.h \
     src/cpp/yue/alien/utf8/utf8/core.h \
@@ -86,8 +89,9 @@ HEADERS += \
     src/cpp/yue/bell/MediaPlayerBase.h \
     src/cpp/yue/bell/MediaPlayerQt.h \
     src/cpp/yue/bell/playlist.hpp \
-    src/cpp/yue/bell/SongList.h \
+    src/cpp/yue/bell/scanner.h \
     src/cpp/yue/bell/settings.h \
+    src/cpp/yue/bell/SongList.h \
     src/cpp/yue/core/lrucache.h \
     src/cpp/yue/core/RandomArtExpressions.h \
     src/cpp/yue/core/search/grammar.hpp \
@@ -96,19 +100,19 @@ HEADERS += \
     src/cpp/yue/core/song.hpp \
     src/cpp/yue/core/util/dateutil.h \
     src/cpp/yue/core/util/random.h \
-    src/cpp/yue/util/logging.h \
     src/cpp/yue/global.h \
     src/cpp/yue/qtcommon/DirectoryListModel.h \
     src/cpp/yue/qtcommon/examples/BasicListModel.hpp \
     src/cpp/yue/qtcommon/examples/SwipeListModel.hpp \
+    src/cpp/yue/qtcommon/iconbutton.h \
     src/cpp/yue/qtcommon/LibraryTreeListModel.h \
     src/cpp/yue/qtcommon/PlaylistModel.h \
     src/cpp/yue/qtcommon/ResourceCache.h \
     src/cpp/yue/qtcommon/SongListModel.h \
-    src/cpp/yue/qtcommon/TreeListModelBase.h \
+    src/cpp/yue/qtcommon/svg.h \
     src/cpp/yue/qtcommon/toolbar.h \
-    src/cpp/yue/qtcommon/iconbutton.h \
-    src/cpp/yue/qtcommon/svg.h
+    src/cpp/yue/qtcommon/TreeListModelBase.h \
+    src/cpp/yue/util/logging.h
 
 # src/cpp/yue/qtcommon/AlbumArtImage.h
 
@@ -139,3 +143,7 @@ android {
     ANDROID_JAVA_SOURCES.files = $$files($$PWD/src/java/org/github/nsetzer/yueapp2/*.java)
     INSTALLS += ANDROID_JAVA_SOURCES
 }
+
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../TagLib/release/ -ltag
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../TagLib/debug/ -ltag
+else:unix: LIBS += -L$$OUT_PWD/../TagLib/ -ltag

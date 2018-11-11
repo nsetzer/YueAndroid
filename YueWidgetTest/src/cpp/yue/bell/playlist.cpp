@@ -96,7 +96,7 @@ void Playlist::set(QList<Database::uid_t> lst, size_t current_index) {
     }
 
     q.prepare("UPDATE playlists SET idx=?,size=? WHERE uid=?");
-    q.addBindValue(current_index);
+    q.addBindValue(toQVariant(current_index));
     q.addBindValue(lst.size());
     q.addBindValue(toQVariant(m_plid));
     q.exec();
@@ -314,7 +314,7 @@ bool Playlist::_insert_uid(int idx, Database::uid_t uid)
 
     q.prepare("INSERT into playlist_songs (uid,idx,song_id) VALUES (?,?,?)");
     q.addBindValue(toQVariant(m_plid));
-    q.addBindValue(toQVariant(idx));
+    q.addBindValue(toQVariant(static_cast<size_t>(idx)));
     q.addBindValue(toQVariant(uid));
     q.exec();
 

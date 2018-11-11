@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       -= core gui
+QT       -= core gui svg
 
 TARGET = tag
 TEMPLATE = lib
@@ -15,7 +15,8 @@ DEFINES += \
    HAVE_ZLIB_SOURCE \
    VERSION=1.0 \
    SOVERSION=1.0 \
-   MAKE_TAGLIB_LIB
+   MAKE_TAGLIB_LIB \
+   TAGLIB_STATIC
 
 QMAKE_CXXFLAGS_RELEASE -= -O2
 QMAKE_CXXFLAGS_RELEASE += -Os
