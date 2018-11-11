@@ -14,7 +14,7 @@ void PlaylistDelegate::paint(
     painter->save();
 
     //QSize song_id = index.data(yue::qtcommon::PlaylistModel::SongIdRole).toSize();
-    int song_index = index.data(yue::qtcommon::PlaylistModel::IndexRole).toInt();
+    //int song_index = index.data(yue::qtcommon::PlaylistModel::IndexRole).toInt();
     QString song_artist = index.data(yue::qtcommon::PlaylistModel::ArtistRole).toString();
     QString song_album = index.data(yue::qtcommon::PlaylistModel::AlbumRole).toString();
     QString song_title = index.data(yue::qtcommon::PlaylistModel::TitleRole).toString();
@@ -138,8 +138,22 @@ void PlaylistView::refresh()
     qDebug() << "refresh";
 }
 
+void PlaylistView::move(int src, int dst)
+{
+    m_model->move(src, dst);
+    m_model->refresh(); // TODO: playlist consistency
+
+}
+
+void PlaylistView::remove(int index)
+{
+    m_model->removeItem(index);
+    m_model->refresh(); // TODO: playlist consistency
+}
+
 QueueMoreDialog::QueueMoreDialog(int row, int currentIndex, QWidget *parent)
     : QDialog(parent)
+    , m_index(row)
 {
     m_layoutCentral = new QVBoxLayout();
     setLayout(m_layoutCentral);
@@ -172,16 +186,19 @@ QueueMoreDialog::QueueMoreDialog(int row, int currentIndex, QWidget *parent)
 
 void QueueMoreDialog::onPlay()
 {
+    emit play(m_index);
     accept();
 }
 
 void QueueMoreDialog::onPlayNext()
 {
+    emit playNext(m_index);
     accept();
 }
 
 void QueueMoreDialog::onRemove()
 {
+    emit remove(m_index);
     accept();
 }
 
@@ -236,7 +253,6 @@ PageQueue::PageQueue(QWidget *parent)
 
     auto inst = yue::bell::MediaCtrlBase::instance();
 
-
     connect(inst.data(), &yue::bell::MediaCtrlBase::playlistReset,
         this, &PageQueue::onPlaylistChanged);
 
@@ -258,6 +274,15 @@ void PageQueue::onMore(QModelIndex index)
 
     QueueMoreDialog dialog(index.row(), inst->currentIndex(), this);
 
+    connect(&dialog, &QueueMoreDialog::play,
+            this, &PageQueue::onPlay);
+
+    connect(&dialog, &QueueMoreDialog::playNext,
+            this, &PageQueue::onPlayNext);
+
+    connect(&dialog, &QueueMoreDialog::remove,
+            this, &PageQueue::onRemove);
+
     dialog.exec();
 }
 
@@ -269,4 +294,31 @@ void PageQueue::onPlaylistChanged()
 void PageQueue::onCurrentIndexChanged(int index)
 {
     m_ui->m_view->setCurrentIndex(index);
+}
+
+
+void PageQueue::onPlay(int index)
+{
+    auto inst = yue::bell::MediaCtrlBase::instance();
+    inst->playIndex(index);
+}
+
+void PageQueue::onPlayNext(int index)
+{
+    auto inst = yue::bell::MediaCtrlBase::instance();
+
+    //int dst = m_ui->m_view->currentIndex().row();
+    int dst = inst->currentIndex();
+    qDebug() << "move" << index << " to " << dst;
+    m_ui->m_view->move(index, dst);
+
+    inst->sync();
+}
+
+void PageQueue::onRemove(int index)
+{
+    auto inst = yue::bell::MediaCtrlBase::instance();
+    m_ui->m_view->remove(index);
+
+    inst->sync();
 }

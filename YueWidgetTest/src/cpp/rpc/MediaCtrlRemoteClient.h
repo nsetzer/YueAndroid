@@ -28,6 +28,7 @@ public slots:
     virtual void playpause() override;
     virtual void next() override;
     virtual void prev() override;
+    virtual void sync() override;
     virtual void setVolume(float volume) override;
     virtual void setProgress(float progress) override;
 

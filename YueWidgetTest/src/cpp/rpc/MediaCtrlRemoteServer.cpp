@@ -47,6 +47,7 @@ void MediaCtrlRemoteServer::onProgressChanged(float progress)
     emit progressChanged(progress);
     qDebug() << "server: progress" << progress;
 }
+
 void MediaCtrlRemoteServer::onCurrentIndexChanged(int index)
 {
     m_index = index;

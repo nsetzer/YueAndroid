@@ -36,6 +36,7 @@ public:
 class YUECOMMON_EXPORT MediaCtrlBase : public QObject
 {
     Q_OBJECT
+
     Q_PROPERTY(int currentIndex READ currentIndex  NOTIFY currentIndexChanged)
     Q_PROPERTY(SongInfo currentSong READ currentSong NOTIFY currentIndexChanged)
 
@@ -88,6 +89,7 @@ public slots:
     virtual void playpause()=0;
     virtual void next()=0;
     virtual void prev()=0;
+    virtual void sync()=0;
     virtual void setVolume(float volume) = 0;
     virtual void setProgress(float progress) = 0;
 

@@ -116,7 +116,7 @@ void LibraryView::toggleChecked()
 
 void LibraryView::createPlaylist(bool shuffle)
 {
-    m_model->createPlaylist();
+    m_model->createPlaylist(shuffle);
     m_model->checkAll(false);
 }
 
@@ -135,7 +135,7 @@ public:
     yue::qtcommon::IconButton *m_btnSearch;
 
     yue::qtcommon::IconButton *m_btnToggleSelection;
-    yue::qtcommon::IconButton *m_btnCreate2;
+    yue::qtcommon::IconButton *m_btnToggleShuffle;
     yue::qtcommon::IconButton *m_btnCreatePlaylist;
 
     LibraryView *m_view;
@@ -153,7 +153,7 @@ uiPageLibrary::uiPageLibrary(QWidget *parent) {
     m_editSearch = new QLineEdit(parent);
     m_btnClearSearch = new yue::qtcommon::IconButton(QIcon(":/res/clear.svg"), parent);
     m_btnToggleSelection = new yue::qtcommon::IconButton(QIcon(":/res/select.svg"), parent);
-    m_btnCreate2 = new yue::qtcommon::IconButton(QIcon(":/res/shuffle.svg"), parent);
+    m_btnToggleShuffle = new yue::qtcommon::IconButton(QIcon(":/res/shuffle.svg"), parent);
     m_btnCreatePlaylist = new yue::qtcommon::IconButton(QIcon(":/res/playlist.svg"), parent);
 
     m_view = new LibraryView(parent);
@@ -162,7 +162,7 @@ uiPageLibrary::uiPageLibrary(QWidget *parent) {
     m_layoutSearch->addWidget(m_btnClearSearch);
 
     m_layoutCreate->addWidget(m_btnToggleSelection);
-    m_layoutCreate->addWidget(m_btnCreate2);
+    m_layoutCreate->addWidget(m_btnToggleShuffle);
     m_layoutCreate->addWidget(m_btnCreatePlaylist);
 
     m_layoutCentral->addLayout(m_layoutSearch);
@@ -182,6 +182,7 @@ uiPageLibrary::~uiPageLibrary() {
 PageLibrary::PageLibrary(QWidget *parent)
     : QWidget(parent)
     , m_ui(new UI::uiPageLibrary(this))
+    , m_shuffle(true)
 {
     connect(m_ui->m_editSearch, &QLineEdit::editingFinished,
             this, &PageLibrary::onEditingFinished);
@@ -191,6 +192,9 @@ PageLibrary::PageLibrary(QWidget *parent)
 
     connect(m_ui->m_btnCreatePlaylist, &yue::qtcommon::IconButton::clicked,
             this, &PageLibrary::onCreatePlaylist);
+
+    connect(m_ui->m_btnToggleShuffle, &yue::qtcommon::IconButton::clicked,
+            this, &PageLibrary::onToggleShuffle);
 
     connect(m_ui->m_btnClearSearch, &yue::qtcommon::IconButton::clicked,
             this, &PageLibrary::onClearSearch);
@@ -209,9 +213,16 @@ void PageLibrary::onToggleSelection()
     m_ui->m_view->toggleChecked();
 }
 
+void PageLibrary::onToggleShuffle()
+{
+    m_shuffle = !m_shuffle;
+    m_ui->m_btnToggleShuffle->setIcon(QIcon(m_shuffle?":/res/shuffle.svg":":/res/sort.svg"));
+}
+
+
 void PageLibrary::onCreatePlaylist()
 {
-    m_ui->m_view->createPlaylist(true);
+    m_ui->m_view->createPlaylist(m_shuffle);
 }
 
 void PageLibrary::onClearSearch()

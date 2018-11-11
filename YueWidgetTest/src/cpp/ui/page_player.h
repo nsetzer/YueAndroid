@@ -20,9 +20,6 @@ class PagePlayer : public QWidget
 {
     Q_OBJECT
 
-private:
-
-    yue::bell::MediaPlayerBase::Status m_status;
 public:
 
     PagePlayer(QWidget *parent = nullptr);
@@ -39,6 +36,7 @@ protected:
 
 private:
     QScopedPointer<UI::uiPagePlayer> m_ui;
+    yue::bell::MediaPlayerBase::Status m_status;
 };
 
 #endif

@@ -67,6 +67,12 @@ void MediaCtrlRemoteClient::prev()
         m_rep->prev();
 }
 
+void MediaCtrlRemoteClient::sync()
+{
+    if (m_rep)
+        m_rep->sync();
+}
+
 void MediaCtrlRemoteClient::setVolume(float volume)
 {
     if (m_rep)

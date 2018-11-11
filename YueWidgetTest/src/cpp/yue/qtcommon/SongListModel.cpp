@@ -113,7 +113,7 @@ void SongListModel::setPlaylist(QSharedPointer<yue::bell::Playlist> playlist)
         m_lst.push_back(d);
     }
     try {
-        m_lst.setCurrentIndex(m_playlist->current().second);
+        m_lst.setCurrentIndex(static_cast<int>(m_playlist->current().second));
     } catch (std::runtime_error& e) {
         qWarning() << "Error Loading Song: " << e.what();
         m_lst.setCurrentIndex(-1);

@@ -94,6 +94,19 @@ void MediaCtrlBackend::setVolume(float volume)
     m_pPlayer->setVolume(volume);
 }
 
+void MediaCtrlBackend::sync()
+{
+    auto pl = PlaylistManager::instance()->openCurrent();
+
+    try {
+        int index = static_cast<int>(pl->current().second);
+        emit currentIndexChanged(index);
+    } catch (std::runtime_error& e) {
+        qWarning() << e.what();
+    }
+
+}
+
 void MediaCtrlBackend::stop()
 {
     m_pPlayer->stop();

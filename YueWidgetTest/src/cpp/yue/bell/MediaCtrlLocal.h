@@ -19,7 +19,6 @@ class YUECOMMON_EXPORT MediaCtrlLocal : public MediaCtrlBase
 
 public:
     MediaCtrlLocal(QObject *parent = nullptr);
-    virtual ~MediaCtrlLocal() = default;
 
 signals:
     //void progressChanged(float progress);
@@ -29,14 +28,15 @@ signals:
 
 public slots:
 
-    virtual void load() { m_pBackend->load(); }
-    virtual void loadIndex(int index) { m_pBackend->loadIndex(index); }
-    virtual void playIndex(int index) { m_pBackend->playIndex(index); }
-    virtual void playpause() { m_pBackend->playpause(); }
-    virtual void next() { m_pBackend->next(); }
-    virtual void prev() { m_pBackend->prev(); }
-    virtual void setVolume(float volume) { m_pBackend->setVolume(volume); }
-    virtual void setProgress(float progress) { m_pBackend->setProgress(progress); }
+    virtual void load() override { m_pBackend->load(); }
+    virtual void loadIndex(int index) override { m_pBackend->loadIndex(index); }
+    virtual void playIndex(int index) override { m_pBackend->playIndex(index); }
+    virtual void playpause() override { m_pBackend->playpause(); }
+    virtual void next() override { m_pBackend->next(); }
+    virtual void prev() override { m_pBackend->prev(); }
+    virtual void setVolume(float volume) override { m_pBackend->setVolume(volume); }
+    virtual void setProgress(float progress) override { m_pBackend->setProgress(progress); }
+    virtual void sync() override { m_pBackend->sync(); }
 
 private slots:
     void onProgressChanged(float progress) {

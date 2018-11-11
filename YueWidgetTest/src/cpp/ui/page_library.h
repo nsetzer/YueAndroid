@@ -93,11 +93,13 @@ public slots:
 protected:
     void onEditingFinished();
     void onToggleSelection();
+    void onToggleShuffle();
     void onCreatePlaylist();
     void onClearSearch();
 
 private:
     QScopedPointer<UI::uiPageLibrary> m_ui;
+    bool m_shuffle;
 };
 
 #endif // UI_PAGE_LIBRARY_H

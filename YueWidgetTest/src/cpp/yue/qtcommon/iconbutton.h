@@ -1,5 +1,5 @@
 #ifndef YUE_QTCOMMON_ICONBUTTON_H
-#define ICONBUTTON_H
+#define YUE_QTCOMMON_ICONBUTTON_H
 
 #include <QScreen>
 #include <QApplication>

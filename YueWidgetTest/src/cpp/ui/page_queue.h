@@ -71,11 +71,16 @@ public:
         viewport()->repaint();
         qDebug() << "update" << index;
     }
+
+    void move(int src, int dst);
+    void remove(int index);
 };
 
 class QueueMoreDialog : public QDialog
 {
     Q_OBJECT
+
+    int m_index;
 
     QVBoxLayout *m_layoutCentral;
     QPushButton *m_btnPlay;
@@ -85,6 +90,11 @@ class QueueMoreDialog : public QDialog
 
 public:
     QueueMoreDialog(int row, int currentIndex, QWidget *parent=nullptr);
+
+signals:
+    void play(int index);
+    void playNext(int index);
+    void remove(int index);
 
 public slots:
     void onPlay();
@@ -116,6 +126,10 @@ public slots:
     void onPlaylistChanged();
 
     void onCurrentIndexChanged(int index);
+
+    void onPlay(int index);
+    void onPlayNext(int index);
+    void onRemove(int index);
 
 private:
     QScopedPointer<UI::uiPageQueue> m_ui;

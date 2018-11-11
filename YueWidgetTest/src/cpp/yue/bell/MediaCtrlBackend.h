@@ -36,6 +36,7 @@ public slots:
     void prev();
     void setVolume(float volume);
     void setProgress(float progress);
+    void sync();
     void stop();
 
 private slots:

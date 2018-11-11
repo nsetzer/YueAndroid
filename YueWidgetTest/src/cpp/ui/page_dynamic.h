@@ -19,7 +19,7 @@
 #include <QResizeEvent>
 #include <QDebug>
 
-#include "yue/qtcommon/toolbar.h"
+#include "yue/qtcommon/iconbutton.h"
 
 class DynamicQueryEditor : public QFrame {
     Q_OBJECT
@@ -28,13 +28,14 @@ class DynamicQueryEditor : public QFrame {
     QHBoxLayout *m_layoutName;
     QLabel *m_lblName;
     QLabel *m_lblIndex;
-    yue::qtcommon::ToolBar *m_barOptions;
     QLineEdit *m_editName;
     QLineEdit *m_editQuery;
 
-    QAction *m_actEdit;
-    QAction *m_actRemove;
-    QAction *m_actCreate;
+    QString m_name;
+
+    yue::qtcommon::IconButton *m_btnEdit;
+    yue::qtcommon::IconButton *m_btnRemove;
+    yue::qtcommon::IconButton *m_btnCreate;
 
 public:
     DynamicQueryEditor(int index=-1, QWidget *parent = nullptr);

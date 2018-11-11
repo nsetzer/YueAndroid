@@ -6,6 +6,7 @@
 
 DynamicQueryEditor::DynamicQueryEditor(int index, QWidget *parent)
     : QFrame(parent)
+    , m_name()
 {
     m_layoutCentral = new QVBoxLayout();
     m_layoutName = new QHBoxLayout();
@@ -13,15 +14,14 @@ DynamicQueryEditor::DynamicQueryEditor(int index, QWidget *parent)
     m_lblName = new QLabel(this);
     m_lblIndex = new QLabel(this);
 
-    m_barOptions = new yue::qtcommon::ToolBar(this);
     m_editName = new QLineEdit(this);
     m_editQuery = new QLineEdit(this);
 
     // order here is chosen so that the edit button does not move
     // when the editing mode is toggeled. this allows for accidental double taps
-    m_actRemove = m_barOptions->addAction(QIcon(":/res/delete.svg"), "");
-    m_actEdit = m_barOptions->addAction(QIcon(":/res/edit.svg"), "");
-    m_actCreate = m_barOptions->addAction(QIcon(":/res/playlist.svg"), "");
+    m_btnRemove = new yue::qtcommon::IconButton(QIcon(":/res/delete.svg"), this);
+    m_btnEdit = new yue::qtcommon::IconButton(QIcon(":/res/edit.svg"), this);
+    m_btnCreate = new yue::qtcommon::IconButton(QIcon(":/res/playlist.svg"), this);
 
     // --
     this->setLayout(m_layoutCentral);
@@ -30,27 +30,30 @@ DynamicQueryEditor::DynamicQueryEditor(int index, QWidget *parent)
     m_layoutName->addWidget(m_lblIndex);
     m_layoutName->addWidget(m_lblName);
     m_layoutName->addWidget(m_editName);
-    m_layoutName->addWidget(m_barOptions);
+    m_layoutName->addWidget(m_btnRemove);
+    m_layoutName->addWidget(m_btnCreate);
+    m_layoutName->addWidget(m_btnEdit);
 
     // --
 
     m_editName->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     m_lblName->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    m_barOptions->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
     m_editName->setPlaceholderText("Edit Name");
-    m_editQuery->setPlaceholderText("Blank Search");
+    m_editQuery->setPlaceholderText("Edit Query");
+
+    m_lblName->setText("New Dynamic List");
 
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     setFrameStyle(QFrame::Panel | QFrame::Raised);
     setLineWidth(2);
 
-    connect(m_actEdit, &QAction::triggered,
+    connect(m_btnEdit, &yue::qtcommon::IconButton::clicked,
             this, &DynamicQueryEditor::onToggleEdit);
 
-    connect(m_actRemove, &QAction::triggered,
+    connect(m_btnRemove, &yue::qtcommon::IconButton::clicked,
             this, &DynamicQueryEditor::onRemove);
 
-    connect(m_actCreate, &QAction::triggered,
+    connect(m_btnCreate, &yue::qtcommon::IconButton::clicked,
             this, &DynamicQueryEditor::onCreate);
 
     // --
@@ -71,7 +74,7 @@ DynamicQueryEditor::~DynamicQueryEditor()
 }
 
 QString DynamicQueryEditor::name() const {
-    return m_editName->text();
+    return m_name;
 }
 
 QString DynamicQueryEditor::query() const {
@@ -79,8 +82,15 @@ QString DynamicQueryEditor::query() const {
 }
 
 void DynamicQueryEditor::setName(QString name) {
-    m_lblName->setText(name);
-    m_editName->setText(name);
+    m_name = name;
+
+    if (name.isEmpty()) {
+        m_lblName->setText("New Dynamic List");
+        m_editName->setText("");
+    } else {
+        m_lblName->setText(name);
+        m_editName->setText(name);
+    }
     emit nameChanged();
 }
 void DynamicQueryEditor::setQuery(QString query) {
@@ -93,13 +103,16 @@ void DynamicQueryEditor::enableEditing(bool enabled)
 
     m_editName->setVisible(enabled);
     m_lblName->setVisible(!enabled);
-    m_actEdit->setIcon(QIcon((enabled)?":/res/edit_finished.svg":":/res/edit.svg"));
-    m_actRemove->setVisible(enabled);
+    m_btnEdit->setIcon(QIcon((enabled)?":/res/edit_finished.svg":":/res/edit.svg"));
+    m_btnRemove->setVisible(enabled);
+    m_btnCreate->setVisible(!enabled);
     m_editQuery->setVisible(enabled);
     qDebug() << enabled;
 
     if(!enabled) {
-        m_lblName->setText(m_editName->text());
+
+        m_name = m_editName->text();
+        m_lblName->setText(m_name.isEmpty()?"New Dynamic List":m_name);
         emit editingFinished();
     }
 }
@@ -138,7 +151,8 @@ public:
     QWidget *m_centralWidget;
     QVBoxLayout *m_layoutMain;
 
-    yue::qtcommon::ToolBar *m_barActions;
+    yue::qtcommon::IconButton *m_btnNewEditor;
+
 
     uiPageDynamic(QWidget *parent = nullptr);
     ~uiPageDynamic();
@@ -152,13 +166,13 @@ uiPageDynamic::uiPageDynamic(QWidget *parent)
     m_centralWidget = new QWidget(parent);
     m_layoutMain = new QVBoxLayout();
 
-    m_barActions = new yue::qtcommon::ToolBar(2.0, parent);
+    m_btnNewEditor = new yue::qtcommon::IconButton(QIcon(":/res/file.svg"), parent);
 
     // -
     parent->setLayout(m_layoutCentral);
     m_layoutCentral->addWidget(m_scrollArea);
 
-    m_layoutCentral->addWidget(m_barActions);
+    m_layoutCentral->addWidget(m_btnNewEditor);
     m_centralWidget->setLayout(m_layoutMain);
     //m_scrollArea->setBackgroundRole(QPalette::Dark);
     m_scrollArea->setWidget(m_centralWidget);
@@ -179,8 +193,8 @@ PageDynamic::PageDynamic(QWidget *parent)
     : QWidget(parent)
     , m_ui(new UI::uiPageDynamic(this))
 {
-    auto action = m_ui->m_barActions->addAction(QIcon(":/res/file.svg"), "");
-    connect(action, &QAction::triggered,
+
+    connect(m_ui->m_btnNewEditor, &yue::qtcommon::IconButton::clicked,
             this, &PageDynamic::newEditor);
 
     resetEditors();
@@ -231,7 +245,11 @@ void PageDynamic::resetEditors()
         delete child;
     }
 
-    for (const auto& pair : yue::bell::Settings::instance()->dynamicLists()) {
+    QList<QPair<QString, QString>> lst = yue::bell::Settings::instance()->dynamicLists();
+    qSort(lst.begin(), lst.end(), [](const QPair<QString, QString>& a,const QPair<QString, QString>& b) -> bool {
+        return a.first < b.first;
+    });
+    for (const auto& pair : lst) {
         createEditor(pair.first, pair.second);
     }
 }

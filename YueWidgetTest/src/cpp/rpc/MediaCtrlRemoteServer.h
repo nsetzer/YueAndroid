@@ -48,6 +48,7 @@ public slots:
     virtual void prev() { m_pBackend->prev(); }
     virtual void setVolume(float volume) { m_pBackend->setVolume(volume); }
     virtual void setProgress(float progress) { m_pBackend->setProgress(progress); }
+    virtual void sync() { m_pBackend->sync(); }
 
     virtual void stop() { m_pBackend->stop(); }
 

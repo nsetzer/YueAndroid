@@ -7,6 +7,7 @@ class MediaControl {
     SLOT(void prev());
     SLOT(void setVolume(float volume));
     SLOT(void setProgress(float progress));
+    SLOT(void sync());
 
     SIGNAL(progressChanged(float progress));
     SIGNAL(currentIndexChanged(int index));

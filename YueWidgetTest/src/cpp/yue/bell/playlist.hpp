@@ -63,7 +63,7 @@ public:
 
     QString name() { return m_name; }
 
-    void set(QList<Database::uid_t> lst);
+    void set(QList<Database::uid_t> lst, size_t current_index=0);
     void clear();
     size_t size();
 
@@ -77,6 +77,8 @@ public:
     void move(int src, int tgt);
 
     QSqlQuery select();
+
+    QList<Database::uid_t> toList() const;
 
 
 

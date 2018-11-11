@@ -72,7 +72,7 @@ Playlist::~Playlist()
 
 }\
 
-void Playlist::set(QList<Database::uid_t> lst) {
+void Playlist::set(QList<Database::uid_t> lst, size_t current_index) {
 
     LOG_FUNCTION_TIME();
 
@@ -95,7 +95,8 @@ void Playlist::set(QList<Database::uid_t> lst) {
         idx++;
     }
 
-    q.prepare("UPDATE playlists SET idx=0,size=? WHERE uid=?");
+    q.prepare("UPDATE playlists SET idx=?,size=? WHERE uid=?");
+    q.addBindValue(current_index);
     q.addBindValue(lst.size());
     q.addBindValue(toQVariant(m_plid));
     q.exec();
@@ -406,10 +407,48 @@ bool Playlist::_move_one(int src, int tgt)
         return true;
     }
 
-    size_t current_index;
+    QList<Database::uid_t> lst = toList();
+    //Database::uid_t song_id = lst[src];
+    int current_index = static_cast<int>(current().second);
+
+    if (src < 0) {
+        return false;
+    }
+
+    if (src >= lst.size()) {
+        return false;
+    }
+
+    if (tgt < 0) {
+        tgt = 0;
+    }
+
+    if (tgt >= lst.size()) {
+        tgt = lst.size()-1;
+    }
+
+    if (src < current_index && current_index < tgt) {
+        current_index -= 1;
+    } else if (src > current_index && tgt < current_index) {
+        current_index += 1;
+    }
+
+    if (tgt < src) {
+        tgt += 1;
+    }
+
+    lst.move(src, tgt);
+    //lst.removeAt(src);
+    //lst.insert(tgt, song_id);
+    set(lst, static_cast<size_t>(current_index));
+
+
+    /*
+    int current_index;
     Database::uid_t song_id;
     QSqlQuery q(m_db->db());
 
+    // get the song id from the current playlist at the source index
     q.prepare("SELECT song_id FROM playlist_songs WHERE uid=? AND idx=?");
     q.addBindValue(toQVariant(m_plid));
     q.addBindValue(src);
@@ -417,43 +456,62 @@ bool Playlist::_move_one(int src, int tgt)
     q.first();
     song_id = q.value(0).toULongLong();
 
+    // get the current song index (the song that is playing)
     q.prepare("SELECT idx FROM playlists WHERE (uid=?)");
     q.addBindValue(toQVariant(m_plid));
     q.exec();
     q.first();
-    current_index = q.value(0).toULongLong();
+    current_index = q.value(0).toInt();
     //qDebug() << src << tgt << current_index;
 
     if (src < tgt) {
+        // if moving the song to a position further down in the list
+        // 0 1 2 3 4 5 6 7  // the index order
+        // a b c d e f g h  // given this list, move c -> f (2 -> 5)
+        // a b   d e f g h  // remove c
+        // a b d e f   g h  // subtract 1 for range (2 to 5)
+        // a b d e f c g h
 
+        // remove the source index
         q.prepare("DELETE FROM playlist_songs WHERE uid=? AND idx=?");
         q.addBindValue(toQVariant(m_plid));
         q.addBindValue(src);
         q.exec();
 
-        q.prepare("UPDATE playlist_songs SET idx=idx-1 WHERE (uid=? AND (idx>? AND idx<?))");
+        // update all songs above source by subtracting one from the index
+        q.prepare("UPDATE playlist_songs SET idx=idx-1 WHERE (uid=? AND (idx>? AND idx<=?))");
         q.addBindValue(toQVariant(m_plid));
         q.addBindValue(src);
         q.addBindValue(tgt);
         q.exec();
 
+        // insert song into the target position
         q.prepare("INSERT into playlist_songs (uid,idx,song_id) VALUES (?,?,?)");
         q.addBindValue(toQVariant(m_plid));
-        q.addBindValue(tgt-1);
+        q.addBindValue(tgt);
         q.addBindValue(toQVariant(song_id));
         q.exec();
 
         if (src==current_index) {
+            // ! something is not right
             q.prepare("UPDATE playlists SET idx=? WHERE (uid=?)");
-            q.addBindValue(toQVariant(tgt)); // ! something is not right
+            q.addBindValue(toQVariant(static_cast<Database::uid_t>(tgt)));
             q.addBindValue(toQVariant(m_plid));
             q.exec();
-        } else {
+        } else if (src < current_index && tgt > current_index) {
             q.prepare("UPDATE playlists SET idx=idx-1 WHERE (uid=?)");
             q.addBindValue(toQVariant(m_plid));
             q.exec();
         }
     } else {
+        // if moving the song to a position towards the top of the list
+        //   0 1 2 3 4 5 6 7 // the list of indices
+        //   a b c d e f g h // the list of items
+        //                   // move 5 -> 2
+        //   a b c d e   g h // remove 5
+        //   a b   c d e g h // shift by 1
+        //   a b f c d e g h // place back
+
         q.prepare("DELETE FROM playlist_songs WHERE uid=? AND idx=?");
         q.addBindValue(toQVariant(m_plid));
         q.addBindValue(src);
@@ -467,23 +525,50 @@ bool Playlist::_move_one(int src, int tgt)
 
         q.prepare("INSERT into playlist_songs (uid,idx,song_id) VALUES (?,?,?)");
         q.addBindValue(toQVariant(m_plid));
-        q.addBindValue(tgt);
+        q.addBindValue(tgt+1);
         q.addBindValue(toQVariant(song_id));
         q.exec();
 
         if (src==current_index) {
             q.prepare("UPDATE playlists SET idx=? WHERE (uid=?)");
-            q.addBindValue(toQVariant(tgt));
+            q.addBindValue(toQVariant(static_cast<Database::uid_t>(tgt)));
             q.addBindValue(toQVariant(m_plid));
             q.exec();
-        } else {
+        } else if (tgt < current_index && src > current_index) {
             q.prepare("UPDATE playlists SET idx=idx+1 WHERE (uid=?)");
             q.addBindValue(toQVariant(m_plid));
             q.exec();
         }
     }
+    */
 
     return true;
+}
+
+QList<Database::uid_t> Playlist::toList() const
+{
+    QSqlQuery q(m_db->db());
+    QList<Database::uid_t> lst;
+
+    q.prepare("SELECT idx, song_id FROM playlist_songs WHERE uid=? ORDER BY idx ASC");
+    q.addBindValue(toQVariant(m_plid));
+
+    if (!q.exec()) {
+        qWarning() << "error executing query";
+        qWarning() << q.lastError();
+        return lst;
+    }
+
+    if (q.lastError().isValid()) {
+        qWarning() << q.lastError();
+        return lst;
+    }
+
+    while (q.next()) {
+        lst.append(q.value(1).toULongLong());
+    }
+
+    return lst;
 }
 
 /**
