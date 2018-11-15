@@ -8,10 +8,14 @@ class MediaControl {
     SLOT(void setVolume(float volume));
     SLOT(void setProgress(float progress));
     SLOT(void sync());
+    SLOT(void scanStart(QString path));
+    SLOT(void scanStop());
+    SLOT(void scanStatus());
 
     SIGNAL(progressChanged(float progress));
     SIGNAL(currentIndexChanged(int index));
     SIGNAL(statusChanged(int status));
     SIGNAL(stateChanged(int state));
+    SIGNAL(scanUpdate(bool running, int ndirs, int nfiles, int nsongs));
 
 }

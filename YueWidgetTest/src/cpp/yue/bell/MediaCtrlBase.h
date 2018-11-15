@@ -70,6 +70,7 @@ signals:
     void currentIndexChanged(int index);
     void statusChanged(MediaPlayerBase::Status status);
     void stateChanged(MediaPlayerBase::State state);
+    void syncUpdate(bool running, int ndirs, int nfiles, int nsongs);
 
     void doPlaySong(int uid);
     void doSetCurrentPlaylist(QList<yue::bell::Database::uid_t> lst, bool autoplay);
@@ -92,6 +93,10 @@ public slots:
     virtual void sync()=0;
     virtual void setVolume(float volume) = 0;
     virtual void setProgress(float progress) = 0;
+
+    virtual void scanStart(QString path) = 0;
+    virtual void scanStop() = 0;
+    virtual void scanStatus() = 0;
 
 
     //virtual void setNewPlaylist(SongList lst);

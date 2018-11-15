@@ -42,6 +42,16 @@ MediaCtrlRemoteServer::MediaCtrlRemoteServer()
     }
 }
 
+QSharedPointer<MediaCtrlRemoteServer> MediaCtrlRemoteServer::create() {
+    m_instance = QSharedPointer<MediaCtrlRemoteServer>(new MediaCtrlRemoteServer());
+    return m_instance;
+}
+
+QSharedPointer<MediaCtrlRemoteServer> MediaCtrlRemoteServer::instance() {
+    return m_instance;
+}
+
+
 void MediaCtrlRemoteServer::onProgressChanged(float progress)
 {
     emit progressChanged(progress);
@@ -86,6 +96,10 @@ void MediaCtrlRemoteServer::onStateChanged(yue::bell::MediaPlayerBase::State sta
     emit stateChanged(static_cast<int>(state));
     sendNotification();
     qDebug() << "server: state changed" << state;
+}
+
+void MediaCtrlRemoteServer::onSyncUpdate(bool running, int ndirs, int nfiles, int nsongs) {
+    emit scanUpdate(running, ndirs, nfiles, nsongs);
 }
 
 void MediaCtrlRemoteServer::sendNotification()

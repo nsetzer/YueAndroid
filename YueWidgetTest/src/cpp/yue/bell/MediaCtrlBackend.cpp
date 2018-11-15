@@ -112,7 +112,6 @@ void MediaCtrlBackend::stop()
     m_pPlayer->stop();
 }
 
-
 void MediaCtrlBackend::setProgress(float progress)
 {
     m_pPlayer->setPosition(m_pPlayer->duration() * progress);
@@ -151,6 +150,20 @@ void MediaCtrlBackend::onSongEnded()
 {
     next();
 }
+
+void MediaCtrlBackend::scanStart(QString path)
+{
+
+}
+void MediaCtrlBackend::scanStop()
+{
+
+}
+void MediaCtrlBackend::scanStatus()
+{
+
+}
+
 
 } // bell
 } // yue

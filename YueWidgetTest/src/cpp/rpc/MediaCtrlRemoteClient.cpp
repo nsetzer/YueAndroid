@@ -11,11 +11,18 @@ MediaCtrlRemoteClient::MediaCtrlRemoteClient()
     m_repNode.connectToNode(QUrl(QStringLiteral("local:replica")));
     m_rep = QSharedPointer<MediaControlReplica>(m_repNode.acquire<MediaControlReplica>());
 
-    QObject::connect(m_rep.data(),&MediaControlReplica::progressChanged,this,&MediaCtrlRemoteClient::onServiceProgressChanged);
-    QObject::connect(m_rep.data(),&MediaControlReplica::currentIndexChanged,this,&MediaCtrlRemoteClient::onServiceCurrentIndexChanged);
+    QObject::connect(m_rep.data(),&MediaControlReplica::progressChanged,
+                     this,&MediaCtrlRemoteClient::onServiceProgressChanged);
+    QObject::connect(m_rep.data(),&MediaControlReplica::currentIndexChanged,
+                     this,&MediaCtrlRemoteClient::onServiceCurrentIndexChanged);
 
-    QObject::connect(m_rep.data(),&MediaControlReplica::stateChanged,this,&MediaCtrlRemoteClient::onServiceStateChanged);
-    QObject::connect(m_rep.data(),&MediaControlReplica::statusChanged,this,&MediaCtrlRemoteClient::onServiceStatusChanged);
+    QObject::connect(m_rep.data(),&MediaControlReplica::stateChanged,
+                     this,&MediaCtrlRemoteClient::onServiceStateChanged);
+    QObject::connect(m_rep.data(),&MediaControlReplica::statusChanged,
+                     this,&MediaCtrlRemoteClient::onServiceStatusChanged);
+
+    QObject::connect(m_rep.data(),&MediaControlReplica::scanUpdate,
+                     this,&MediaCtrlRemoteClient::onServiceSyncUpdate);
 
     qDebug() << "waiting for RPC source";
 
@@ -113,6 +120,11 @@ void MediaCtrlRemoteClient::onServiceStateChanged(int state)
     m_state = s;
     emit stateChanged(s);
 }
+
+void MediaCtrlRemoteClient::onServiceSyncUpdate(bool running, int ndirs, int nfiles, int nsongs) {
+    emit syncUpdate(running, ndirs, nfiles, nsongs);
+}
+
 
 void MediaCtrlRemoteClient::tts()
 {

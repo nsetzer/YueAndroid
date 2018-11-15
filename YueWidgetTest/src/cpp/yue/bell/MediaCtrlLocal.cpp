@@ -21,6 +21,10 @@ MediaCtrlLocal::MediaCtrlLocal(QObject *parent/* = nullptr*/)
 
     connect(m_pBackend.data(),&MediaCtrlBackend::statusChanged,
             this,&MediaCtrlLocal::onStatusChanged);
+
+    connect(m_pBackend.data(),&MediaCtrlBackend::syncUpdate,
+            this,&MediaCtrlLocal::onSyncUpdate);
+
     try {
         m_pBackend->load();
     } catch (std::runtime_error& e) {

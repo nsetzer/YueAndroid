@@ -282,7 +282,7 @@ class InvertedPartialStringSearchRule : public ColumnSearchRule {
     InvertedPartialStringSearchRule(const std::string &column,
                                     const std::string &value)
         : ColumnSearchRule(column), m_sValue(value) {}
-    virtual ~InvertedPartialStringSearchRule(){};
+    virtual ~InvertedPartialStringSearchRule(){}
 
     virtual bool check(const std::map<std::string, std::string> &elem,
                        bool ignoreCase = true) const override;

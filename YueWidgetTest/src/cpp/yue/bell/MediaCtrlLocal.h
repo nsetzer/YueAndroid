@@ -25,6 +25,7 @@ signals:
     //void currentIndexChanged(int index);
     //void statusChanged(MediaPlayerBase::Status status);
     //void stateChanged(MediaPlayerBase::State state);
+    //void syncUpdate(bool running, int ndirs, int nfiles, int nsongs);
 
 public slots:
 
@@ -37,6 +38,11 @@ public slots:
     virtual void setVolume(float volume) override { m_pBackend->setVolume(volume); }
     virtual void setProgress(float progress) override { m_pBackend->setProgress(progress); }
     virtual void sync() override { m_pBackend->sync(); }
+
+    virtual void scanStart(QString path) override { m_pBackend->scanStart(path); }
+    virtual void scanStop() override { m_pBackend->scanStop(); }
+    virtual void scanStatus() override { m_pBackend->scanStatus(); }
+
 
 private slots:
     void onProgressChanged(float progress) {
@@ -54,6 +60,9 @@ private slots:
     void onStateChanged(yue::bell::MediaPlayerBase::State state) {
         m_state = state;
         emit stateChanged(state);
+    }
+    void onSyncUpdate(bool running, int ndirs, int nfiles, int nsongs) {
+        emit syncUpdate(running, ndirs, nfiles, nsongs);
     }
 
 private:
