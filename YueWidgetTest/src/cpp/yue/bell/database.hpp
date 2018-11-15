@@ -44,6 +44,7 @@ public:
         m_instance = new Database();
         return m_instance;
     }
+    static QSharedPointer<Database> reconnect( void );
     static Database* instance( void ) {
         return m_instance;
     }

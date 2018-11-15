@@ -4,6 +4,7 @@
 #include "yue/bell/database.hpp"
 #include "yue/bell/LibraryTreeNode.hpp"
 #include "yue/core/search/grammar.hpp"
+#include "yue/core/search/rules.hpp"
 #include "yue/core/shuffle.hpp"
 
 #include <algorithm>
@@ -71,6 +72,16 @@ bool Library::_insert(QMap<QString,QVariant> data, Database::uid_t& uid)
         throw std::runtime_error(std::string("missing key: ") + yue::core::Song::album);
     if (!data.contains(yue::core::Song::title))
         throw std::runtime_error(std::string("missing key: ") + yue::core::Song::title);
+
+    // calculate the sort key if given
+    if (!data.contains(yue::core::Song::artist_key)) {
+        QString art = data[yue::core::Song::artist].toString();
+        if (art.toLower().startsWith("the ")) {
+            art = art.remove(0, 4);
+        }
+        data[yue::core::Song::artist_key] = art;
+    }
+
 
     m_db->db().transaction();
 
@@ -310,6 +321,33 @@ void Library::incrementPlaycount(Database::uid_t uid)
 
     q.exec();
     return;
+}
+
+/**
+ * @brief Library::exists
+ * @param path to a local file on disk
+ * @return true if the path exists in the database
+ */
+bool Library::exists(QString path)
+{
+    QSqlQuery query = m_grammar.buildQuery(QStringList() << yue::core::Song::path,
+              std::unique_ptr<yue::core::SearchRule>(
+                  new yue::core::ExactSearchRule<std::string>(
+                      yue::core::Song::path, path.toUtf8().toStdString())),
+              "",
+              m_db->db());
+
+    if (!query.exec()) {
+        qWarning() << "error executing query";
+        qWarning() << query.lastError();
+        return false;
+    }
+
+    while (query.next()) {
+        return true;
+    }
+
+    return false;
 }
 
 /**

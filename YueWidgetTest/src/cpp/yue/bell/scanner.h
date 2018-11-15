@@ -6,6 +6,9 @@
 #include <QDir>
 #include <QDebug>
 
+#include "yue/bell/database.hpp"
+#include "yue/bell/library.hpp"
+
 namespace yue {
 namespace bell {
 
@@ -24,7 +27,8 @@ signals:
 
 private:
     QList<QDir> m_dirs; // list of dirs to scan
-
+    QSharedPointer<Database> m_db;
+    QSharedPointer<Library> m_lib;
 
 };
 

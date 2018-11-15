@@ -50,6 +50,8 @@ public:
 
     void incrementPlaycount(Database::uid_t uid);
 
+    bool exists(QString path);
+
     QList<LibraryTreeNode*> queryToForest(QString querystr);
 
     QList<Database::uid_t> createPlaylist(QString query, size_t size = 0);

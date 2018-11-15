@@ -26,16 +26,20 @@ LibrarySearchGrammar::LibrarySearchGrammar()
     }
 }
 
-QSqlQuery LibrarySearchGrammar::buildQuery(QStringList select, QString query, QString orderby/* = ""*/)
+QSqlQuery LibrarySearchGrammar::buildQuery(QStringList select, QString query, QString orderby, QSqlDatabase db)
+{
+    auto rule = ruleFromString(std::string(query.toUtf8()));
+    return buildQuery(select, std::move(rule), orderby, db);
+}
+
+QSqlQuery LibrarySearchGrammar::buildQuery(QStringList select, std::unique_ptr<yue::core::SearchRule> rule, QString orderby, QSqlDatabase db)
 {
     typedef yue::core::util::Variant::Type Type;
     yue::core::Rule::QueryValues values;
-    QSqlQuery sqlquery;
+    QSqlQuery sqlquery(db);
 
     QString sql = "SELECT " + select.join(", ");
     sql += " FROM library ";
-
-    auto rule = ruleFromString(std::string(query.toUtf8()));
 
     if (rule) {
         std::string s = rule->toSql(values);
@@ -71,7 +75,6 @@ QSqlQuery LibrarySearchGrammar::buildQuery(QStringList select, QString query, QS
             throw std::runtime_error("unknown type in rule");
         }
     }
-
 
     return sqlquery;
 }

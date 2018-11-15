@@ -15,9 +15,7 @@ android{
 
 CONFIG += c++11
 
-INCLUDEPATH += src/cpp ../TagLib/include
-
-DEFINES += TAGLIB_STATIC
+INCLUDEPATH += src/cpp
 
 RESOURCES = resource.qrc
 
@@ -144,6 +142,28 @@ android {
     INSTALLS += ANDROID_JAVA_SOURCES
 }
 
+#-------------------------------------------------
+# configure id3v2lib
+
+#SOURCES += \
+#    src/cpp/id3v2lib/frame.c \
+#    src/cpp/id3v2lib/header.c \
+#    src/cpp/id3v2lib/id3v2lib.c \
+#    src/cpp/id3v2lib/types.c \
+#    src/cpp/id3v2lib/utils.c
+#
+#HEADERS += \
+#    src/cpp/id3v2lib/constants.h \
+#    src/cpp/id3v2lib/frame.h \
+#    src/cpp/id3v2lib/header.h \
+#    src/cpp/id3v2lib/id3v2lib.h \
+#    src/cpp/id3v2lib/types.h \
+#    src/cpp/id3v2lib/utils.h
+
+#-------------------------------------------------
+# configure TAGLIB
+INCLUDEPATH += $$PWD/../TagLib/include
+DEFINES += TAGLIB_STATIC
 win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../TagLib/release/ -ltag
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../TagLib/debug/ -ltag
 else:unix: LIBS += -L$$OUT_PWD/../TagLib/ -ltag

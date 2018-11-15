@@ -47,6 +47,13 @@ Database::~Database()
 
 }
 
+QSharedPointer<Database> Database::reconnect() {
+
+    QSharedPointer<Database> db = QSharedPointer<Database>(new Database());
+    db->connect(m_instance->db().databaseName());
+    return db;
+}
+
 void Database::connect(QString path)
 {
     // path:  :memory:
