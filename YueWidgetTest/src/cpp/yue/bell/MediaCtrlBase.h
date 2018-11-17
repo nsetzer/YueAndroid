@@ -70,7 +70,7 @@ signals:
     void currentIndexChanged(int index);
     void statusChanged(MediaPlayerBase::Status status);
     void stateChanged(MediaPlayerBase::State state);
-    void syncUpdate(bool running, int ndirs, int nfiles, int nsongs);
+    void scanUpdate(bool running, int ndirs, int nfiles, int nsongs);
 
     void doPlaySong(int uid);
     void doSetCurrentPlaylist(QList<yue::bell::Database::uid_t> lst, bool autoplay);

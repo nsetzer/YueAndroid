@@ -25,7 +25,7 @@ signals:
     //void currentIndexChanged(int index);
     //void statusChanged(MediaPlayerBase::Status status);
     //void stateChanged(MediaPlayerBase::State state);
-    //void syncUpdate(bool running, int ndirs, int nfiles, int nsongs);
+    //void scanUpdate(bool running, int ndirs, int nfiles, int nsongs);
 
 public slots:
 
@@ -61,8 +61,8 @@ private slots:
         m_state = state;
         emit stateChanged(state);
     }
-    void onSyncUpdate(bool running, int ndirs, int nfiles, int nsongs) {
-        emit syncUpdate(running, ndirs, nfiles, nsongs);
+    void onScanUpdate(bool running, int ndirs, int nfiles, int nsongs) {
+        emit scanUpdate(running, ndirs, nfiles, nsongs);
     }
 
 private:

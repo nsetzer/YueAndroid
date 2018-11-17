@@ -1,6 +1,6 @@
 
 #include "yue/qtcommon/toolbar.h"
-
+#include "yue/bell/MediaCtrlBase.h"
 #include "ui/page_explorer.h"
 
 #include <QApplication>
@@ -174,6 +174,18 @@ PageExplorer::PageExplorer(QWidget *parent)
     connect(m_ui->m_btnHome, &yue::qtcommon::IconButton::clicked,
             this, &PageExplorer::onOpenHome);
 
+    connect(m_ui->m_btnScan, &yue::qtcommon::IconButton::clicked,
+            this, &PageExplorer::onScan);
+
+    auto inst = yue::bell::MediaCtrlBase::instance();
+
+    connect(inst.data(), &yue::bell::MediaCtrlBase::scanUpdate,
+            this, &PageExplorer::onScanUpdate);
+
+    m_ui->m_btnScan->setEnabled(false);
+    inst->scanStatus();
+
+
 }
 
 PageExplorer::~PageExplorer() {
@@ -187,4 +199,25 @@ void PageExplorer::onOpenParentDir()
 void PageExplorer::onOpenHome()
 {
     m_ui->m_view->openRoot();
+}
+
+void PageExplorer::onScan()
+{
+    auto inst = yue::bell::MediaCtrlBase::instance();
+    if (m_scanRunning) {
+        inst->scanStop();
+    } else {
+        inst->scanStart("C:\\Users\\nicks\\Music");
+    }
+}
+
+void PageExplorer::onScanUpdate(bool running, int ndirs, int nfiles, int nsongs)
+{
+    m_ui->m_btnScan->setEnabled(true);
+    m_scanRunning = running;
+
+    m_ui->m_btnScan->setIcon(QIcon(running?":/res/stop.svg":":/res/scan.svg"));
+
+    m_ui->m_pbarScan->setRange(0, 100);
+    m_ui->m_pbarScan->setValue(running?100:0);
 }

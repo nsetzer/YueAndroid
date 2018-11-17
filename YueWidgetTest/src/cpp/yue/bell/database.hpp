@@ -44,14 +44,14 @@ public:
         m_instance = new Database();
         return m_instance;
     }
-    static QSharedPointer<Database> reconnect( void );
+    static QSharedPointer<Database> reconnect( QString connectionName );
     static Database* instance( void ) {
         return m_instance;
     }
 
     QSqlDatabase& db() { return m_db; }
 
-    void connect(QString path);
+    void connect(QString path, QString connectionName="");
 
     static bool checked_select(QSqlQuery& query);
 

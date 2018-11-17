@@ -98,7 +98,7 @@ void MediaCtrlRemoteServer::onStateChanged(yue::bell::MediaPlayerBase::State sta
     qDebug() << "server: state changed" << state;
 }
 
-void MediaCtrlRemoteServer::onSyncUpdate(bool running, int ndirs, int nfiles, int nsongs) {
+void MediaCtrlRemoteServer::onScanUpdate(bool running, int ndirs, int nfiles, int nsongs) {
     emit scanUpdate(running, ndirs, nfiles, nsongs);
 }
 

@@ -1,4 +1,5 @@
 
+#include <QFileInfo>
 
 #include "yue/bell/library.hpp"
 #include "yue/bell/database.hpp"
@@ -82,9 +83,6 @@ bool Library::_insert(QMap<QString,QVariant> data, Database::uid_t& uid)
         data[yue::core::Song::artist_key] = art;
     }
 
-
-    m_db->db().transaction();
-
     QString artist = data[yue::core::Song::artist].toString();
     QString album = data[yue::core::Song::album].toString();
 
@@ -101,16 +99,16 @@ bool Library::_insert(QMap<QString,QVariant> data, Database::uid_t& uid)
     q.prepare("UPDATE artists SET count=count+1 WHERE uid=?");
     q.addBindValue(toQVariant(iArtistId));
     if(!q.exec()) {
-        m_db->db().rollback();
-        throw std::runtime_error("failed to increment artist count");
+        qWarning() << q.lastError();
+        return false;
     }
     q.finish();
 
     q.prepare("UPDATE albums SET count=count+1 WHERE uid=?");
     q.addBindValue(toQVariant(iAlbumId));
     if(!q.exec()) {
-        m_db->db().rollback();
-        throw std::runtime_error("failed to increment album count");
+        qWarning() << q.lastError();
+        return false;
     }
     q.finish();
 
@@ -155,7 +153,6 @@ bool Library::_insert(QMap<QString,QVariant> data, Database::uid_t& uid)
     uid = new_uid;
     return true;
 }
-
 
 void Library::update(Database::uid_t uid, QMap<QString,QVariant> data)
 {
@@ -350,6 +347,84 @@ bool Library::exists(QString path)
     return false;
 }
 
+void Library::remove(QMap<QString,QVariant> data)
+{
+    m_db->db().transaction();
+    bool result;
+    try {
+         result = _remove(data);
+    } catch (DatabaseError& e) {
+        qCritical() << e.what();
+        qCritical() << m_db->db().lastError();
+        m_db->db().rollback();
+        return;
+    } catch (...) {
+        qCritical() << "unhandled exception during sql transaction";
+        qCritical() << m_db->db().lastError();
+        m_db->db().rollback();
+        return;
+    }
+
+    if (result)
+        m_db->db().commit();
+    else
+        m_db->db().rollback();
+    return;
+}
+
+bool Library::_remove(QMap<QString,QVariant> data)
+{
+    if (!data.contains(yue::core::Song::artist))
+        throw std::runtime_error(std::string("missing key: ") + yue::core::Song::artist);
+    if (!data.contains(yue::core::Song::album))
+        throw std::runtime_error(std::string("missing key: ") + yue::core::Song::album);
+    if (!data.contains(yue::core::Song::uid))
+        throw std::runtime_error(std::string("missing key: ") + yue::core::Song::uid);
+
+    QString artist = data[yue::core::Song::artist].toString();
+    QString album = data[yue::core::Song::album].toString();
+    Database::uid_t iSongId = data[yue::core::Song::uid].toULongLong();
+
+    // remove the song from the library
+    QSqlQuery query = m_grammar.buildDelete(
+              std::unique_ptr<yue::core::SearchRule>(
+                  new yue::core::ExactSearchRule<int>(
+                      yue::core::Song::uid, iSongId)),
+              m_db->db());
+
+    if (!query.exec()) {
+        qWarning() << query.lastError();
+        return false;
+    }
+
+    Database::uid_t iArtistId = _get_or_create_artist_id(artist,artist);
+    Database::uid_t iAlbumId = _get_or_create_album_id(iArtistId,album);
+
+    // update the artist count
+
+    QSqlQuery q(m_db->db());
+    q.prepare("UPDATE artists SET count=count-1 WHERE uid=?");
+    q.addBindValue(toQVariant(iArtistId));
+    if(!q.exec()) {
+        qWarning() << query.lastError();
+        return false;
+    }
+    q.finish();
+
+    // update the album count
+
+    q.prepare("UPDATE albums SET count=count-1 WHERE uid=?");
+    q.addBindValue(toQVariant(iAlbumId));
+    if(!q.exec()) {
+        qWarning() << query.lastError();
+        return false;
+    }
+    q.finish();
+
+
+    return true;
+}
+
 /**
  * @brief Library::queryToForest
  * @param query
@@ -386,12 +461,6 @@ QList<LibraryTreeNode*> Library::queryToForest(QString querystr)
         qWarning() << query.lastError();
         return forest;
     }
-
-    if (query.lastError().isValid()) {
-        qWarning() << query.lastError();
-        return forest;
-    }
-
 
     yue::bell::LibraryTreeNode* nd_art = nullptr;
     yue::bell::LibraryTreeNode* nd_alb = nullptr;
@@ -641,5 +710,6 @@ Database::uid_t Library::_get_or_create_album_id(Database::uid_t artist, QString
 
 } // namespace bell
 } // namespace yue
+
 
 

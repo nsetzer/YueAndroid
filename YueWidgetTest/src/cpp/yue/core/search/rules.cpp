@@ -47,6 +47,13 @@ fromString<std::string>(const std::string &s) {
 }
 
 template<>
+unsigned long long
+fromString<unsigned long long>(const std::string &s) {
+    char* end;
+    return std::strtoull(s.c_str(), &end, 10);
+}
+
+template<>
 int
 fromString<int>(const std::string &s) {
     // std::stoi is not available on all platforms

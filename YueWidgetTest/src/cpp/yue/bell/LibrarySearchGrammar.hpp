@@ -19,6 +19,8 @@ public:
 
     QSqlQuery buildQuery(QStringList select, QString query, QString orderby = "", QSqlDatabase db = QSqlDatabase());
     QSqlQuery buildQuery(QStringList select, std::unique_ptr<yue::core::SearchRule> rule, QString orderby = "", QSqlDatabase db = QSqlDatabase());
+
+    QSqlQuery buildDelete(std::unique_ptr<yue::core::SearchRule> rule, QSqlDatabase db = QSqlDatabase());
 };
 
 } // bell

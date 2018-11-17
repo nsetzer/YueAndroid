@@ -31,6 +31,8 @@
         <file>res/shuffle.svg</file>
         <file>res/sort.svg</file>
         <file>res/stop.svg</file>
+        <file>res/star.svg</file>
+        <file>res/star_fill.svg</file>
         <file>res/volume_0.svg</file>
         <file>res/volume_1.svg</file>
         <file>res/volume_2.svg</file>

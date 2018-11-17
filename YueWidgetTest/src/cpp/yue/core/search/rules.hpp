@@ -24,8 +24,10 @@ std::string join(const std::vector<std::string> &items, const std::string &sep);
 template<typename T>
 T fromString(const std::string &s){/*compiliation error if used*/}
 
+
 template<> std::string fromString<std::string>(const std::string &s);
 template<> int fromString<int>(const std::string &s);
+template<> unsigned long long fromString<unsigned long long>(const std::string &s);
 template<> float fromString<float>(const std::string &s);
 
 template<typename T>

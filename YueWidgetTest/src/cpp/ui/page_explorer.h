@@ -83,8 +83,11 @@ public:
 public slots:
     void onOpenParentDir();
     void onOpenHome();
+    void onScan();
+    void onScanUpdate(bool running, int ndirs, int nfiles, int nsongs);
 private:
     QScopedPointer<UI::uiPageExplorer> m_ui;
+    bool m_scanRunning;
 };
 
 

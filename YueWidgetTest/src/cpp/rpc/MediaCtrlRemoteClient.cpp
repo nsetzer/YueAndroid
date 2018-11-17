@@ -22,7 +22,7 @@ MediaCtrlRemoteClient::MediaCtrlRemoteClient()
                      this,&MediaCtrlRemoteClient::onServiceStatusChanged);
 
     QObject::connect(m_rep.data(),&MediaControlReplica::scanUpdate,
-                     this,&MediaCtrlRemoteClient::onServiceSyncUpdate);
+                     this,&MediaCtrlRemoteClient::onServiceScanUpdate);
 
     qDebug() << "waiting for RPC source";
 
@@ -121,8 +121,8 @@ void MediaCtrlRemoteClient::onServiceStateChanged(int state)
     emit stateChanged(s);
 }
 
-void MediaCtrlRemoteClient::onServiceSyncUpdate(bool running, int ndirs, int nfiles, int nsongs) {
-    emit syncUpdate(running, ndirs, nfiles, nsongs);
+void MediaCtrlRemoteClient::onServiceScanUpdate(bool running, int ndirs, int nfiles, int nsongs) {
+    emit scanUpdate(running, ndirs, nfiles, nsongs);
 }
 
 

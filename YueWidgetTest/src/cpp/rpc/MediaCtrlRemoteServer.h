@@ -29,7 +29,7 @@ signals:
     //void currentIndexChanged(int index);
     //void stateChanged(int state);
     //void statusChanged(int Status);
-    //void syncUpdate(bool running, int ndirs, int nfiles, int nsongs);
+    //void scanUpdate(bool running, int ndirs, int nfiles, int nsongs);
 
 
 public slots:
@@ -55,7 +55,7 @@ private slots:
     void onCurrentIndexChanged(int index);
     void onStatusChanged(yue::bell::MediaPlayerBase::Status status);
     void onStateChanged(yue::bell::MediaPlayerBase::State state);
-    void onSyncUpdate(bool running, int ndirs, int nfiles, int nsongs);
+    void onScanUpdate(bool running, int ndirs, int nfiles, int nsongs);
 
 private:
     QScopedPointer<yue::bell::MediaCtrlBackend> m_pBackend;

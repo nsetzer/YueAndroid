@@ -79,5 +79,40 @@ QSqlQuery LibrarySearchGrammar::buildQuery(QStringList select, std::unique_ptr<y
     return sqlquery;
 }
 
+QSqlQuery LibrarySearchGrammar::buildDelete(std::unique_ptr<yue::core::SearchRule> rule, QSqlDatabase db)
+{
+    QSqlQuery sqlquery(db);
+    typedef yue::core::util::Variant::Type Type;
+    yue::core::Rule::QueryValues values;
+    QString sql = "DELETE FROM library";
+
+    if (rule) {
+        std::string s = rule->toSql(values);
+        if (s.size() > 0) {
+            sql += QString(" WHERE ") + s.c_str();
+        }
+    }
+
+    sqlquery.prepare( sql );
+    for (auto& v : values) {
+        switch (v->type()) {
+        case Type::Int:
+            sqlquery.addBindValue(v->toInt());
+            break;
+        case Type::Float:
+            sqlquery.addBindValue(v->toFloat());
+            break;
+        case Type::String:
+            sqlquery.addBindValue(v->toString().c_str());
+            break;
+        default:
+            throw std::runtime_error("unknown type in rule");
+        }
+    }
+
+    return sqlquery;
+}
+
+
 } // bell
 } // yue

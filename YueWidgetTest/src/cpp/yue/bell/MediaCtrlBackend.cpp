@@ -7,6 +7,7 @@ namespace bell {
 MediaCtrlBackend::MediaCtrlBackend(QObject *parent/* = nullptr*/)
     : QObject(parent)
     , m_pPlayer(new MediaPlayerQt(this))
+    , m_scanner(this)
 {
 
     connect(m_pPlayer.data(),&MediaPlayerBase::progressChanged,
@@ -153,15 +154,16 @@ void MediaCtrlBackend::onSongEnded()
 
 void MediaCtrlBackend::scanStart(QString path)
 {
-
+    m_scanner.start(QDir(path));
+    emit scanUpdate(m_scanner.isRunning(), 0, 0, 0);
 }
 void MediaCtrlBackend::scanStop()
 {
-
+    m_scanner.stop();
 }
 void MediaCtrlBackend::scanStatus()
 {
-
+    emit scanUpdate(m_scanner.isRunning(), 0, 0, 0);
 }
 
 

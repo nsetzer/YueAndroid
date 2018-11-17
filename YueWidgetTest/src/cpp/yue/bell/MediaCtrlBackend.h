@@ -7,7 +7,7 @@
 #include "yue/bell/database.hpp"
 #include "yue/bell/library.hpp"
 #include "yue/bell/playlist.hpp"
-
+#include "yue/bell/scanner.h"
 /*
  * The backend holds the implementation for media events.
  * Signals and slots are used to transfer state
@@ -46,7 +46,7 @@ signals:
     void currentIndexChanged(int index);
     void statusChanged(yue::bell::MediaPlayerBase::Status status);
     void stateChanged(yue::bell::MediaPlayerBase::State state);
-    void syncUpdate(bool running, int ndirs, int nfiles, int nsongs);
+    void scanUpdate(bool running, int ndirs, int nfiles, int nsongs);
 
 public slots:
 
@@ -78,6 +78,8 @@ private slots:
 
 private:
     QScopedPointer<MediaPlayerBase> m_pPlayer;
+    Scanner m_scanner;
+
 };
 
 } // bell

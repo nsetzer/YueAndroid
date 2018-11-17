@@ -19,7 +19,7 @@ signals:
     //void currentIndexChanged(int index);
     //void statusChanged(yue::bell::MediaPlayerBase::Status status);
     //void stateChanged(yue::bell::MediaPlayerBase::State state);
-    //void syncUpdate(bool running, int ndirs, int nfiles, int nsongs);
+    //void scanUpdate(bool running, int ndirs, int nfiles, int nsongs);
 
 public slots:
 
@@ -39,7 +39,7 @@ private slots:
     void onServiceCurrentIndexChanged(int index);
     void onServiceStatusChanged(int index);
     void onServiceStateChanged(int index);
-    void onServiceSyncUpdate(bool running, int ndirs, int nfiles, int nsongs);
+    void onServiceScanUpdate(bool running, int ndirs, int nfiles, int nsongs);
 
 private:
     QRemoteObjectNode m_repNode;

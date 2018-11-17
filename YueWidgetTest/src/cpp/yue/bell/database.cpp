@@ -47,18 +47,23 @@ Database::~Database()
 
 }
 
-QSharedPointer<Database> Database::reconnect() {
+QSharedPointer<Database> Database::reconnect(QString connectionName) {
 
     QSharedPointer<Database> db = QSharedPointer<Database>(new Database());
-    db->connect(m_instance->db().databaseName());
+    db->connect(m_instance->db().databaseName(), connectionName);
     return db;
 }
 
-void Database::connect(QString path)
+void Database::connect(QString path, QString connectionName)
 {
     // path:  :memory:
     qDebug() << "connect to database: " << path;
-    QSqlDatabase m_db = QSqlDatabase::addDatabase("QSQLITE");
+    if (connectionName.isEmpty()) {
+        // create the default connection
+        m_db = QSqlDatabase::addDatabase("QSQLITE");
+    } else {
+        m_db = QSqlDatabase::addDatabase("QSQLITE", connectionName);
+    }
 
     qDebug() << QSqlDatabase::drivers();
 

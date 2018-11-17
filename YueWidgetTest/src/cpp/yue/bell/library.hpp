@@ -52,6 +52,8 @@ public:
 
     bool exists(QString path);
 
+    void remove(QMap<QString,QVariant> data);
+
     QList<LibraryTreeNode*> queryToForest(QString querystr);
 
     QList<Database::uid_t> createPlaylist(QString query, size_t size = 0);
@@ -74,7 +76,7 @@ public:
 private:
     bool _insert(QMap<QString,QVariant> data, Database::uid_t& uid);
     bool _update(Database::uid_t uid, QMap<QString,QVariant> data);
-
+    bool _remove(QMap<QString,QVariant> data);
 
     Database::uid_t _get_or_create_artist_id(QString name, QString sortkey);
     Database::uid_t _get_or_create_album_id(Database::uid_t artist, QString name);
