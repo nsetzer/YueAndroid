@@ -1,5 +1,7 @@
 #include "ui/mainwindow.h"
+#ifdef Q_OS_ANDROID
 #include <QAndroidService>
+#endif
 #include <QCoreApplication>
 #include <QApplication>
 #include <QGuiApplication>
@@ -69,21 +71,14 @@ int app_main(QCoreApplication *app, bool isService)
 
     //QString dirPath =yue::qtcommon::Device::getDirectory(yue::qtcommon::Device::DIRECTORY_MUSIC);
     //QDir dirMusic(dirPath);
+    //qDebug() << "actual db path" << dirMusic.absoluteFilePath("yue-library.v1.sqlitedb");
+
     //QString libPath = dirMusic.absoluteFilePath("yue-library.v1.sqlitedb");
     QString libPath = "/mnt/sdcard/Music/yue-library.v1.sqlitedb";
-    QFileInfo libfile(libPath);
 
-    qDebug() << libPath;
-    qDebug() << libfile.exists() << libfile.isReadable() << libfile.isWritable();
-    qDebug() << libfile.owner();
-    qDebug() << libfile.size();
-    qDebug() << libfile.permissions();
     //QString libPath = ":memory:";
     db->connect(libPath);
 
-
-    //db->connect("/mnt/sdcard/Music/library.db");
-    //db->connect("/mnt/sdcard/Music/yue-library.v1.sqlitedb");
 
 #else
 
@@ -127,8 +122,8 @@ int app_main(QCoreApplication *app, bool isService)
 #ifdef Q_OS_ANDROID
         mccli = QSharedPointer<yue::bell::MediaCtrlBase>(new MediaCtrlRemoteClient());
 #else
-        mccli = QSharedPointer<yue::bell::MediaCtrlBase>(new yue::bell::MediaCtrlLocal());
-        //mccli = QSharedPointer<yue::bell::MediaCtrlBase>(new MediaCtrlRemoteClient());
+        //mccli = QSharedPointer<yue::bell::MediaCtrlBase>(new yue::bell::MediaCtrlLocal());
+        mccli = QSharedPointer<yue::bell::MediaCtrlBase>(new MediaCtrlRemoteClient());
 #endif
         yue::bell::MediaCtrlBase::registerInstance(mccli);
 

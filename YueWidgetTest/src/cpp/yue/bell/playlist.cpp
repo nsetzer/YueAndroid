@@ -286,13 +286,20 @@ void Playlist::insert(int idx, Database::uid_t uid)
     try {
          result = _insert_uid(idx,uid);
     } catch (DatabaseError& e) {
-        qCritical() << e.what();
-        qCritical() << m_db->db().lastError();
+        qCritical() << "database error"
+                    << e.what()
+                    << m_db->db().lastError();
+        m_db->db().rollback();
+        return;
+    } catch (std::exception& e) {
+        qCritical() << "unexpected exception"
+                    << e.what()
+                    << m_db->db().lastError();
         m_db->db().rollback();
         return;
     } catch (...) {
-        qCritical() << "unhandled exception during sql transaction";
-        qCritical() << m_db->db().lastError();
+        qCritical() << "unhandled exception during sql transaction"
+                    << m_db->db().lastError();
         m_db->db().rollback();
         return;
     }
@@ -333,13 +340,20 @@ void Playlist::remove(int idx)
     try {
          result = _remove_one(idx);
     } catch (DatabaseError& e) {
-        qCritical() << e.what();
-        qCritical() << m_db->db().lastError();
+        qCritical() << "database error"
+                    << e.what()
+                    << m_db->db().lastError();
+        m_db->db().rollback();
+        return;
+    } catch (std::exception& e) {
+        qCritical() << "unexpected exception"
+                    << e.what()
+                    << m_db->db().lastError();
         m_db->db().rollback();
         return;
     } catch (...) {
-        qCritical() << "unhandled exception during sql transaction";
-        qCritical() << m_db->db().lastError();
+        qCritical() << "unhandled exception during sql transaction"
+                    << m_db->db().lastError();
         m_db->db().rollback();
         return;
     }
@@ -381,13 +395,20 @@ void Playlist::move(int src, int tgt)
     try {
          result = _move_one(src,tgt);
     } catch (DatabaseError& e) {
-        qCritical() << e.what();
-        qCritical() << m_db->db().lastError();
+        qCritical() << "database error"
+                    << e.what()
+                    << m_db->db().lastError();
+        m_db->db().rollback();
+        return;
+    } catch (std::exception& e) {
+        qCritical() << "unexpected exception"
+                    << e.what()
+                    << m_db->db().lastError();
         m_db->db().rollback();
         return;
     } catch (...) {
-        qCritical() << "unhandled exception during sql transaction";
-        qCritical() << m_db->db().lastError();
+        qCritical() << "unhandled exception during sql transaction"
+                    << m_db->db().lastError();
         m_db->db().rollback();
         return;
     }

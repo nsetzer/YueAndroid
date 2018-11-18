@@ -94,8 +94,10 @@ void MediaCtrlRemoteClient::setProgress(float progress)
 
 void MediaCtrlRemoteClient::scanStart(QString path)
 {
-    if (m_rep)
+    if (m_rep) {
+        qDebug() << "rpc start scan" << path;
         m_rep->scanStart(path);
+    }
 }
 
 void MediaCtrlRemoteClient::scanStop()

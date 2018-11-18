@@ -157,6 +157,7 @@ void MediaCtrlBackend::onSongEnded()
 
 void MediaCtrlBackend::scanStart(QString path)
 {
+    qDebug() << "backend starting scan" << path;
     m_scanner.start(QDir(path));
     emit scanUpdate(m_scanner.isRunning(), 0, 0, 0);
 }

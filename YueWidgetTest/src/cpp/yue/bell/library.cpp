@@ -33,25 +33,33 @@ size_t Library::size()
     QSqlQuery q(m_db->db());
     bool result = q.exec("SELECT count(uid) from library");
     if (result && q.first())
-        return q.value(0).toULongLong();
+        return q.value(0).toUInt();
     return 0;
 }
 
 Database::uid_t Library::insert(QMap<QString,QVariant> data)
 {
-    m_db->db().transaction();
+    if (!m_db->db().transaction()) {
+        qCritical() << "unable to create a transaction" << m_db->db().lastError();
+        return 0;
+    }
     Database::uid_t uid;
     bool result;
     try {
-         result = _insert(data,uid);
+         result = _insert(data, uid);
     } catch (DatabaseError& e) {
-        qCritical() << e.what();
-        qCritical() << m_db->db().lastError();
+        qCritical() << e.what() << m_db->db().lastError();
+        m_db->db().rollback();
+        return 0;
+    } catch (std::exception& ex) {
+        qCritical() << "unexpected exception during sql transaction"
+                    << ex.what()
+                    << m_db->db().lastError();
         m_db->db().rollback();
         return 0;
     } catch (...) {
-        qCritical() << "unhandled exception during sql transaction";
-        qCritical() << m_db->db().lastError();
+        qCritical() << "unhandled exception during sql transaction"
+                    << m_db->db().lastError();
         m_db->db().rollback();
         return 0;
     }
@@ -148,7 +156,7 @@ bool Library::_insert(QMap<QString,QVariant> data, Database::uid_t& uid)
     for (QVariant& v : lstvals)
         q.addBindValue( v );
     if (q.exec()) {
-        new_uid = q.lastInsertId().toULongLong();
+        new_uid = q.lastInsertId().toUInt();
         q.finish();
     } else {
         qWarning() << q.executedQuery();
@@ -167,13 +175,18 @@ void Library::update(Database::uid_t uid, QMap<QString,QVariant> data)
     try {
          result = _update(uid,data);
     } catch (DatabaseError& e) {
-        qCritical() << e.what();
-        qCritical() << m_db->db().lastError();
+        qCritical() << e.what() << m_db->db().lastError();
+        m_db->db().rollback();
+        return;
+    } catch (std::exception& ex) {
+        qCritical() << "unexpected exception during sql transaction"
+                    << ex.what()
+                    << m_db->db().lastError();
         m_db->db().rollback();
         return;
     } catch (...) {
-        qCritical() << "unhandled exception during sql transaction";
-        qCritical() << m_db->db().lastError();
+        qCritical() << "unhandled exception during sql transaction"
+                    << m_db->db().lastError();
         m_db->db().rollback();
         return;
     }
@@ -209,8 +222,8 @@ bool Library::_update(Database::uid_t uid, QMap<QString,QVariant> data)
         m_db->db().rollback();
         throw std::runtime_error("failed to select song");
     }
-    old_artist_id = q.value(0).toULongLong();
-    old_album_id = q.value(1).toULongLong();
+    old_artist_id = q.value(0).toUInt();
+    old_album_id = q.value(1).toUInt();
     q.finish();
 
     if (data.contains(yue::core::Song::artist)) {
@@ -318,11 +331,17 @@ void Library::incrementPlaycount(Database::uid_t uid)
 {
     // TODO: update last_played
 
+    m_db->db().transaction();
+
     QSqlQuery q(m_db->db());
     q.prepare("UPDATE songs SET playcount=playcount+1 WHERE uid=?");
     q.addBindValue(toQVariant(uid));
 
-    q.exec();
+    if (!q.exec()) {
+        qWarning() << "error executing query" << q.lastError();
+    }
+
+    m_db->db().commit();
     return;
 }
 
@@ -341,8 +360,7 @@ bool Library::exists(QString path)
               m_db->db());
 
     if (!query.exec()) {
-        qWarning() << "error executing query";
-        qWarning() << query.lastError();
+        qWarning() << "error executing query" << query.lastError();
         return false;
     }
 
@@ -360,13 +378,18 @@ void Library::remove(QMap<QString,QVariant> data)
     try {
          result = _remove(data);
     } catch (DatabaseError& e) {
-        qCritical() << e.what();
-        qCritical() << m_db->db().lastError();
+        qCritical() << e.what() << m_db->db().lastError();
+        m_db->db().rollback();
+        return;
+    } catch (std::exception& ex) {
+        qCritical() << "unexpected exception during sql transaction"
+                    << ex.what()
+                    << m_db->db().lastError();
         m_db->db().rollback();
         return;
     } catch (...) {
-        qCritical() << "unhandled exception during sql transaction";
-        qCritical() << m_db->db().lastError();
+        qCritical() << "unhandled exception during sql transaction"
+                    << m_db->db().lastError();
         m_db->db().rollback();
         return;
     }
@@ -389,7 +412,7 @@ bool Library::_remove(QMap<QString,QVariant> data)
 
     QString artist = data[yue::core::Song::artist].toString();
     QString album = data[yue::core::Song::album].toString();
-    Database::uid_t iSongId = data[yue::core::Song::uid].toULongLong();
+    Database::uid_t iSongId = data[yue::core::Song::uid].toUInt();
 
     // remove the song from the library
     QSqlQuery query = m_grammar.buildDelete(
@@ -537,7 +560,7 @@ QList<Database::uid_t> Library::createPlaylist(QString query, size_t size/* = 0*
 
     // unpack the query results
     while (q.next()) {
-        Database::uid_t uid = q.value(0).toULongLong();
+        Database::uid_t uid = q.value(0).toUInt();
         QString group = q.value(1).toString();
         data.push_back( uid );
         groups[uid] = group;
@@ -578,7 +601,7 @@ void Library::sort(QList<Database::uid_t>& songs)
     if (q.lastError().isValid())
         qWarning() << q.lastError();
     while (q.next()) {
-        Database::uid_t uid = q.value(0).toULongLong();
+        Database::uid_t uid = q.value(0).toUInt();
         int year = q.value(1).toInt();
         QString album = q.value(2).toString();
         int index = q.value(3).toInt();
@@ -645,8 +668,8 @@ void Library::getArtInfo(Database::uid_t uid, Database::uid_t& artist_id, Databa
     if (q.lastError().isValid())
         qWarning() << q.lastError();
     if (result && q.first()) {
-        artist_id = q.value(0).toULongLong();
-        album_id = q.value(1).toULongLong();
+        artist_id = q.value(0).toUInt();
+        album_id = q.value(1).toUInt();
         path = q.value(2).toString();
         return;
     }
@@ -661,25 +684,31 @@ Database::uid_t Library::_get_or_create_artist_id(QString name, QString sortkey)
     q.prepare("SELECT uid from artists where artist=?");
     q.addBindValue(name);
     result = q.exec();
-    if (q.lastError().isValid())
+    if (q.lastError().isValid()) {
         qWarning() << q.lastError();
+    }
     if (result && q.first()) {
-        return q.value(0).toULongLong();
+        return q.value(0).toUInt();
     }
     q.finish();
+
+    q.clear();
 
     q.prepare("INSERT into artists (artist, sortkey, count) VALUES (?,?,?)");
     q.addBindValue(name);
     q.addBindValue(sortkey);
     q.addBindValue(0);
     result = q.exec();
-    if (q.lastError().isValid())
+    if (q.lastError().isValid()) {
         qWarning() << q.lastError();
+    }
     if (!result) {
         throw std::runtime_error("failed to insert artist name");
     }
 
-    return  q.lastInsertId().toULongLong();
+    Database::uid_t uid = q.lastInsertId().toUInt();
+    q.finish();
+    return  uid;
 }
 
 Database::uid_t Library::_get_or_create_album_id(Database::uid_t artist, QString name)
@@ -694,9 +723,10 @@ Database::uid_t Library::_get_or_create_album_id(Database::uid_t artist, QString
     if (q.lastError().isValid())
         qWarning() << q.lastError();
     if (result && q.first()) {
-        return q.value(0).toULongLong();
+        return q.value(0).toUInt();
     }
     q.finish();
+    q.clear();
 
     q.prepare("INSERT into albums (artist, album, sortkey, count) VALUES (?,?,?,?)");
     q.addBindValue(toQVariant(artist));
@@ -710,7 +740,9 @@ Database::uid_t Library::_get_or_create_album_id(Database::uid_t artist, QString
         throw std::runtime_error("failed to insert album name");
     }
 
-    return  q.lastInsertId().toULongLong();
+    Database::uid_t uid = q.lastInsertId().toUInt();
+    q.finish();
+    return  uid;
 }
 
 

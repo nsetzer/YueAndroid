@@ -187,8 +187,9 @@ PageExplorer::PageExplorer(QWidget *parent)
     connect(inst.data(), &yue::bell::MediaCtrlBase::scanUpdate,
             this, &PageExplorer::onScanUpdate);
 
+    m_scanRunning = false;
     //m_ui->m_btnScan->setEnabled(false);
-    //inst->scanStatus();
+    inst->scanStatus();
 
 }
 
@@ -209,9 +210,12 @@ void PageExplorer::onScan()
 {
     auto inst = yue::bell::MediaCtrlBase::instance();
     if (m_scanRunning) {
+        qDebug() << "attempting to stop scan";
         inst->scanStop();
     } else {
-        inst->scanStart(m_ui->m_view->currentDirectory());
+        QString path = m_ui->m_view->currentDirectory();
+        qDebug() << "starting scan" << path;
+        inst->scanStart(path);
     }
 }
 

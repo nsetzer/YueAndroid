@@ -28,9 +28,14 @@ void ScannerThread::run()
     Database *db = m_db.data();
     m_lib = QSharedPointer<Library>(new Library(db));
 
-    remove_missing();
+    try {
+        remove_missing();
 
-    scan();
+        scan();
+    } catch (ScannerInterrupt& ex) {
+        qDebug() << "scanner interrupted" << ex.what();
+
+    }
 
     m_lib.reset();
 }
@@ -53,10 +58,6 @@ void ScannerThread::remove_missing()
         qWarning() << query.lastError();
         return;
     }
-
-    qDebug() << "qsize" << query.size();
-
-    qDebug() << query.executedQuery();
 
     while (query.next()) {
         check();
@@ -119,6 +120,23 @@ void ScannerThread::scan_file(const QFileInfo& info)
     QString title(f.tag()->title().toCString(true));
     QString genre(f.tag()->genre().toCString(true));
 
+    artist = artist.simplified();
+    album = album.simplified();
+    title = title.simplified();
+    genre = genre.simplified();
+
+    if (artist.isEmpty()) {
+        artist = "Unknown Artist";
+    }
+
+    if (album.isEmpty()) {
+        album = "Unknown Album";
+    }
+
+    if (title.isEmpty()) {
+        title = info.baseName();
+    }
+
     QMap<QString,QVariant> data;
 
     data[yue::core::Song::path] = info.absoluteFilePath();
@@ -128,7 +146,11 @@ void ScannerThread::scan_file(const QFileInfo& info)
     data[yue::core::Song::genre] = genre;
 
     qDebug() << "inserting" << data[yue::core::Song::path].toString();
-    m_lib->insert(data);
+    Database::uid_t uid = m_lib->insert(data);
+    if (uid == 0) {
+        qDebug() << "failed to insert song";
+        throw ScannerInterrupt();
+    }
 
 }
 
