@@ -84,12 +84,12 @@ QSqlQuery LibrarySearchGrammar::buildDelete(std::unique_ptr<yue::core::SearchRul
     QSqlQuery sqlquery(db);
     typedef yue::core::util::Variant::Type Type;
     yue::core::Rule::QueryValues values;
-    QString sql = "DELETE FROM library";
+    QString sql = "DELETE FROM songs";
 
     if (rule) {
         std::string s = rule->toSql(values);
         if (s.size() > 0) {
-            sql += QString(" WHERE ") + s.c_str();
+            sql += QString(" WHERE (") + s.c_str() + QString(")");
         }
     }
 

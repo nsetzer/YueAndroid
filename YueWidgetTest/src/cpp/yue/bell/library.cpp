@@ -75,18 +75,22 @@ bool Library::_insert(QMap<QString,QVariant> data, Database::uid_t& uid)
         throw std::runtime_error(std::string("missing key: ") + yue::core::Song::title);
 
     // calculate the sort key if given
+
+    QString artist = data[yue::core::Song::artist].toString();
+    QString album = data[yue::core::Song::album].toString();
+    QString sortkey;
     if (!data.contains(yue::core::Song::artist_key)) {
         QString art = data[yue::core::Song::artist].toString();
         if (art.toLower().startsWith("the ")) {
             art = art.remove(0, 4);
         }
-        data[yue::core::Song::artist_key] = art;
+        sortkey = art;
+    } else {
+        sortkey = data[yue::core::Song::artist_key].toString();
+        data.remove(yue::core::Song::artist_key);
     }
 
-    QString artist = data[yue::core::Song::artist].toString();
-    QString album = data[yue::core::Song::album].toString();
-
-    Database::uid_t iArtistId = _get_or_create_artist_id(artist,artist);
+    Database::uid_t iArtistId = _get_or_create_artist_id(artist, sortkey);
     Database::uid_t iAlbumId = _get_or_create_album_id(iArtistId,album);
 
     data.remove(yue::core::Song::artist);
@@ -147,6 +151,8 @@ bool Library::_insert(QMap<QString,QVariant> data, Database::uid_t& uid)
         new_uid = q.lastInsertId().toULongLong();
         q.finish();
     } else {
+        qWarning() << q.executedQuery();
+        qWarning() << q.lastError();
         q.finish();
     }
 
@@ -389,7 +395,7 @@ bool Library::_remove(QMap<QString,QVariant> data)
     QSqlQuery query = m_grammar.buildDelete(
               std::unique_ptr<yue::core::SearchRule>(
                   new yue::core::ExactSearchRule<int>(
-                      yue::core::Song::uid, iSongId)),
+                      yue::core::Song::uid, static_cast<int>(iSongId))),
               m_db->db());
 
     if (!query.exec()) {

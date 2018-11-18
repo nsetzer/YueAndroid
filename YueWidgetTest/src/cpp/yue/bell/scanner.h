@@ -24,7 +24,7 @@ public:
     ScannerThread(const QDir& root, QObject *parent = nullptr);
 
     void run() override;
-
+    void stop() {m_alive = false;}
 
 signals:
 
@@ -59,6 +59,9 @@ public slots:
 
     void start(QDir path);
     void stop();
+
+private slots:
+    void onScanFinished();
 
 private:
     ScannerThread *m_pScannerThread;

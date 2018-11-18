@@ -31,6 +31,8 @@ void ScannerThread::run()
     remove_missing();
 
     scan();
+
+    m_lib.reset();
 }
 
 void ScannerThread::remove_missing()
@@ -155,13 +157,27 @@ void Scanner::start(QDir path)
     if (m_pScannerThread == nullptr) {
         qDebug() << "scan start" << path;
         m_pScannerThread = new ScannerThread(path, this);
+
+        connect(m_pScannerThread, &QThread::finished,
+                this, &Scanner::onScanFinished);
+
         m_pScannerThread->start();
     }
 }
 
 void Scanner::stop()
 {
+    if (m_pScannerThread) {
+        m_pScannerThread->stop();
+    }
+}
 
+void Scanner::onScanFinished()
+{
+    qDebug() << "scan finished";
+    delete m_pScannerThread;
+    m_pScannerThread = nullptr;
+    emit finished();
 }
 
 } // namespace bell

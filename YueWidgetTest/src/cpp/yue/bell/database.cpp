@@ -44,7 +44,7 @@ Database::Database(QObject *parent/*=nullptr*/)
 
 Database::~Database()
 {
-
+    m_db.close();
 }
 
 QSharedPointer<Database> Database::reconnect(QString connectionName) {

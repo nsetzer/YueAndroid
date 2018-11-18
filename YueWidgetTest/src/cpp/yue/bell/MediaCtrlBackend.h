@@ -72,6 +72,8 @@ private slots:
     void onStatusChanged(MediaPlayerBase::Status status);
     void onStateChanged(MediaPlayerBase::State state);
 
+    void onScanFinished();
+
     void onSongEnded();
 
     void load(Database::uid_t uid);

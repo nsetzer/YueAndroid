@@ -19,6 +19,9 @@ MediaCtrlBackend::MediaCtrlBackend(QObject *parent/* = nullptr*/)
     connect(m_pPlayer.data(),&MediaPlayerBase::stateChanged,
             this,&MediaCtrlBackend::onStateChanged);
 
+    connect(&m_scanner, &Scanner::finished,
+            this, &MediaCtrlBackend::onScanFinished);
+
 }
 
 void MediaCtrlBackend::loadIndex(int index)
@@ -161,11 +164,16 @@ void MediaCtrlBackend::scanStop()
 {
     m_scanner.stop();
 }
+
 void MediaCtrlBackend::scanStatus()
 {
     emit scanUpdate(m_scanner.isRunning(), 0, 0, 0);
 }
 
+void MediaCtrlBackend::onScanFinished()
+{
+    emit scanUpdate(m_scanner.isRunning(), 0, 0, 0);
+}
 
 } // bell
 } // yue
