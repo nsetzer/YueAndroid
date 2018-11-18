@@ -33,6 +33,10 @@ public slots:
     virtual void setVolume(float volume) override;
     virtual void setProgress(float progress) override;
 
+    virtual void scanStart(QString path) override;
+    virtual void scanStop() override;
+    virtual void scanStatus() override;
+
 
 private slots:
     void onServiceProgressChanged(float progress);

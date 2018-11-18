@@ -49,9 +49,7 @@ public:
 
     QString iconPath( int index ) const;
 
-
-
-
+    QString currentDirectory() const;
 
 signals:
     //void dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int> ());

@@ -118,9 +118,13 @@ QSize PlaylistDelegate::sizeHint(
 
 PlaylistView::PlaylistView(QWidget *parent)
   : QListView(parent)
+  , m_gesture(this)
 {
     m_model = new yue::qtcommon::PlaylistModel(this);
     m_delegate = new PlaylistDelegate(this);
+
+    m_gesture.setViewport(this);
+    m_gesture.setVScrollBar(this->verticalScrollBar());
 
     this->setModel(m_model);
     this->setItemDelegate(m_delegate);

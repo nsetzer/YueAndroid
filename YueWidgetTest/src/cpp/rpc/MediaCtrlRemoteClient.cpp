@@ -92,6 +92,25 @@ void MediaCtrlRemoteClient::setProgress(float progress)
         m_rep->setProgress(progress);
 }
 
+void MediaCtrlRemoteClient::scanStart(QString path)
+{
+    if (m_rep)
+        m_rep->scanStart(path);
+}
+
+void MediaCtrlRemoteClient::scanStop()
+{
+    if (m_rep)
+        m_rep->scanStop();
+}
+
+void MediaCtrlRemoteClient::scanStatus()
+{
+    if (m_rep)
+        m_rep->scanStatus();
+}
+
+
 void MediaCtrlRemoteClient::onServiceProgressChanged(float progress)
 {
     m_progress = progress;

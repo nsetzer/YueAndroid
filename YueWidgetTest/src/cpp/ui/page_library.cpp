@@ -63,7 +63,7 @@ QSize LibraryTreeDelegate::sizeHint(
     const QStyleOptionViewItem &option,
     const QModelIndex &index) const
 {
-
+    Q_UNUSED(index);
     QFontMetrics fm(option.font);
     fm.height();
     int w = -1;

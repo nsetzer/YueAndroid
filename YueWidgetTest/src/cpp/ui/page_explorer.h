@@ -58,6 +58,8 @@ public:
     void openParentDirectory();
     void openRoot();
 
+    QString currentDirectory();
+
 protected:
     virtual void mouseReleaseEvent(QMouseEvent *event);
 

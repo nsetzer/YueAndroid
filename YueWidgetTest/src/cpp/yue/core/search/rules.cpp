@@ -49,8 +49,9 @@ fromString<std::string>(const std::string &s) {
 template<>
 unsigned long long
 fromString<unsigned long long>(const std::string &s) {
-    char* end;
-    return std::strtoull(s.c_str(), &end, 10);
+
+    throw std::runtime_error("str to ull not implemented");
+    return 0;
 }
 
 template<>

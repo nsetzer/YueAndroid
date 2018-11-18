@@ -1,4 +1,6 @@
 #include "ui/mainwindow.h"
+#include <QAndroidService>
+#include <QCoreApplication>
 #include <QApplication>
 #include <QGuiApplication>
 #include <QDebug>
@@ -50,16 +52,9 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*)
 
 #endif
 
-int main(int argc, char *argv[])
+int app_main(QCoreApplication *app, bool isService)
 {
-    QApplication app(argc, argv);
 
-    app.setOrganizationName("nsetzer");
-    app.setOrganizationDomain("github.com");
-    app.setApplicationName("Yue");
-    app.setApplicationVersion("1.0");
-    app.setApplicationDisplayName("Yue");
-    app.setDesktopFileName("Yue");
 
     QSharedPointer<MainWindow> window;
 
@@ -67,6 +62,7 @@ int main(int argc, char *argv[])
     QSharedPointer<MediaCtrlRemoteServer> mcsvc;
     QSharedPointer<yue::bell::MediaCtrlBase> mccli;
 
+    qDebug() << "main: create database";
     yue::bell::Database* db = yue::bell::Database::create();
 
 #ifdef Q_OS_ANDROID
@@ -75,7 +71,7 @@ int main(int argc, char *argv[])
     //QDir dirMusic(dirPath);
     //QString libPath = dirMusic.absoluteFilePath("yue-library.v1.sqlitedb");
     QString libPath = "/mnt/sdcard/Music/yue-library.v1.sqlitedb";
-     QFileInfo libfile(libPath);
+    QFileInfo libfile(libPath);
 
     qDebug() << libPath;
     qDebug() << libfile.exists() << libfile.isReadable() << libfile.isWritable();
@@ -108,7 +104,7 @@ int main(int argc, char *argv[])
     yue::bell::PlaylistManager::create();
 
 
-    if (QCoreApplication::arguments().count() > 1){
+    if (isService){
         qDebug() << "service application starting";
 
         srcNode = QSharedPointer<QRemoteObjectHost>(new QRemoteObjectHost(QUrl(QStringLiteral("local:replica"))));
@@ -123,15 +119,16 @@ int main(int argc, char *argv[])
 
        // NOTE: to debug this, open 2 IDEs
        // in Projects > MSVC2015 > Run > add a new runtime confiruration "backend"
-       // command line arguments: any single calue e.g. "$0 backend"
+       // command line arguments: add '-service' e.g. "$0 -service"
        // in both IDEs click build
        // in one IDE, start the backend
        // in the other, start the frontend
-       // *** change the lines below to starta remote client on windows.
+       // *** change the lines below to start a remote client on windows.
 #ifdef Q_OS_ANDROID
         mccli = QSharedPointer<yue::bell::MediaCtrlBase>(new MediaCtrlRemoteClient());
 #else
         mccli = QSharedPointer<yue::bell::MediaCtrlBase>(new yue::bell::MediaCtrlLocal());
+        //mccli = QSharedPointer<yue::bell::MediaCtrlBase>(new MediaCtrlRemoteClient());
 #endif
         yue::bell::MediaCtrlBase::registerInstance(mccli);
 
@@ -148,5 +145,44 @@ int main(int argc, char *argv[])
         window->show();
     }
 
-    return app.exec();
+    return app->exec();
+}
+
+int main(int argc, char *argv[])
+{
+    QCoreApplication *app;
+
+    bool isService = argc > 1; // && QString(argv[1]) == "-service";
+    QString name = (isService)?"YueBackend_":"YueFrontend";
+
+
+    // https://stackoverflow.com/questions/48963731/qtservice-automatically-restarts-on-android-after-running-the-application
+
+    if (isService) {
+#ifdef Q_OS_ANDROID
+        app = new QAndroidService(argc, argv);
+        qDebug() << "created android service";
+#else
+        app = new QCoreApplication(argc, argv);
+        qDebug() << "created core service";
+#endif
+    } else {
+        QApplication* gui_app = new QApplication(argc, argv);
+        qDebug() << "created application";
+        gui_app->setApplicationDisplayName(name);
+        gui_app->setDesktopFileName(name);
+        app = gui_app;
+    }
+
+    qDebug() << "main: application starting";
+
+    app->setOrganizationName("nsetzer");
+    app->setOrganizationDomain("github.com");
+
+    app->setApplicationVersion("1.0");
+    app->setApplicationName(name);
+
+    int retval = app_main(app, isService);
+    delete app;
+    return retval;
 }

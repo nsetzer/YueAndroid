@@ -27,7 +27,7 @@ public class YueAppActivity extends QtActivity {
     @Override
     public void onCreate(Bundle bundle) {
         super.onCreate(bundle);
-        Log.i("Activity", "Starting service!");
+        Log.i("YueActivity", "Starting service!");
         Intent serviceIntent = new Intent(this, YueAppService.class);
         startService(serviceIntent);
     }
@@ -111,7 +111,7 @@ public class YueAppActivity extends QtActivity {
         //https://stackoverflow.com/questions/36369845/how-to-stop-service-the-service-when-android-app-has-been-closed
         // https://developer.android.com/reference/android/app/Activity.html
         //https://stackoverflow.com/questions/19568315/how-to-handle-code-when-app-is-killed-by-swiping-in-android/26882533#26882533
-        Log.i("Activity", "Service: on Destroy Activity");
+        Log.i("YueActivity", "Service: on Destroy Activity");
         Intent intent = new Intent(YueAppActivity.this, YueAppService.class);
         stopService(intent);
 

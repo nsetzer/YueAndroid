@@ -86,6 +86,7 @@ QHash<int, QByteArray> DirectoryListModel::roleNames() const
     roles[DirectoryListModel::IsDirectoryRole] = "isdir";
     return roles;
 }
+
 /*
 void DirectoryListModel::setNewData(QStringList lst)
 {
@@ -213,6 +214,11 @@ QString DirectoryListModel::iconPath( int index ) const
 
 
     return "images/00_file_default.svg";
+}
+
+QString DirectoryListModel::currentDirectory() const
+{
+    return m_pwd.absolutePath();
 }
 
 } // qtcommon

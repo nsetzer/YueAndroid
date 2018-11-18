@@ -22,7 +22,7 @@ std::string join(const std::vector<std::string> &items, const std::string &sep);
 
 // convert string to numerical type
 template<typename T>
-T fromString(const std::string &s){/*compiliation error if used*/}
+T fromString(const std::string &s){ (void) s; /*compiliation error if used*/}
 
 
 template<> std::string fromString<std::string>(const std::string &s);

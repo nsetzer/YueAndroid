@@ -57,7 +57,8 @@ SOURCES += \
     src/cpp/yue/qtcommon/ResourceCache.cpp \
     src/cpp/yue/qtcommon/SongListModel.cpp \
     src/cpp/yue/qtcommon/toolbar.cpp \
-    src/cpp/yue/qtcommon/TreeListModelBase.cpp
+    src/cpp/yue/qtcommon/TreeListModelBase.cpp \
+    src/cpp/yue/qtcommon/gesture.cpp
 
 # src/cpp/yue/qtcommon/AlbumArtImage.cpp
 
@@ -110,7 +111,8 @@ HEADERS += \
     src/cpp/yue/qtcommon/svg.h \
     src/cpp/yue/qtcommon/toolbar.h \
     src/cpp/yue/qtcommon/TreeListModelBase.h \
-    src/cpp/yue/util/logging.h
+    src/cpp/yue/util/logging.h \
+    src/cpp/yue/qtcommon/gesture.h
 
 # src/cpp/yue/qtcommon/AlbumArtImage.h
 

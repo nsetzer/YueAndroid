@@ -15,6 +15,7 @@
 #include <QPushButton>
 
 #include "yue/qtcommon/PlaylistModel.h"
+#include "yue/qtcommon/gesture.h"
 
 class PlaylistDelegate: public QStyledItemDelegate
 {
@@ -42,8 +43,10 @@ class PlaylistView : public QListView
 {
     Q_OBJECT
 private:
+    yue::qtcommon::Gesture m_gesture;
     yue::qtcommon::PlaylistModel *m_model;
     PlaylistDelegate *m_delegate;
+
 
 signals:
     void more(QModelIndex index);
@@ -52,11 +55,22 @@ public:
     PlaylistView(QWidget *parent = nullptr);
     ~PlaylistView() {}
 
+    virtual void mousePressEvent(QMouseEvent *event) {
+        m_gesture.mousePressEvent(event);
+    }
+
+    virtual void mouseMoveEvent(QMouseEvent *event) {
+        m_gesture.mouseMoveEvent(event);
+    }
+
+    virtual void mouseReleaseEvent(QMouseEvent *event) {
+        m_gesture.mouseReleaseEvent(event);
+    }
+
+    /*
     virtual void mouseReleaseEvent(QMouseEvent *event) {
         const QModelIndex index = indexAt(event->pos());
         const QSize size = sizeHintForIndex(index);
-
-
 
         if (event->pos().x() > (viewport()->width() - size.height())) {
             emit more(index);
@@ -64,6 +78,7 @@ public:
             QListView::mouseReleaseEvent(event);
         }
     }
+    */
 
     void refresh();
     void setCurrentIndex(int index) {

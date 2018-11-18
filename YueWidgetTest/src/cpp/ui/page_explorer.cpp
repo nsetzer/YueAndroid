@@ -87,6 +87,11 @@ void ExplorerView::openRoot()
     m_model->openRoot();
 }
 
+QString ExplorerView::currentDirectory()
+{
+    return m_model->currentDirectory();
+}
+
 void ExplorerView::mouseReleaseEvent(QMouseEvent *event)
 {
     const QModelIndex index = indexAt(event->pos());
@@ -182,9 +187,8 @@ PageExplorer::PageExplorer(QWidget *parent)
     connect(inst.data(), &yue::bell::MediaCtrlBase::scanUpdate,
             this, &PageExplorer::onScanUpdate);
 
-    m_ui->m_btnScan->setEnabled(false);
-    inst->scanStatus();
-
+    //m_ui->m_btnScan->setEnabled(false);
+    //inst->scanStatus();
 
 }
 
@@ -207,13 +211,17 @@ void PageExplorer::onScan()
     if (m_scanRunning) {
         inst->scanStop();
     } else {
-        inst->scanStart("C:\\Users\\nicks\\Music");
+        inst->scanStart(m_ui->m_view->currentDirectory());
     }
 }
 
 void PageExplorer::onScanUpdate(bool running, int ndirs, int nfiles, int nsongs)
 {
-    m_ui->m_btnScan->setEnabled(true);
+    Q_UNUSED(ndirs);
+    Q_UNUSED(nfiles);
+    Q_UNUSED(nsongs);
+
+    //m_ui->m_btnScan->setEnabled(true);
     m_scanRunning = running;
 
     m_ui->m_btnScan->setIcon(QIcon(running?":/res/stop.svg":":/res/scan.svg"));

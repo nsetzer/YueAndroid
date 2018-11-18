@@ -59,7 +59,7 @@ public class YueAppService extends QtService {
    @Override
    public void onCreate() {
       super.onCreate();
-      Log.i("Service", "Service created!");
+      Log.i("YueService", "Service created!");
 
       initMediaSession();
 
@@ -77,17 +77,17 @@ public class YueAppService extends QtService {
 
       if (intent == null) {
          int ret = super.onStartCommand(intent, flags, startId);
-         Log.i("Service", "Service started!");
+         Log.i("YueService", "Service started!");
          return ret;//|START_STICKY;
       }
 
       String action = intent.getAction();
       if (ACTION_PLAYBACK_PLAYPAUSE.equals(action)) {
-         Log.i("Service", "new intent playpause pressed");
+         Log.i("YueService", "new intent playpause pressed");
       } else if (ACTION_PLAYBACK_PREV.equals(action)) {
-         Log.i("Service", "new intent prev pressed");
+         Log.i("YueService", "new intent prev pressed");
       } else if (ACTION_PLAYBACK_NEXT.equals(action)) {
-         Log.i("Service", "new intent next pressed");
+         Log.i("YueService", "new intent next pressed");
       }
 
       return super.onStartCommand(intent, flags, startId);
@@ -119,7 +119,7 @@ public class YueAppService extends QtService {
    public void onDestroy() {
 
       stopForeground(true);
-      Log.i("Service", "stop foreground");
+      Log.i("YueService", "stop foreground");
 
       unregisterReceiver(mReceiver);
 
@@ -138,7 +138,7 @@ public class YueAppService extends QtService {
 
    // byte[] coverart, long length
    public static void showNotification( byte[] coverart, boolean playing, String title, String message) {
-      Log.i("Service", "a4 display notification");
+      Log.i("YueService", "a4 display notification");
       m_instance.showNotificationImpl(coverart, playing, title, message);
    }
 
@@ -150,7 +150,7 @@ public class YueAppService extends QtService {
       Context ctx = this;
       try {
 
-         Log.i("Service", "cover art length: " + Integer.toString(coverart.length) );
+         Log.i("YueService", "cover art length: " + Integer.toString(coverart.length) );
 
          Bitmap cover;
          Notification.Builder builder;
@@ -193,7 +193,7 @@ public class YueAppService extends QtService {
                 .setShowActionsInCompactView(0,1,2));
                 //.setMediaSession(mMediaSession.getSessionToken()));
 
-         Log.i("Service", "display notification");
+         Log.i("YueService", "display notification");
          //startService(new Intent(ctx, YueAppService.class));
          //if (playing) {
          startForeground(3, builder.build());
@@ -201,25 +201,25 @@ public class YueAppService extends QtService {
          //   stopForeground(false);
          //}
       } catch (IllegalArgumentException e) {
-         Log.e("Service", "Failed to display notification", e);
+         Log.e("YueService", "Failed to display notification", e);
       }
    }
 
    //@MainThread
    public void playpause() {
-      Log.i("Service", "onbtn playpause pressed");
+      Log.i("YueService", "onbtn playpause pressed");
       JNIServicePlayPauseCallback();
    }
 
    //@MainThread
    public void prev() {
-      Log.i("Service", "onbtn prev pressed");
+      Log.i("YueService", "onbtn prev pressed");
       JNIServicePrevCallback();
    }
 
    //@MainThread
    public void next() {
-      Log.i("Service", "onbtn next pressed");
+      Log.i("YueService", "onbtn next pressed");
       JNIServiceNextCallback();
    }
 
