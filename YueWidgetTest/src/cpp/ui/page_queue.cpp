@@ -126,6 +126,9 @@ PlaylistView::PlaylistView(QWidget *parent)
     m_gesture.setViewport(this);
     m_gesture.setVScrollBar(this->verticalScrollBar());
 
+    connect(&m_gesture, &yue::qtcommon::Gesture::tap,
+            this, &PlaylistView::onTap);
+
     this->setModel(m_model);
     this->setItemDelegate(m_delegate);
     this->setSelectionBehavior(QAbstractItemView::SelectRows);

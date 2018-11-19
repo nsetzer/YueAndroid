@@ -145,6 +145,7 @@ class uiPageDynamic
 
 public:
 
+
     QVBoxLayout *m_layoutCentral;
     QScrollArea *m_scrollArea;
 
@@ -153,20 +154,22 @@ public:
 
     yue::qtcommon::IconButton *m_btnNewEditor;
 
-
     uiPageDynamic(QWidget *parent = nullptr);
-    ~uiPageDynamic();
+    virtual ~uiPageDynamic();
+
+
 
 };
 
 uiPageDynamic::uiPageDynamic(QWidget *parent)
 {
     m_layoutCentral = new QVBoxLayout();
-    m_scrollArea = new QScrollArea(parent);
+    m_scrollArea = new yue::qtcommon::GestureArea(parent);
     m_centralWidget = new QWidget(parent);
     m_layoutMain = new QVBoxLayout();
 
     m_btnNewEditor = new yue::qtcommon::IconButton(QIcon(":/res/file.svg"), parent);
+
 
     // -
     parent->setLayout(m_layoutCentral);
@@ -177,6 +180,7 @@ uiPageDynamic::uiPageDynamic(QWidget *parent)
     //m_scrollArea->setBackgroundRole(QPalette::Dark);
     m_scrollArea->setWidget(m_centralWidget);
     m_scrollArea->setWidgetResizable(true);
+
 
     m_layoutMain->addStretch(1);
 }

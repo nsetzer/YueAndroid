@@ -13,6 +13,7 @@
 
 #include "yue/qtcommon/TreeListModelBase.h"
 #include "yue/qtcommon/LibraryTreeListModel.h"
+#include "yue/qtcommon/gesture.h"
 
 class LibraryTreeDelegate: public QStyledItemDelegate
 {
@@ -32,6 +33,7 @@ class LibraryView : public QListView
 {
     Q_OBJECT
 private:
+    yue::qtcommon::Gesture m_gesture;
     yue::qtcommon::LibraryTreeListModel *m_model;
     LibraryTreeDelegate *m_delegate;
 
@@ -41,20 +43,34 @@ public:
 
     void setQuery(QString query);
     void toggleChecked();
+    void toggleExpand();
     void createPlaylist(bool shuffle);
 
 protected:
 
+    virtual void mousePressEvent(QMouseEvent *event) {
+        m_gesture.mousePressEvent(event);
+    }
+
+    virtual void mouseMoveEvent(QMouseEvent *event) {
+        m_gesture.mouseMoveEvent(event);
+    }
+
     virtual void mouseReleaseEvent(QMouseEvent *event) {
-        const QModelIndex index = indexAt(event->pos());
+        m_gesture.mouseReleaseEvent(event);
+    }
+
+    virtual void onTap(int x, int y) {
+
+        const QModelIndex index = indexAt(QPoint(x, y));
         const QSize size = sizeHintForIndex(index);
         int depth = index.data(yue::qtcommon::TreeListModelBase::DepthRole).toInt();
         int count = index.data(yue::qtcommon::TreeListModelBase::ChildCountRole).toInt();
 
-        if (count>0 && event->pos().x() < (1+depth)*size.height()) {
+        if (count>0 && x < (1+depth)*size.height()) {
             onDoubleClick(index);
         } else {
-            QListView::mouseReleaseEvent(event);
+            onClick(index);
         }
     }
 
@@ -90,9 +106,10 @@ public:
 public slots:
     void setQuery(QString query);
 
-protected:
+private slots:
     void onEditingFinished();
     void onToggleSelection();
+    void onToggleExpand();
     void onToggleShuffle();
     void onCreatePlaylist();
     void onClearSearch();

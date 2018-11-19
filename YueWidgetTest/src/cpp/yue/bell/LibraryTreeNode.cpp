@@ -38,7 +38,7 @@ LibraryTreeNode::~LibraryTreeNode()
 
 void LibraryTreeNode::setCheckState(Qt::CheckState state)
 {
-    if (m_uid==-1) // null / dummy node
+    if (m_uid==-1U) // null / dummy node
         return;
     // setting true/false must toggle parent states as well
     m_checkstate = state;
@@ -87,6 +87,9 @@ bool LibraryTreeNode::isDescendant(LibraryTreeNode* node)
 void LibraryTreeNode::updateCheckState( void )
 {
     int iChecked = 0;
+
+    Qt::CheckState newState = Qt::Checked;
+
     for (LibraryTreeNode* nd : m_children)
     {
         if (nd->getCheckState()==Qt::Checked) {
@@ -98,16 +101,16 @@ void LibraryTreeNode::updateCheckState( void )
             // since a child is partially checked, then this node is aswell
             // partially checked
             iChecked++;
+            newState = Qt::PartiallyChecked;
             break;
         }
         else if (iChecked > 0)
             break;
     }
-    Qt::CheckState newState = Qt::Unchecked;
 
-    if (iChecked == m_children.size())
-        newState = Qt::Checked;
-    else if (iChecked > 0)
+    if (iChecked == 0)
+        newState = Qt::Unchecked;
+    else if (iChecked != m_children.size())
         newState = Qt::PartiallyChecked;
 
     if (newState != getCheckState())

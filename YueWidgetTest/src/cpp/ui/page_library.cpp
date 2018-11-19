@@ -18,8 +18,13 @@ void LibraryTreeDelegate::paint(
     int depth = index.data(yue::qtcommon::TreeListModelBase::DepthRole).toInt();
     int count = index.data(yue::qtcommon::TreeListModelBase::ChildCountRole).toInt();
 
+    if (check != 0)
+        qDebug() << check;
     if (check/*option.state & QStyle::State_Selected*/) {
-        painter->fillRect(option.rect, option.palette.highlight());
+        QBrush color = option.palette.highlight();
+        if (check == Qt::CheckState::PartiallyChecked)
+            color = option.palette.highlight().color().lighter();
+        painter->fillRect(option.rect, color);
         painter->setPen(Qt::white);
         painter->setBrush(option.palette.highlightedText());
     }
@@ -30,6 +35,9 @@ void LibraryTreeDelegate::paint(
     }
 
     int height = option.rect.height();
+    if (height%2 == 0) {
+        height -= 1;
+    }
 
     int left = option.rect.left();
     int top = option.rect.top();
@@ -38,13 +46,19 @@ void LibraryTreeDelegate::paint(
     if (count>0) {
         xoffset+=1;
         int h = static_cast<int>(.75F * height);
+        int w = h - (h/3) - (h/3);
+        int s = (option.rect.height() - h) / 2;
         // draw the expansion state
         if (!expand) {
-            QRect vrect(left + height/2 - h/2 + (depth*height), top, h/2, h);
+            QRect vrect(left + h/3 + (depth*height) + s, top + s, w, h);
             painter->fillRect(vrect, QBrush(QColor(0,0,0)));
         }
-        QRect hrect(left + (depth*height), top + height/2 - h/2, h, h/2);
+        QRect hrect(left + (depth*height) + s, top + h/3 + s, h, w);
         painter->fillRect(hrect, QBrush(QColor(0,0,0)));
+
+        // paint the bounding box to check centering
+        //painter->drawRect(option.rect.left(), option.rect.top(),
+        //                  option.rect.height(), option.rect.height());
     }
 
     QRect rect = option.rect;
@@ -83,6 +97,12 @@ LibraryView::LibraryView(QWidget *parent)
     // TODO: scale this value to 1x font size
     setContentsMargins(0, 0, 0, 20);
 
+    m_gesture.setViewport(this);
+    m_gesture.setVScrollBar(this->verticalScrollBar());
+
+    connect(&m_gesture, &yue::qtcommon::Gesture::tap,
+            this, &LibraryView::onTap);
+
     m_delegate = new LibraryTreeDelegate(this);
     m_model = new yue::qtcommon::LibraryTreeListModel(this);
 
@@ -90,6 +110,7 @@ LibraryView::LibraryView(QWidget *parent)
     this->setItemDelegate(m_delegate);
     this->setSelectionBehavior(QAbstractItemView::SelectRows);
     this->setSelectionMode(QAbstractItemView::NoSelection);
+    this->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
 
     connect(this ,SIGNAL(doubleClicked(const QModelIndex)),
                 this, SLOT(onDoubleClick(const QModelIndex)));
@@ -114,6 +135,15 @@ void LibraryView::toggleChecked()
     }
 }
 
+void LibraryView::toggleExpand()
+{
+    if (m_model->anyExpanded()) {
+        m_model->expandAll(false);
+    } else {
+        m_model->expandAll(true);
+    }
+}
+
 void LibraryView::createPlaylist(bool shuffle)
 {
     m_model->createPlaylist(shuffle);
@@ -135,6 +165,7 @@ public:
     yue::qtcommon::IconButton *m_btnSearch;
 
     yue::qtcommon::IconButton *m_btnToggleSelection;
+    yue::qtcommon::IconButton *m_btnToggleExpand;
     yue::qtcommon::IconButton *m_btnToggleShuffle;
     yue::qtcommon::IconButton *m_btnCreatePlaylist;
 
@@ -153,6 +184,7 @@ uiPageLibrary::uiPageLibrary(QWidget *parent) {
     m_editSearch = new QLineEdit(parent);
     m_btnClearSearch = new yue::qtcommon::IconButton(QIcon(":/res/clear.svg"), parent);
     m_btnToggleSelection = new yue::qtcommon::IconButton(QIcon(":/res/select.svg"), parent);
+    m_btnToggleExpand = new yue::qtcommon::IconButton(QIcon(":/res/select.svg"), parent);
     m_btnToggleShuffle = new yue::qtcommon::IconButton(QIcon(":/res/shuffle.svg"), parent);
     m_btnCreatePlaylist = new yue::qtcommon::IconButton(QIcon(":/res/playlist.svg"), parent);
 
@@ -162,12 +194,15 @@ uiPageLibrary::uiPageLibrary(QWidget *parent) {
     m_layoutSearch->addWidget(m_btnClearSearch);
 
     m_layoutCreate->addWidget(m_btnToggleSelection);
+    m_layoutCreate->addWidget(m_btnToggleExpand);
     m_layoutCreate->addWidget(m_btnToggleShuffle);
     m_layoutCreate->addWidget(m_btnCreatePlaylist);
 
     m_layoutCentral->addLayout(m_layoutSearch);
     m_layoutCentral->addWidget(m_view);
     m_layoutCentral->addLayout(m_layoutCreate);
+
+    m_btnToggleExpand->setVisible(false);
 
     m_editSearch->setPlaceholderText("Search Library");
     parent->setLayout(m_layoutCentral);
@@ -190,6 +225,9 @@ PageLibrary::PageLibrary(QWidget *parent)
     connect(m_ui->m_btnToggleSelection, &yue::qtcommon::IconButton::clicked,
             this, &PageLibrary::onToggleSelection);
 
+    connect(m_ui->m_btnToggleExpand, &yue::qtcommon::IconButton::clicked,
+            this, &PageLibrary::onToggleExpand);
+
     connect(m_ui->m_btnCreatePlaylist, &yue::qtcommon::IconButton::clicked,
             this, &PageLibrary::onCreatePlaylist);
 
@@ -211,6 +249,11 @@ void PageLibrary::onEditingFinished()
 void PageLibrary::onToggleSelection()
 {
     m_ui->m_view->toggleChecked();
+}
+
+void PageLibrary::onToggleExpand()
+{
+    m_ui->m_view->toggleExpand();
 }
 
 void PageLibrary::onToggleShuffle()

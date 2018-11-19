@@ -1,5 +1,6 @@
 #include "gesture.h"
 
+#include <QDebug>
 
 namespace yue {
 namespace qtcommon {
@@ -26,6 +27,27 @@ Gesture::Gesture(QObject *parent)
     m_timerAutoscroll.setSingleShot(false);
     connect(&m_timerAutoscroll, &QTimer::timeout,
             this, &Gesture::onAutoscrollTimeout);
+}
+
+void Gesture::setViewport(QWidget *viewport)
+{
+    m_pViewport = viewport;
+}
+
+void Gesture::setHScrollBar(QScrollBar *bar)
+{
+    m_pHBar = bar;
+#ifdef Q_OS_ANDROID
+    m_pHBar->setVisible(false);
+#endif
+}
+
+void Gesture::setVScrollBar(QScrollBar *bar)
+{
+    m_pVBar = bar;
+#ifdef Q_OS_ANDROID
+    m_pVBar->setVisible(false);
+#endif
 }
 
 void Gesture::mousePressEvent(QMouseEvent *event)
@@ -91,7 +113,9 @@ void Gesture::move_event_default(QMouseEvent *event)
     }
 
     if (m_pVBar) {
-        int pos = qMax(m_pVBar->minimum(), qMin(m_pVBar->maximum(), m_pVBar_pos - dy));
+        int _min = m_pVBar->minimum();
+        int _max = m_pVBar->maximum();
+        int pos = qMax(_min, qMin(_max, m_pVBar_pos - dy));
         m_pVBar->setSliderPosition(pos);
     }
 

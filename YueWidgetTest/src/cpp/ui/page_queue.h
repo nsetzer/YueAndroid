@@ -67,18 +67,15 @@ public:
         m_gesture.mouseReleaseEvent(event);
     }
 
-    /*
-    virtual void mouseReleaseEvent(QMouseEvent *event) {
-        const QModelIndex index = indexAt(event->pos());
+    virtual void onTap(int x, int y) {
+
+        const QModelIndex index = indexAt(QPoint(x, y));
         const QSize size = sizeHintForIndex(index);
 
-        if (event->pos().x() > (viewport()->width() - size.height())) {
+        if (x > (viewport()->width() - size.height())) {
             emit more(index);
-        } else {
-            QListView::mouseReleaseEvent(event);
         }
     }
-    */
 
     void refresh();
     void setCurrentIndex(int index) {

@@ -66,14 +66,22 @@ QSize ExplorerDelegate::sizeHint(
 
 ExplorerView::ExplorerView(QWidget *parent)
   : QListView(parent)
+  , m_gesture(this)
 {
     m_model = new yue::qtcommon::DirectoryListModel(this);
     m_delegate = new ExplorerDelegate(this);
+
+    m_gesture.setViewport(this);
+    m_gesture.setVScrollBar(this->verticalScrollBar());
+
+    connect(&m_gesture, &yue::qtcommon::Gesture::tap,
+            this, &ExplorerView::onTap);
 
     this->setModel(m_model);
     this->setItemDelegate(m_delegate);
     this->setSelectionBehavior(QAbstractItemView::SelectRows);
     this->setSelectionMode(QAbstractItemView::NoSelection);
+    this->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
 
 }
 
@@ -92,9 +100,9 @@ QString ExplorerView::currentDirectory()
     return m_model->currentDirectory();
 }
 
-void ExplorerView::mouseReleaseEvent(QMouseEvent *event)
+void ExplorerView::onTap(int x, int y)
 {
-    const QModelIndex index = indexAt(event->pos());
+    const QModelIndex index = indexAt(QPoint(x, y));
 
     if (index.isValid()) {
         bool isDir = index.data(yue::qtcommon::DirectoryListModel::IsDirectoryRole).toBool();

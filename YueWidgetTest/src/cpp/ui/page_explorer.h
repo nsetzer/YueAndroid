@@ -23,7 +23,7 @@
 
 #include "yue/qtcommon/DirectoryListModel.h"
 #include "yue/qtcommon/iconbutton.h"
-
+#include "yue/qtcommon/gesture.h"
 
 class ExplorerDelegate: public QStyledItemDelegate
 {
@@ -48,6 +48,7 @@ class ExplorerView : public QListView
 {
     Q_OBJECT
 private:
+    yue::qtcommon::Gesture m_gesture;
     yue::qtcommon::DirectoryListModel *m_model;
     ExplorerDelegate *m_delegate;
 
@@ -61,7 +62,19 @@ public:
     QString currentDirectory();
 
 protected:
-    virtual void mouseReleaseEvent(QMouseEvent *event);
+    virtual void mousePressEvent(QMouseEvent *event) {
+        m_gesture.mousePressEvent(event);
+    }
+
+    virtual void mouseMoveEvent(QMouseEvent *event) {
+        m_gesture.mouseMoveEvent(event);
+    }
+
+    virtual void mouseReleaseEvent(QMouseEvent *event) {
+        m_gesture.mouseReleaseEvent(event);
+    }
+
+    void onTap(int x, int y);
 
 };
 

@@ -39,11 +39,15 @@ public:
     void setNewData(QList<yue::bell::LibraryTreeNode*> lst);
 
     Q_INVOKABLE void toggleExpandItem(int index);
+    void _expand_item(yue::bell::LibraryTreeNode* node);
     Q_INVOKABLE void toggleCheckState(int index);
     Q_INVOKABLE void checkAll(bool bAll);
     bool anySelected();
     bool allSelected();
 
+    Q_INVOKABLE void expandAll(bool bAll);
+    bool anyExpanded();
+    bool allExpanded();
 signals:
     //void dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int> ());
     void onExpand();

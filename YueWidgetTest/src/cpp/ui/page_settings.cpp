@@ -1,5 +1,7 @@
 
 #include "ui/page_settings.h"
+#include "yue/qtcommon/gesture.h"
+
 namespace UI {
 
 class uiPageSettings
@@ -15,6 +17,8 @@ public:
 
 
     QGroupBox *m_grpPlayer;
+    QLabel *m_lblPlayerVolume;
+    QSlider *m_sliderPlayerVolume;
 
     QGroupBox *m_grpRemote;
     QLabel *m_lblRemoteHostname;
@@ -23,6 +27,7 @@ public:
     QLineEdit *m_editRemoteHostname;
     QLineEdit *m_editRemoteUsername;
     QLineEdit *m_editRemotePassword;
+    QLabel *m_lblRemoteStatus;
     QPushButton *m_btnConnect;
 
     uiPageSettings(QWidget *parent = nullptr);
@@ -33,11 +38,23 @@ public:
 uiPageSettings::uiPageSettings(QWidget *parent)
 {
     m_layoutCentral = new QVBoxLayout();
-    m_scrollArea = new QScrollArea(parent);
+    m_scrollArea = new yue::qtcommon::GestureArea(parent);
     m_centralWidget = new QWidget(parent);
     m_layoutMain = new QVBoxLayout();
-    m_grpPlayer = new QGroupBox("Player", parent);
 
+    // ------------
+    m_grpPlayer = new QGroupBox("Player", parent);
+    m_lblPlayerVolume = new QLabel("Volume:", parent);
+    m_sliderPlayerVolume = new QSlider(Qt::Orientation::Horizontal, parent);
+    m_sliderPlayerVolume->setRange(0, 100);
+    {
+        QVBoxLayout *vbox = new QVBoxLayout();
+        m_grpPlayer->setLayout(vbox);
+        vbox->addWidget(m_lblPlayerVolume);
+        vbox->addWidget(m_sliderPlayerVolume);
+    }
+
+    // ------------
     m_grpRemote = new QGroupBox("Remote", parent);
     m_lblRemoteHostname = new QLabel("Hostname:", parent);
     m_lblRemoteUsername = new QLabel("Username:", parent);
@@ -49,6 +66,7 @@ uiPageSettings::uiPageSettings(QWidget *parent)
     m_editRemotePassword = new QLineEdit(parent);
     m_editRemotePassword->setText("admin");
     m_btnConnect = new QPushButton("Connect", parent);
+    m_lblRemoteStatus = new QLabel("Status:", parent);
     {
         QVBoxLayout *vbox = new QVBoxLayout();
         m_grpRemote->setLayout(vbox);
@@ -59,6 +77,7 @@ uiPageSettings::uiPageSettings(QWidget *parent)
         vbox->addWidget(m_lblRemotePassword);
         vbox->addWidget(m_editRemotePassword);
         vbox->addWidget(m_btnConnect);
+        vbox->addWidget(m_lblRemoteStatus);
     }
     // -
     parent->setLayout(m_layoutCentral);

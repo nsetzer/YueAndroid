@@ -7,7 +7,7 @@
 #include <QScrollBar>
 #include <QMouseEvent>
 #include <QPainter>
-
+#include <QScrollArea>
 
 namespace yue {
 namespace qtcommon {
@@ -28,9 +28,13 @@ public:
         Left
     };
 
-    void setViewport(QWidget *viewport) { m_pViewport = viewport; }
-    void setHScrollBar(QScrollBar *bar) { m_pHBar = bar; }
-    void setVScrollBar(QScrollBar *bar) { m_pVBar = bar; }
+    void setViewport(QWidget *viewport);
+    void setHScrollBar(QScrollBar *bar);
+    void setVScrollBar(QScrollBar *bar);
+
+    QWidget* viewport() { return m_pViewport; }
+    QScrollBar* verticalScrollbar() { return m_pVBar; }
+    QScrollBar* horizontalScrollbar() { return m_pVBar; }
 
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
@@ -117,6 +121,42 @@ private:
 
 };
 
+// a scroll area which supports gestures
+class GestureArea : public QScrollArea
+{
+
+public:
+    GestureArea(QWidget *parent = nullptr)
+        : QScrollArea(parent)
+        , m_gesture(this)
+
+    {
+        m_gesture.setViewport(this);
+        m_gesture.setVScrollBar(verticalScrollBar());
+    }
+
+    virtual ~GestureArea() {}
+
+    // return a pointer to the underlying gesture engine
+    // to support attaching to signals
+    Gesture* gesture() { return &m_gesture; }
+
+protected:
+
+    virtual void mousePressEvent(QMouseEvent *event) {
+        m_gesture.mousePressEvent(event);
+    }
+
+    virtual void mouseMoveEvent(QMouseEvent *event) {
+        m_gesture.mouseMoveEvent(event);
+    }
+
+    virtual void mouseReleaseEvent(QMouseEvent *event) {
+        m_gesture.mouseReleaseEvent(event);
+    }
+
+    Gesture m_gesture;
+};
 
 } // qtcommon
 } // yue

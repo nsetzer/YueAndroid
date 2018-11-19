@@ -20,6 +20,7 @@
 #include <QDebug>
 
 #include "yue/qtcommon/iconbutton.h"
+#include "yue/qtcommon/gesture.h"
 
 class DynamicQueryEditor : public QFrame {
     Q_OBJECT

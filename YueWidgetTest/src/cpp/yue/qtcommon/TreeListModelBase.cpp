@@ -237,6 +237,48 @@ bool TreeListModelBase::allSelected()
     return true;
 }
 
+void TreeListModelBase::expandAll(bool bAll)
+{
+    // TODO: this does not work because the model does
+    // not get updated correctly.
+    /*
+    for (yue::bell::LibraryTreeNode* root : m_forest) {
+        root->setExpanded(bAll);
+        for (yue::bell::LibraryTreeNode* child : root->children()) {
+            child->setExpanded(bAll);
+        }
+    }
+    emit dataChanged(index(0), index(m_tabledata.size()-1), {TreeListModelBase::CheckRole});
+    emit selectionChanged();
+    */
+    return;
+}
+
+bool TreeListModelBase::anyExpanded()
+{
+    for (yue::bell::LibraryTreeNode* root : m_forest) {
+        if (root->isExpanded())
+            return true;
+        for (yue::bell::LibraryTreeNode* child : root->children()) {
+            if (child->isExpanded())
+                return true;
+        }
+    }
+    return false;
+}
+
+bool TreeListModelBase::allExpanded()
+{
+    for (yue::bell::LibraryTreeNode* root : m_forest) {
+        if (!root->isExpanded())
+            return false;
+        for (yue::bell::LibraryTreeNode* child : root->children()) {
+            if (!child->isExpanded())
+                return false;
+        }
+    }
+    return true;
+}
 
 } // qtcommon
 } // yue
