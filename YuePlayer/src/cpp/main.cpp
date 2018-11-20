@@ -1,20 +1,43 @@
+#include "ui/mainwindow.h"
+#ifdef Q_OS_ANDROID
+#include <QAndroidService>
+#endif
+#include <QCoreApplication>
+#include <QApplication>
 #include <QGuiApplication>
-#include <QQmlApplicationEngine>
-#include <QQmlContext>
 #include <QDebug>
 #include <QSharedPointer>
+
+#include "rpc/MediaCtrlRemoteClient.h"
+#include "rpc/MediaCtrlRemoteServer.h"
 
 #include "yue/bell/database.hpp"
 #include "yue/bell/library.hpp"
 #include "yue/bell/playlist.hpp"
+#include "yue/bell/settings.h"
 #include "yue/bell/MediaCtrlBase.h"
 #include "yue/bell/MediaCtrlLocal.h"
-#include "yue/device.h"
-#include "yue/qtcommon/qtcommon.hpp"
+//#include "yue/device.h"
+//#include "yue/qtcommon/qtcommon.hpp"
 #include "yue/qtcommon/ResourceCache.h"
 #include "yue/bell/LibraryTreeNode.hpp"
-#include "MediaCtrlRemoteClient.h"
-#include "MediaCtrlRemoteServer.h"
+//#include "MediaCtrlRemoteClient.h"
+//#include "MediaCtrlRemoteServer.h"
+
+//#ifdef Q_OS_ANDROID
+//#include <QAndroidJniObject>
+//#include <QtAndroid>
+//
+//#include "JavaCompat.h"
+//
+//JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*)
+//{
+//    Q_UNUSED(vm);
+//    qDebug() << "JNI_OnLoad";
+//    return JavaCompat::RegisterNatives();
+//}
+//
+//#endif
 
 #ifdef Q_OS_ANDROID
 #include <QAndroidJniObject>
@@ -31,41 +54,31 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*)
 
 #endif
 
-int main(int argc, char *argv[])
+int app_main(QCoreApplication *app, bool isService)
 {
-    QGuiApplication app(argc, argv);
-    QQmlApplicationEngine engine;
 
-    qRegisterMetaType<yue::bell::SongInfo>("SongInfo");
-    qRegisterMetaType<yue::bell::MediaPlayerBase::State>("MediaPlayerBase::State");
-    qRegisterMetaType<yue::bell::MediaPlayerBase::Status>("MediaPlayerBase::Status");
-    qRegisterMetaType<yue::bell::Database::uid_t>("Database::uid_t");
-    qRegisterMetaType<yue::qtcommon::ResourceCache::rid_t>("ResourceCache::rid_t");
-    qRegisterMetaType<yue::bell::LibraryTreeNode>("LibraryTreeNode");
-    qRegisterMetaType<QList<yue::bell::LibraryTreeNode*>>("QList<yue::bell::LibraryTreeNode*>");
-    qRegisterMetaType<QList<yue::bell::Database::uid_t>>("QList<yue::bell::Database::uid_t>");
+
+    QSharedPointer<MainWindow> window;
 
     QSharedPointer<QRemoteObjectHost> srcNode;
     QSharedPointer<MediaCtrlRemoteServer> mcsvc;
     QSharedPointer<yue::bell::MediaCtrlBase> mccli;
 
-
+    qDebug() << "main: create database";
     yue::bell::Database* db = yue::bell::Database::create();
-
-    // all runtime cross thread signal/slots
 
 #ifdef Q_OS_ANDROID
 
-    QString dirPath =yue::qtcommon::Device::getDirectory(yue::qtcommon::Device::DIRECTORY_MUSIC);
-    QDir dirMusic(dirPath);
+    //QString dirPath =yue::qtcommon::Device::getDirectory(yue::qtcommon::Device::DIRECTORY_MUSIC);
+    //QDir dirMusic(dirPath);
+    //qDebug() << "actual db path" << dirMusic.absoluteFilePath("yue-library.v1.sqlitedb");
+
     //QString libPath = dirMusic.absoluteFilePath("yue-library.v1.sqlitedb");
-    //QString libPath = "/mnt/sdcard/Music/yue-library.v1.sqlitedb";
-    QString libPath = ":memory:";
+    QString libPath = "/mnt/sdcard/Music/yue-library.v1.sqlitedb";
+
+    //QString libPath = ":memory:";
     db->connect(libPath);
 
-
-    //db->connect("/mnt/sdcard/Music/library.db");
-    //db->connect("/mnt/sdcard/Music/yue-library.v1.sqlitedb");
 
 #else
 
@@ -77,21 +90,17 @@ int main(int argc, char *argv[])
 #endif
 #endif
 
+    yue::bell::Settings::create();
+
     qDebug() << "main: create library";
     yue::bell::Library::create();
     qDebug() << "main: create library complete. number of records:" << yue::bell::Library::instance()->size();
     qDebug() << "main: create playlist manager";
     yue::bell::PlaylistManager::create();
 
-    if (QCoreApplication::arguments().count() > 1){
+
+    if (isService){
         qDebug() << "service application starting";
-        {
-            auto pl = yue::bell::PlaylistManager::instance()->openCurrent();
-            if (pl->size()==0) {
-                pl->set( yue::bell::Library::instance()->createPlaylist("", 100) );
-            }
-            qDebug() << "playlist size " << pl->size();
-        }
 
         srcNode = QSharedPointer<QRemoteObjectHost>(new QRemoteObjectHost(QUrl(QStringLiteral("local:replica"))));
         mcsvc = MediaCtrlRemoteServer::create();
@@ -101,22 +110,83 @@ int main(int argc, char *argv[])
     }
     else{
 
-
         qDebug() << "client application starting";
-        yue::qtcommon::registerQmlTypes();
 
+       // NOTE: to debug this, open 2 IDEs
+       // in Projects > MSVC2015 > Run > add a new runtime confiruration "backend"
+       // command line arguments: add '-service' e.g. "$0 -service"
+       // in both IDEs click build
+       // in one IDE, start the backend
+       // in the other, start the frontend
+       // *** change the lines below to start a remote client on windows.
 #ifdef Q_OS_ANDROID
         mccli = QSharedPointer<yue::bell::MediaCtrlBase>(new MediaCtrlRemoteClient());
 #else
         mccli = QSharedPointer<yue::bell::MediaCtrlBase>(new yue::bell::MediaCtrlLocal());
+        //mccli = QSharedPointer<yue::bell::MediaCtrlBase>(new MediaCtrlRemoteClient());
 #endif
-        engine.rootContext()->setContextProperty("MediaPlayer", mccli.data());
-        yue::qtcommon::Device::create();
-        engine.rootContext()->setContextProperty("gDevice", yue::qtcommon::Device::instance());
-        yue::bell::MediaCtrlBase::registerInstance( mccli );
+        yue::bell::MediaCtrlBase::registerInstance(mccli);
 
-        engine.addImportPath(QStringLiteral("qrc:/"));
-        engine.load(QUrl(QStringLiteral("qrc:/src/qml/main.qml")));
+        {
+            auto pl = yue::bell::PlaylistManager::instance()->openCurrent();
+            if (pl->size()==0) {
+                pl->set( yue::bell::Library::instance()->createPlaylist("", 100) );
+            }
+            qDebug() << "playlist size " << pl->size();
+        }
+
+        window = QSharedPointer<MainWindow>(new MainWindow());
+
+        window->show();
     }
-    return app.exec();
+
+    return app->exec();
+}
+
+int main(int argc, char *argv[])
+{
+    QCoreApplication *app;
+
+    bool isService = argc > 1; // && QString(argv[1]) == "-service";
+    QString name = (isService)?"YueBackend_":"YueFrontend";
+
+
+    // https://stackoverflow.com/questions/48963731/qtservice-automatically-restarts-on-android-after-running-the-application
+
+    if (isService) {
+#ifdef Q_OS_ANDROID
+        app = new QAndroidService(argc, argv);
+        qDebug() << "created android service";
+#else
+        app = new QCoreApplication(argc, argv);
+        qDebug() << "created core service";
+#endif
+    } else {
+        QApplication* gui_app = new QApplication(argc, argv);
+        qDebug() << "created application";
+        gui_app->setApplicationDisplayName(name);
+        gui_app->setDesktopFileName(name);
+        app = gui_app;
+    }
+
+    qRegisterMetaType<yue::bell::SongInfo>("SongInfo");
+    qRegisterMetaType<yue::bell::Database::uid_t>("Database::uid_t");
+    qRegisterMetaType<QList<yue::bell::Database::uid_t>>("QList<yue::bell::Database::uid_t>");
+    qRegisterMetaType<yue::bell::MediaPlayerBase::State>("MediaPlayerBase::State");
+    qRegisterMetaType<yue::bell::MediaPlayerBase::Status>("MediaPlayerBase::Status");
+    qRegisterMetaType<yue::qtcommon::ResourceCache::rid_t>("ResourceCache::rid_t");
+    qRegisterMetaType<yue::bell::LibraryTreeNode>("LibraryTreeNode");
+    qRegisterMetaType<QList<yue::bell::LibraryTreeNode*>>("QList<yue::bell::LibraryTreeNode*>");
+
+    qDebug() << "main: application starting";
+
+    app->setOrganizationName("nsetzer");
+    app->setOrganizationDomain("github.com");
+
+    app->setApplicationVersion("1.0");
+    app->setApplicationName(name);
+
+    int retval = app_main(app, isService);
+    delete app;
+    return retval;
 }

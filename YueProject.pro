@@ -1,11 +1,9 @@
 
 TEMPLATE = subdirs
-SUBDIRS = YueWidgetTest  TagLib
+SUBDIRS = YuePlayer YueTest TagLib
 
-# YueTest
-
-YueWidgetTest.depends = TagLib
-#YueTest.depends = TagLib
+YuePlayer.depends = TagLib
+YueTest.depends = TagLib
 
 
 #####################################################################
@@ -24,7 +22,7 @@ YueWidgetTest.depends = TagLib
 # copy crtbegin_so.o, crtend_so.o from here:
 #   C:\Qt-ndk\android-ndk-r16b\platforms\android-23\arch-arm64\usr\lib
 # to here:
-#   D:\git\build-YueProject-Android_for_arm64_v8a_GCC_4_9_Qt_5_12_0_for_Android_ARM64_v8a-Debug\YueWidgetTest
+#   D:\git\build-YueProject-Android_for_arm64_v8a_GCC_4_9_Qt_5_12_0_for_Android_ARM64_v8a-Debug\YuePlayer
 # for some reason it ignores $$NDK_ROOT\platforms\android-23\arch-arm64\usr\lib
 # but will look in the current working directory
 # configure a post-qmake pre-make build step to copy these files

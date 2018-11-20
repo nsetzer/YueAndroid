@@ -11,80 +11,80 @@ CONFIG += c++11
 
 CONFIG += testcase
 
-INCLUDEPATH += ../YueWidgetTest/src/cpp
+INCLUDEPATH += ../YuePlayer/src/cpp
 
-RESOURCES = ../YueWidgetTest/resource.qrc
-
-SOURCES += \
-    ../YueWidgetTest/src/cpp/yue/bell/AlbumArt.cpp \
-    ../YueWidgetTest/src/cpp/yue/bell/database.cpp \
-    ../YueWidgetTest/src/cpp/yue/bell/library.cpp \
-    ../YueWidgetTest/src/cpp/yue/bell/LibrarySearchGrammar.cpp \
-    ../YueWidgetTest/src/cpp/yue/bell/LibraryTreeNode.cpp \
-    ../YueWidgetTest/src/cpp/yue/bell/MediaCtrlBackend.cpp \
-    ../YueWidgetTest/src/cpp/yue/bell/MediaCtrlBase.cpp \
-    ../YueWidgetTest/src/cpp/yue/bell/MediaCtrlLocal.cpp \
-    ../YueWidgetTest/src/cpp/yue/bell/MediaPlayerBase.cpp \
-    ../YueWidgetTest/src/cpp/yue/bell/MediaPlayerQt.cpp \
-    ../YueWidgetTest/src/cpp/yue/bell/playlist.cpp \
-    ../YueWidgetTest/src/cpp/yue/bell/settings.cpp \
-    ../YueWidgetTest/src/cpp/yue/core/RandomArtExpressions.cpp \
-    ../YueWidgetTest/src/cpp/yue/core/search/grammar.cpp \
-    ../YueWidgetTest/src/cpp/yue/core/search/rules.cpp \
-    ../YueWidgetTest/src/cpp/yue/core/song.cpp \
-    ../YueWidgetTest/src/cpp/yue/core/util/dateutil.cpp \
-    ../YueWidgetTest/src/cpp/yue/qtcommon/DirectoryListModel.cpp \
-    ../YueWidgetTest/src/cpp/yue/qtcommon/examples/BasicListModel.cpp \
-    ../YueWidgetTest/src/cpp/yue/qtcommon/examples/SwipeListModel.cpp \
-    ../YueWidgetTest/src/cpp/yue/qtcommon/LibraryTreeListModel.cpp \
-    ../YueWidgetTest/src/cpp/yue/qtcommon/PlaylistModel.cpp \
-    ../YueWidgetTest/src/cpp/yue/qtcommon/ResourceCache.cpp \
-    ../YueWidgetTest/src/cpp/yue/qtcommon/SongListModel.cpp \
-    ../YueWidgetTest/src/cpp/yue/qtcommon/TreeListModelBase.cpp \
-    ../YueWidgetTest/src/cpp/yue/qtcommon/toolbar.cpp
-
-HEADERS += \
-    ../YueWidgetTest/src/cpp/yue/alien/utf8/utf8.h \
-    ../YueWidgetTest/src/cpp/yue/alien/utf8/utf8/checked.h \
-    ../YueWidgetTest/src/cpp/yue/alien/utf8/utf8/core.h \
-    ../YueWidgetTest/src/cpp/yue/alien/utf8/utf8/unchecked.h \
-    ../YueWidgetTest/src/cpp/yue/bell/AlbumArt.h \
-    ../YueWidgetTest/src/cpp/yue/bell/database.hpp \
-    ../YueWidgetTest/src/cpp/yue/bell/library.hpp \
-    ../YueWidgetTest/src/cpp/yue/bell/LibrarySearchGrammar.hpp \
-    ../YueWidgetTest/src/cpp/yue/bell/LibraryTreeNode.hpp \
-    ../YueWidgetTest/src/cpp/yue/bell/MediaCtrlBackend.h \
-    ../YueWidgetTest/src/cpp/yue/bell/MediaCtrlBase.h \
-    ../YueWidgetTest/src/cpp/yue/bell/MediaCtrlLocal.h \
-    ../YueWidgetTest/src/cpp/yue/bell/MediaPlayerBase.h \
-    ../YueWidgetTest/src/cpp/yue/bell/MediaPlayerQt.h \
-    ../YueWidgetTest/src/cpp/yue/bell/playlist.hpp \
-    ../YueWidgetTest/src/cpp/yue/bell/SongList.h \
-    ../YueWidgetTest/src/cpp/yue/bell/settings.h \
-    ../YueWidgetTest/src/cpp/yue/core/lrucache.h \
-    ../YueWidgetTest/src/cpp/yue/core/RandomArtExpressions.h \
-    ../YueWidgetTest/src/cpp/yue/core/search/grammar.hpp \
-    ../YueWidgetTest/src/cpp/yue/core/search/rules.hpp \
-    ../YueWidgetTest/src/cpp/yue/core/shuffle.hpp \
-    ../YueWidgetTest/src/cpp/yue/core/song.hpp \
-    ../YueWidgetTest/src/cpp/yue/core/util/dateutil.h \
-    ../YueWidgetTest/src/cpp/yue/core/util/random.h \
-    ../YueWidgetTest/src/cpp/yue/util/logging.h \
-    ../YueWidgetTest/src/cpp/yue/global.h \
-    ../YueWidgetTest/src/cpp/yue/qtcommon/DirectoryListModel.h \
-    ../YueWidgetTest/src/cpp/yue/qtcommon/examples/BasicListModel.hpp \
-    ../YueWidgetTest/src/cpp/yue/qtcommon/examples/SwipeListModel.hpp \
-    ../YueWidgetTest/src/cpp/yue/qtcommon/LibraryTreeListModel.h \
-    ../YueWidgetTest/src/cpp/yue/qtcommon/PlaylistModel.h \
-    ../YueWidgetTest/src/cpp/yue/qtcommon/ResourceCache.h \
-    ../YueWidgetTest/src/cpp/yue/qtcommon/SongListModel.h \
-    ../YueWidgetTest/src/cpp/yue/qtcommon/TreeListModelBase.h \
-    ../YueWidgetTest/src/cpp/yue/qtcommon/toolbar.h \
-    ../YueWidgetTest/src/cpp/yue/qtcommon/iconbutton.h \
-    ../YueWidgetTest/src/cpp/yue/qtcommon/svg.h
+RESOURCES = ../YuePlayer/resource.qrc
 
 SOURCES += \
-    ../YueWidgetTest/src/cpp/yue/bell/playlist_test.cpp
+    ../YuePlayer/src/cpp/yue/bell/AlbumArt.cpp \
+    ../YuePlayer/src/cpp/yue/bell/database.cpp \
+    ../YuePlayer/src/cpp/yue/bell/library.cpp \
+    ../YuePlayer/src/cpp/yue/bell/LibrarySearchGrammar.cpp \
+    ../YuePlayer/src/cpp/yue/bell/LibraryTreeNode.cpp \
+    ../YuePlayer/src/cpp/yue/bell/MediaCtrlBackend.cpp \
+    ../YuePlayer/src/cpp/yue/bell/MediaCtrlBase.cpp \
+    ../YuePlayer/src/cpp/yue/bell/MediaCtrlLocal.cpp \
+    ../YuePlayer/src/cpp/yue/bell/MediaPlayerBase.cpp \
+    ../YuePlayer/src/cpp/yue/bell/MediaPlayerQt.cpp \
+    ../YuePlayer/src/cpp/yue/bell/playlist.cpp \
+    ../YuePlayer/src/cpp/yue/bell/settings.cpp \
+    ../YuePlayer/src/cpp/yue/core/RandomArtExpressions.cpp \
+    ../YuePlayer/src/cpp/yue/core/search/grammar.cpp \
+    ../YuePlayer/src/cpp/yue/core/search/rules.cpp \
+    ../YuePlayer/src/cpp/yue/core/song.cpp \
+    ../YuePlayer/src/cpp/yue/core/util/dateutil.cpp \
+    ../YuePlayer/src/cpp/yue/qtcommon/DirectoryListModel.cpp \
+    ../YuePlayer/src/cpp/yue/qtcommon/examples/BasicListModel.cpp \
+    ../YuePlayer/src/cpp/yue/qtcommon/examples/SwipeListModel.cpp \
+    ../YuePlayer/src/cpp/yue/qtcommon/LibraryTreeListModel.cpp \
+    ../YuePlayer/src/cpp/yue/qtcommon/PlaylistModel.cpp \
+    ../YuePlayer/src/cpp/yue/qtcommon/ResourceCache.cpp \
+    ../YuePlayer/src/cpp/yue/qtcommon/SongListModel.cpp \
+    ../YuePlayer/src/cpp/yue/qtcommon/TreeListModelBase.cpp \
+    ../YuePlayer/src/cpp/yue/qtcommon/toolbar.cpp
 
 HEADERS += \
-    ../YueWidgetTest/src/cpp/yue/bell/playlist_test.h
+    ../YuePlayer/src/cpp/yue/alien/utf8/utf8.h \
+    ../YuePlayer/src/cpp/yue/alien/utf8/utf8/checked.h \
+    ../YuePlayer/src/cpp/yue/alien/utf8/utf8/core.h \
+    ../YuePlayer/src/cpp/yue/alien/utf8/utf8/unchecked.h \
+    ../YuePlayer/src/cpp/yue/bell/AlbumArt.h \
+    ../YuePlayer/src/cpp/yue/bell/database.hpp \
+    ../YuePlayer/src/cpp/yue/bell/library.hpp \
+    ../YuePlayer/src/cpp/yue/bell/LibrarySearchGrammar.hpp \
+    ../YuePlayer/src/cpp/yue/bell/LibraryTreeNode.hpp \
+    ../YuePlayer/src/cpp/yue/bell/MediaCtrlBackend.h \
+    ../YuePlayer/src/cpp/yue/bell/MediaCtrlBase.h \
+    ../YuePlayer/src/cpp/yue/bell/MediaCtrlLocal.h \
+    ../YuePlayer/src/cpp/yue/bell/MediaPlayerBase.h \
+    ../YuePlayer/src/cpp/yue/bell/MediaPlayerQt.h \
+    ../YuePlayer/src/cpp/yue/bell/playlist.hpp \
+    ../YuePlayer/src/cpp/yue/bell/SongList.h \
+    ../YuePlayer/src/cpp/yue/bell/settings.h \
+    ../YuePlayer/src/cpp/yue/core/lrucache.h \
+    ../YuePlayer/src/cpp/yue/core/RandomArtExpressions.h \
+    ../YuePlayer/src/cpp/yue/core/search/grammar.hpp \
+    ../YuePlayer/src/cpp/yue/core/search/rules.hpp \
+    ../YuePlayer/src/cpp/yue/core/shuffle.hpp \
+    ../YuePlayer/src/cpp/yue/core/song.hpp \
+    ../YuePlayer/src/cpp/yue/core/util/dateutil.h \
+    ../YuePlayer/src/cpp/yue/core/util/random.h \
+    ../YuePlayer/src/cpp/yue/util/logging.h \
+    ../YuePlayer/src/cpp/yue/global.h \
+    ../YuePlayer/src/cpp/yue/qtcommon/DirectoryListModel.h \
+    ../YuePlayer/src/cpp/yue/qtcommon/examples/BasicListModel.hpp \
+    ../YuePlayer/src/cpp/yue/qtcommon/examples/SwipeListModel.hpp \
+    ../YuePlayer/src/cpp/yue/qtcommon/LibraryTreeListModel.h \
+    ../YuePlayer/src/cpp/yue/qtcommon/PlaylistModel.h \
+    ../YuePlayer/src/cpp/yue/qtcommon/ResourceCache.h \
+    ../YuePlayer/src/cpp/yue/qtcommon/SongListModel.h \
+    ../YuePlayer/src/cpp/yue/qtcommon/TreeListModelBase.h \
+    ../YuePlayer/src/cpp/yue/qtcommon/toolbar.h \
+    ../YuePlayer/src/cpp/yue/qtcommon/iconbutton.h \
+    ../YuePlayer/src/cpp/yue/qtcommon/svg.h
+
+SOURCES += \
+    ../YuePlayer/src/cpp/yue/bell/playlist_test.cpp
+
+HEADERS += \
+    ../YuePlayer/src/cpp/yue/bell/playlist_test.h
