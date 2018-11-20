@@ -28,6 +28,7 @@ SOURCES += \
     ../YuePlayer/src/cpp/yue/bell/MediaPlayerQt.cpp \
     ../YuePlayer/src/cpp/yue/bell/playlist.cpp \
     ../YuePlayer/src/cpp/yue/bell/settings.cpp \
+    ../YuePlayer/src/cpp/yue/bell/scanner.cpp \
     ../YuePlayer/src/cpp/yue/core/RandomArtExpressions.cpp \
     ../YuePlayer/src/cpp/yue/core/search/grammar.cpp \
     ../YuePlayer/src/cpp/yue/core/search/rules.cpp \
@@ -61,6 +62,7 @@ HEADERS += \
     ../YuePlayer/src/cpp/yue/bell/playlist.hpp \
     ../YuePlayer/src/cpp/yue/bell/SongList.h \
     ../YuePlayer/src/cpp/yue/bell/settings.h \
+    ../YuePlayer/src/cpp/yue/bell/scanner.h \
     ../YuePlayer/src/cpp/yue/core/lrucache.h \
     ../YuePlayer/src/cpp/yue/core/RandomArtExpressions.h \
     ../YuePlayer/src/cpp/yue/core/search/grammar.hpp \
@@ -88,3 +90,12 @@ SOURCES += \
 
 HEADERS += \
     ../YuePlayer/src/cpp/yue/bell/playlist_test.h
+
+
+#-------------------------------------------------
+# configure TAGLIB
+INCLUDEPATH += $$PWD/../TagLib/include
+DEFINES += TAGLIB_STATIC
+win32:CONFIG(release, debug|release): LIBS += -L$$OUT_PWD/../TagLib/release/ -ltag
+else:win32:CONFIG(debug, debug|release): LIBS += -L$$OUT_PWD/../TagLib/debug/ -ltag
+else:unix: LIBS += -L$$OUT_PWD/../TagLib/ -ltag

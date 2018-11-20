@@ -18,8 +18,6 @@ class ScannerInterrupt : public std::exception {
 
 class ScannerThread : public QThread
 {
-    Q_OBJECT
-
 public:
     ScannerThread(const QDir& root, QObject *parent = nullptr);
 

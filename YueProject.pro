@@ -1,9 +1,9 @@
 
 TEMPLATE = subdirs
-SUBDIRS = YuePlayer YueTest TagLib
+SUBDIRS = YuePlayer TagLib
 
 YuePlayer.depends = TagLib
-YueTest.depends = TagLib
+# YueTest.depends = TagLib
 
 
 #####################################################################
