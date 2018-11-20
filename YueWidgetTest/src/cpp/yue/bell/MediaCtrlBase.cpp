@@ -49,6 +49,7 @@ void MediaCtrlBase::playNext(int uid)
     auto pl = PlaylistManager::instance()->openCurrent();
     auto pair = pl->current();
     pl->insert(static_cast<int>(pair.second)+1,static_cast<Database::uid_t>(uid));
+    emit playlistReset();
 }
 
 void MediaCtrlBase::playSong(int uid)

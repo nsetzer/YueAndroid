@@ -2,9 +2,9 @@
 #include "rpc/MediaCtrlRemoteServer.h"
 #include <QCoreApplication>
 
-//#include "yue/bell/database.hpp"
-//#include "yue/bell/library.hpp"
-//#include "yue/bell/MediaCtrlBase.h"
+#include "yue/bell/database.hpp"
+#include "yue/bell/library.hpp"
+#include "yue/bell/MediaCtrlBase.h"
 
 #ifdef Q_OS_ANDROID
 #include <QAndroidJniObject>
@@ -13,26 +13,25 @@
 
 #ifdef Q_OS_ANDROID
 
-static void JNIActivitySTTResultCallback(JNIEnv *env, jobject obj, jstring jstra, jstring jstrb)
+static void STTResult(yue::bell::Library *lib, const QStringList& results)
 {
-    Q_UNUSED(obj);
-    const char * result1= env->GetStringUTFChars(jstra , nullptr);
-    const char * result2= env->GetStringUTFChars(jstrb , nullptr);
-
-    QStringList results;
-    results.push_back(result1);
-    results.push_back(result2);
     for (QString result : results) {
         QStringList words = result.split(" ");
         if ( words.length() > 1 && words[0].toLower() == "play") {
             words.removeAt(0);
+
+            if (words.length() > 1 && words[0].toLower() == "song") {
+                words.removeAt(0);
+            }
+
             QString query = words.join(" ");
             qDebug() << "jni native call: play song: " << query;
-            //QList<yue::bell::Database::uid_t> lst = yue::bell::Library::instance()->createPlaylist(query,1);
-            //if (lst.length()>0) {
-            //    yue::bell::MediaCtrlBase::instance()->doPlaySong(lst[0]);
-            //    return;
-            //}
+
+            QList<yue::bell::Database::uid_t> lst = lib->createPlaylist(query, 1);
+            if (lst.length()>0) {
+                yue::bell::MediaCtrlBase::instance()->doPlaySong(lst[0]);
+                return;
+            }
         } else if ( words.length() > 1 && words[0].toLower() == "create") {
             words.removeAt(0);
             if (words.length() > 1 && (words[0].toLower() == "playlist" || words[0].toLower() == "playlists")) {
@@ -44,11 +43,11 @@ static void JNIActivitySTTResultCallback(JNIEnv *env, jobject obj, jstring jstra
 
             QString query = words.join(" ");
             qDebug() << "jni native call: create: " << query;
-            //QList<yue::bell::Database::uid_t> lst = yue::bell::Library::instance()->createPlaylist(query);
-            //if (lst.length()>0) {
-            //    yue::bell::MediaCtrlBase::instance()->doSetCurrentPlaylist(lst,true);
-            //    return;
-            //}
+            QList<yue::bell::Database::uid_t> lst = lib->createPlaylist(query);
+            if (lst.length()>0) {
+                yue::bell::MediaCtrlBase::instance()->doSetCurrentPlaylist(lst,true);
+                return;
+            }
         } else {
             qDebug() << "jni native call: default: " << result;
         }
@@ -61,7 +60,29 @@ static void JNIActivitySTTResultCallback(JNIEnv *env, jobject obj, jstring jstra
                                        "makeToast",
                                        "(Ljava/lang/String;)V",
                                        message.object<jstring>());
+}
 
+static void JNIActivitySTTResultCallback(JNIEnv *env, jobject obj, jstring jstra, jstring jstrb)
+{
+    Q_UNUSED(obj);
+    const char * result1= env->GetStringUTFChars(jstra , nullptr);
+    const char * result2= env->GetStringUTFChars(jstrb , nullptr);
+
+    auto db = yue::bell::Database::reconnect("TTS");
+    auto lib = new yue::bell::Library(db.data());
+
+    QStringList results;
+    results.push_back(result1);
+    results.push_back(result2);
+
+    try {
+        STTResult(lib, results);
+    } catch (...) {
+        qCritical() << "unexpected exception";
+    }
+
+    delete lib;
+    db.reset();
 }
 
 static JNINativeMethod ActivityArray[] =

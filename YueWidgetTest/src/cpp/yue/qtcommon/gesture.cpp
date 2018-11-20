@@ -1,4 +1,4 @@
-#include "gesture.h"
+#include "yue/qtcommon/gesture.h"
 
 #include <QDebug>
 

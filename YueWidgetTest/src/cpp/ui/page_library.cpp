@@ -1,6 +1,7 @@
 
 #include "ui/page_library.h"
 #include "yue/qtcommon/iconbutton.h"
+#include "yue/bell/MediaCtrlBase.h"
 
 void LibraryTreeDelegate::paint(
     QPainter *painter,
@@ -164,6 +165,7 @@ public:
     yue::qtcommon::IconButton *m_btnClearSearch;
     yue::qtcommon::IconButton *m_btnSearch;
 
+    yue::qtcommon::IconButton *m_btnSpeech;
     yue::qtcommon::IconButton *m_btnToggleSelection;
     yue::qtcommon::IconButton *m_btnToggleExpand;
     yue::qtcommon::IconButton *m_btnToggleShuffle;
@@ -182,7 +184,9 @@ uiPageLibrary::uiPageLibrary(QWidget *parent) {
     m_layoutCreate = new QHBoxLayout();
 
     m_editSearch = new QLineEdit(parent);
+
     m_btnClearSearch = new yue::qtcommon::IconButton(QIcon(":/res/clear.svg"), parent);
+    m_btnSpeech = new yue::qtcommon::IconButton(QIcon(":/res/speech.svg"), parent);
     m_btnToggleSelection = new yue::qtcommon::IconButton(QIcon(":/res/select.svg"), parent);
     m_btnToggleExpand = new yue::qtcommon::IconButton(QIcon(":/res/select.svg"), parent);
     m_btnToggleShuffle = new yue::qtcommon::IconButton(QIcon(":/res/shuffle.svg"), parent);
@@ -193,6 +197,7 @@ uiPageLibrary::uiPageLibrary(QWidget *parent) {
     m_layoutSearch->addWidget(m_editSearch);
     m_layoutSearch->addWidget(m_btnClearSearch);
 
+    m_layoutCreate->addWidget(m_btnSpeech);
     m_layoutCreate->addWidget(m_btnToggleSelection);
     m_layoutCreate->addWidget(m_btnToggleExpand);
     m_layoutCreate->addWidget(m_btnToggleShuffle);
@@ -236,6 +241,10 @@ PageLibrary::PageLibrary(QWidget *parent)
 
     connect(m_ui->m_btnClearSearch, &yue::qtcommon::IconButton::clicked,
             this, &PageLibrary::onClearSearch);
+
+    connect(m_ui->m_btnSpeech, &yue::qtcommon::IconButton::clicked,
+            this, &PageLibrary::onSpeechClicked);
+
 }
 
 PageLibrary::~PageLibrary() {
@@ -278,4 +287,10 @@ void PageLibrary::setQuery(QString query)
 {
     m_ui->m_editSearch->setText(query);
     m_ui->m_view->setQuery(query);
+}
+
+void PageLibrary::onSpeechClicked()
+{
+    auto inst = yue::bell::MediaCtrlBase::instance();
+    inst->tts();
 }

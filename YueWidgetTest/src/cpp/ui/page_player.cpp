@@ -3,7 +3,7 @@
 #include "ui/page_player.h"
 #include "yue/bell/MediaCtrlBase.h"
 #include "yue/qtcommon/iconbutton.h"
-
+#include "yue/qtcommon/mediaprogressbar.h"
 
 namespace UI {
 
@@ -18,9 +18,7 @@ public:
     yue::qtcommon::IconButton *m_btnMenu;
     yue::qtcommon::IconButton *m_btnPlayPause;
     yue::qtcommon::IconButton *m_btnNext;
-    QProgressBar *m_barPosition;
-    QLabel *m_lblSongInfo;
-
+    yue::qtcommon::MediaProgressBar *m_barInfo;
 
     uiPagePlayer(QWidget *parent = nullptr);
     ~uiPagePlayer();
@@ -30,8 +28,13 @@ public:
 
 uiPagePlayer::uiPagePlayer(QWidget *parent)
 {
+
     m_layoutCentral = new QVBoxLayout();
+    m_layoutCentral->setContentsMargins(0, 0, 0, 0);
+
     m_layoutDisplay = new QHBoxLayout();
+    m_layoutDisplay->setContentsMargins(0, 0, 0, 0);
+
     m_btnMenu = new yue::qtcommon::IconButton(
                 yue::qtcommon::IconButton::IconSize::LARGE,
                 QIcon(":/res/home.svg"),
@@ -44,20 +47,18 @@ uiPagePlayer::uiPagePlayer(QWidget *parent)
                 yue::qtcommon::IconButton::IconSize::LARGE,
                 QIcon(":/res/media_next.svg"),
                 parent);
-    m_barPosition = new QProgressBar(parent);
-    m_barPosition->setTextVisible(false);
-    m_barPosition->setRange(0, 100);
-    m_lblSongInfo = new QLabel("TITLE - ARTIST", parent);
-    m_lblSongInfo->setAlignment(Qt::AlignVCenter | Qt::AlignHCenter);
+    m_barInfo = new yue::qtcommon::MediaProgressBar(parent);
 
     m_layoutDisplay->addWidget(m_btnMenu);
     m_layoutDisplay->addWidget(m_btnPlayPause);
     m_layoutDisplay->addWidget(m_btnNext);
-    m_layoutDisplay->addWidget(m_barPosition);
+    //m_layoutDisplay->addWidget(m_barPosition);
 
     parent->setLayout(m_layoutCentral);
+    m_layoutCentral->addSpacing(8);
     m_layoutCentral->addLayout(m_layoutDisplay);
-    m_layoutCentral->addWidget(m_lblSongInfo);
+
+    m_layoutCentral->addWidget(m_barInfo);
 }
 
 uiPagePlayer::~uiPagePlayer()
@@ -106,6 +107,9 @@ PagePlayer::PagePlayer(QWidget *parent)
     connect(inst.data(), &yue::bell::MediaCtrlBase::stateChanged,
             this, &PagePlayer::onStateChanged);
 
+    connect(m_ui->m_barInfo, &yue::qtcommon::MediaProgressBar::positionChanged,
+            this, &PagePlayer::onPositionChanged);
+
     onCurrentIndexChanged();
 
 }
@@ -127,8 +131,7 @@ void PagePlayer::onNextSongClicked()
 
 void PagePlayer::onProgressChanged(float progress)
 {
-    m_ui->m_barPosition->setValue(
-                static_cast<int>(m_ui->m_barPosition->maximum()*progress));
+    m_ui->m_barInfo->setPosition(progress);
 }
 
 void PagePlayer::onCurrentIndexChanged(int index)
@@ -138,7 +141,8 @@ void PagePlayer::onCurrentIndexChanged(int index)
     auto inst = yue::bell::MediaCtrlBase::instance();
     auto info = inst->currentSong();
     QString text = info.title() + " - " + info.artist();
-    m_ui->m_lblSongInfo->setText(text);
+    m_ui->m_barInfo->setText(text);
+    //m_ui->m_barInfo->setLength(info.length)
 }
 
 void PagePlayer::onStatusChanged(yue::bell::MediaPlayerBase::Status status)
@@ -177,3 +181,8 @@ void PagePlayer::onStateChanged(yue::bell::MediaPlayerBase::State state)
     }
 }
 
+void PagePlayer::onPositionChanged(float pos)
+{
+    auto inst = yue::bell::MediaCtrlBase::instance();
+    inst->setProgress(pos);
+}

@@ -39,7 +39,7 @@ private:
 
 public:
     LibraryView(QWidget *parent = nullptr);
-    ~LibraryView() {}
+    virtual ~LibraryView() {}
 
     void setQuery(QString query);
     void toggleChecked();
@@ -48,15 +48,15 @@ public:
 
 protected:
 
-    virtual void mousePressEvent(QMouseEvent *event) {
+    virtual void mousePressEvent(QMouseEvent *event) override {
         m_gesture.mousePressEvent(event);
     }
 
-    virtual void mouseMoveEvent(QMouseEvent *event) {
+    virtual void mouseMoveEvent(QMouseEvent *event) override {
         m_gesture.mouseMoveEvent(event);
     }
 
-    virtual void mouseReleaseEvent(QMouseEvent *event) {
+    virtual void mouseReleaseEvent(QMouseEvent *event) override {
         m_gesture.mouseReleaseEvent(event);
     }
 
@@ -113,6 +113,7 @@ private slots:
     void onToggleShuffle();
     void onCreatePlaylist();
     void onClearSearch();
+    void onSpeechClicked();
 
 private:
     QScopedPointer<UI::uiPageLibrary> m_ui;

@@ -19,8 +19,8 @@
 #include "yue/bell/MediaCtrlLocal.h"
 //#include "yue/device.h"
 //#include "yue/qtcommon/qtcommon.hpp"
-//#include "yue/qtcommon/ResourceCache.h"
-//#include "yue/bell/LibraryTreeNode.hpp"
+#include "yue/qtcommon/ResourceCache.h"
+#include "yue/bell/LibraryTreeNode.hpp"
 //#include "MediaCtrlRemoteClient.h"
 //#include "MediaCtrlRemoteServer.h"
 
@@ -168,6 +168,15 @@ int main(int argc, char *argv[])
         gui_app->setDesktopFileName(name);
         app = gui_app;
     }
+
+    qRegisterMetaType<yue::bell::SongInfo>("SongInfo");
+    qRegisterMetaType<yue::bell::Database::uid_t>("Database::uid_t");
+    qRegisterMetaType<QList<yue::bell::Database::uid_t>>("QList<yue::bell::Database::uid_t>");
+    qRegisterMetaType<yue::bell::MediaPlayerBase::State>("MediaPlayerBase::State");
+    qRegisterMetaType<yue::bell::MediaPlayerBase::Status>("MediaPlayerBase::Status");
+    qRegisterMetaType<yue::qtcommon::ResourceCache::rid_t>("ResourceCache::rid_t");
+    qRegisterMetaType<yue::bell::LibraryTreeNode>("LibraryTreeNode");
+    qRegisterMetaType<QList<yue::bell::LibraryTreeNode*>>("QList<yue::bell::LibraryTreeNode*>");
 
     qDebug() << "main: application starting";
 

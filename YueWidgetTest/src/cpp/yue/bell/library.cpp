@@ -537,8 +537,9 @@ QList<Database::uid_t> Library::createPlaylist(QString query, size_t size/* = 0*
     if (query == "") {
         q.prepare("SELECT uid, artist FROM library");
     } else {
-        q = m_grammar.buildQuery(QStringList() << yue::core::Song::uid << yue::core::Song::artist,
-                              query);
+        q = m_grammar.buildQuery(
+                    QStringList() << yue::core::Song::uid << yue::core::Song::artist,
+                    query, "", m_db->db());
     }
     q.exec();
 

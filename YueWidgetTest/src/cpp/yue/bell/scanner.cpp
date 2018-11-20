@@ -8,6 +8,7 @@
 #include "taglib/tlist.h"
 #include "taglib/flacfile.h"
 #include "taglib/attachedpictureframe.h"
+#include "taglib/tpropertymap.h"
 
 namespace yue {
 namespace bell {
@@ -113,12 +114,13 @@ void ScannerThread::scan_file(const QFileInfo& info)
         return;
     }
 
-    TagLib::FileRef f(info.absoluteFilePath().toUtf8().constData());
+    TagLib::FileRef f(info.absoluteFilePath().toUtf8().constData(), true, TagLib::AudioProperties::Accurate);
 
     QString artist(f.tag()->artist().toCString(true));
     QString album(f.tag()->album().toCString(true));
     QString title(f.tag()->title().toCString(true));
     QString genre(f.tag()->genre().toCString(true));
+    int length = f.audioProperties()->lengthInSeconds();
 
     artist = artist.simplified();
     album = album.simplified();
@@ -144,6 +146,7 @@ void ScannerThread::scan_file(const QFileInfo& info)
     data[yue::core::Song::album] = album;
     data[yue::core::Song::title] = title;
     data[yue::core::Song::genre] = genre;
+    data[yue::core::Song::length] = length;
 
     qDebug() << "inserting" << data[yue::core::Song::path].toString();
     Database::uid_t uid = m_lib->insert(data);

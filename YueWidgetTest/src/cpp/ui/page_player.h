@@ -33,6 +33,7 @@ protected:
     void onCurrentIndexChanged(int index=-1);
     void onStatusChanged(yue::bell::MediaPlayerBase::Status status);
     void onStateChanged(yue::bell::MediaPlayerBase::State state);
+    void onPositionChanged(float pos);
 
 private:
     QScopedPointer<UI::uiPagePlayer> m_ui;

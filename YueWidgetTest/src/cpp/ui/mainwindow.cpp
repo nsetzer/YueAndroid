@@ -43,6 +43,7 @@ MainWindow::MainWindow(QMainWindow *parent)
     parent->setCentralWidget(m_centralWidget);
 
     m_centralLayout = new QVBoxLayout();
+    m_centralLayout->setContentsMargins(0, 0, 0, 0);
     m_centralWidget->setLayout(m_centralLayout);
 
     m_tabPages = new QTabWidget(parent);
