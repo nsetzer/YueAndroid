@@ -4,6 +4,7 @@
 #include "ui/page_explorer.h"
 
 #include <QApplication>
+#include <QLabel>
 
 ExplorerDelegate::ExplorerDelegate(QObject *parent)
     : QStyledItemDelegate(parent)
@@ -129,7 +130,7 @@ public:
     yue::qtcommon::IconButton *m_btnHome;
     yue::qtcommon::IconButton *m_btnBack;
     yue::qtcommon::IconButton *m_btnScan;
-    QProgressBar *m_pbarScan;
+    QLabel *m_lblScanStatus;
 
     ExplorerView *m_view;
 
@@ -148,15 +149,14 @@ uiPageExplorer::uiPageExplorer(QWidget *parent)
     m_btnHome = new yue::qtcommon::IconButton(QIcon(":/res/home.svg"), parent);
     m_btnScan = new yue::qtcommon::IconButton(QIcon(":/res/scan.svg"), parent);
 
-    m_pbarScan = new QProgressBar(parent);
-    m_pbarScan->setTextVisible(false);
+    m_lblScanStatus = new QLabel("", parent);
 
     m_view = new ExplorerView(parent);
 
     m_layoutNav->addWidget(m_btnBack);
     m_layoutNav->addWidget(m_btnHome);
     m_layoutNav->addWidget(m_btnScan);
-    m_layoutNav->addWidget(m_pbarScan);
+    m_layoutNav->addWidget(m_lblScanStatus);
     // TODO revist spacing,
     // create a ReactiveUI class to handle desktop sizing
     // no reason for any spacing on desktop
@@ -238,6 +238,5 @@ void PageExplorer::onScanUpdate(bool running, int ndirs, int nfiles, int nsongs)
 
     m_ui->m_btnScan->setIcon(QIcon(running?":/res/stop.svg":":/res/scan.svg"));
 
-    m_ui->m_pbarScan->setRange(0, 100);
-    m_ui->m_pbarScan->setValue(running?100:0);
+    m_ui->m_lblScanStatus->setText(running?"Scan Running...":"");
 }

@@ -30,9 +30,15 @@ void ScannerThread::run()
     m_lib = QSharedPointer<Library>(new Library(db));
 
     try {
-        remove_missing();
+        for (int i=0; i<100; i++) {
+            check();
+            msleep(500);
+            emit update();
 
-        scan();
+        }
+        //remove_missing();
+
+        //scan();
     } catch (ScannerInterrupt& ex) {
         qDebug() << "scanner interrupted" << ex.what();
 
@@ -186,7 +192,11 @@ void Scanner::start(QDir path)
         connect(m_pScannerThread, &QThread::finished,
                 this, &Scanner::onScanFinished);
 
+        connect(m_pScannerThread, &ScannerThread::update,
+                this, &Scanner::onScanUpdate);
+
         m_pScannerThread->start();
+        emit start();
     }
 }
 
@@ -196,6 +206,12 @@ void Scanner::stop()
         m_pScannerThread->stop();
     }
 }
+
+void Scanner::onScanUpdate()
+{
+    emit update();
+}
+
 
 void Scanner::onScanFinished()
 {

@@ -72,6 +72,7 @@ private slots:
     void onStatusChanged(MediaPlayerBase::Status status);
     void onStateChanged(MediaPlayerBase::State state);
 
+    void onScanUpdate();
     void onScanFinished();
 
     void onSongEnded();

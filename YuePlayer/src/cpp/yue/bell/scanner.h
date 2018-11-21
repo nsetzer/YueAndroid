@@ -18,6 +18,8 @@ class ScannerInterrupt : public std::exception {
 
 class ScannerThread : public QThread
 {
+    Q_OBJECT
+
 public:
     ScannerThread(const QDir& root, QObject *parent = nullptr);
 
@@ -25,6 +27,7 @@ public:
     void stop() {m_alive = false;}
 
 signals:
+    void update();
 
 private:
     void remove_missing();
@@ -51,6 +54,7 @@ public:
 signals:
 
     void start();
+    void update();
     void finished();
 
 public slots:
@@ -60,6 +64,7 @@ public slots:
 
 private slots:
     void onScanFinished();
+    void onScanUpdate();
 
 private:
     ScannerThread *m_pScannerThread;

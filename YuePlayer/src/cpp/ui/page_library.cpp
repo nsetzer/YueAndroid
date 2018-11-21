@@ -18,9 +18,8 @@ void LibraryTreeDelegate::paint(
     int expand = index.data(yue::qtcommon::TreeListModelBase::ExpandedRole).toInt();
     int depth = index.data(yue::qtcommon::TreeListModelBase::DepthRole).toInt();
     int count = index.data(yue::qtcommon::TreeListModelBase::ChildCountRole).toInt();
+    int rating = index.data(yue::qtcommon::TreeListModelBase::RatingRole).toInt();
 
-    if (check != 0)
-        qDebug() << check;
     if (check/*option.state & QStyle::State_Selected*/) {
         QBrush color = option.palette.highlight();
         if (check == Qt::CheckState::PartiallyChecked)
@@ -44,6 +43,9 @@ void LibraryTreeDelegate::paint(
     int top = option.rect.top();
 
     int xoffset=0;
+
+    painter->save();
+
     if (count>0) {
         xoffset+=1;
         int h = static_cast<int>(.75F * height);
@@ -64,14 +66,32 @@ void LibraryTreeDelegate::paint(
 
     QRect rect = option.rect;
     rect.setLeft(left + ((depth + xoffset)*height));
+    int w = 3 * rect.height() / 4;
+    rect.setRight(rect.right() - w);
 
-    QString text = "(" + index.data(Qt::DisplayRole).toString()
-            + ", " + QString::number(check)
-            + ", " + QString::number(expand)
-            + ", " + QString::number(depth)
-            + ", " + QString::number(count) + ")";
+    QRect rectBtn(rect.right() + (1*w/10),
+                  rect.top() + (2*rect.height()/10),
+                  (8*w/10),
+                  (6*rect.height()/10));
+    QString text = index.data(Qt::DisplayRole).toString();
 
     painter->drawText(rect, Qt::AlignVCenter|Qt::AlignLeft, text);
+
+    painter->restore();
+
+    if (depth == 2) {
+        painter->save();
+
+        QPainterPath path;
+        path.addRoundRect(rectBtn, w/2, w/2);
+        painter->setPen(QPen(Qt::black, 2));
+        painter->fillPath(path, (rating>=8)?Qt::yellow:Qt::gray);
+        painter->drawPath(path);
+
+        painter->restore();
+    }
+
+
 }
 
 QSize LibraryTreeDelegate::sizeHint(

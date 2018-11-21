@@ -7,11 +7,14 @@
 namespace yue {
 namespace qtcommon {
 
-int TreeListModelBase::CheckRole      = Qt::UserRole+1;
-int TreeListModelBase::ExpandedRole   = Qt::UserRole+2;
-int TreeListModelBase::DepthRole      = Qt::UserRole+3;
-int TreeListModelBase::ChildCountRole = Qt::UserRole+4;
-int TreeListModelBase::UserRole       = TreeListModelBase::ChildCountRole;
+int TreeListModelBase::SongIdRole     = Qt::UserRole+1;
+int TreeListModelBase::CheckRole      = Qt::UserRole+2;
+int TreeListModelBase::ExpandedRole   = Qt::UserRole+3;
+int TreeListModelBase::DepthRole      = Qt::UserRole+4;
+int TreeListModelBase::ChildCountRole = Qt::UserRole+5;
+int TreeListModelBase::RatingRole     = Qt::UserRole+6;
+int TreeListModelBase::UserRole       = TreeListModelBase::RatingRole;
+
 /*
  * experiment:
  *  BasicListModel<T>
@@ -66,6 +69,9 @@ QVariant TreeListModelBase::data(const QModelIndex &index, int role/* = Qt::Disp
     if (index.row() < 0 || index.row() >= rowCount())
         return QVariant();
 
+    if (role == TreeListModelBase::SongIdRole)
+        return m_tabledata[index.row()]->getUid();
+
     if (role == TreeListModelBase::CheckRole)
         return static_cast<int>(m_tabledata[index.row()]->getCheckState());
 
@@ -74,6 +80,9 @@ QVariant TreeListModelBase::data(const QModelIndex &index, int role/* = Qt::Disp
 
     if (role == TreeListModelBase::DepthRole)
         return m_tabledata[index.row()]->getDepth();
+
+    if (role == TreeListModelBase::RatingRole)
+        return m_tabledata[index.row()]->getRating();
 
     if (role == TreeListModelBase::ChildCountRole) {
         QVariant v;
@@ -90,6 +99,13 @@ QVariant TreeListModelBase::data(const QModelIndex &index, int role/* = Qt::Disp
 bool TreeListModelBase::setData(const QModelIndex &index, const QVariant &value, int role/* = Qt::EditRole*/)
 {
     Q_UNUSED(value);
+
+    if (role == TreeListModelBase::RatingRole) {
+        m_tabledata[index.row()]->setRating(value.toInt());
+        emit dataChanged(index, index, {role,});
+        return true;
+    }
+
     if (role != Qt::EditRole)
         return false;
 
@@ -106,10 +122,12 @@ QHash<int, QByteArray> TreeListModelBase::roleNames() const
 
     QHash<int, QByteArray> roles(QAbstractItemModel::roleNames());
 
+    roles[TreeListModelBase::SongIdRole] = "songId";
     roles[TreeListModelBase::CheckRole] = "checkState";
     roles[TreeListModelBase::ExpandedRole] = "isExpanded";
     roles[TreeListModelBase::DepthRole] = "depth";
     roles[TreeListModelBase::ChildCountRole] = "childCount";
+    roles[TreeListModelBase::RatingRole] = "rating";
     return roles;
 }
 

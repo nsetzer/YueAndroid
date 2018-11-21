@@ -18,10 +18,12 @@ class YUECOMMON_EXPORT TreeListModelBase : public QAbstractListModel
     Q_PROPERTY(bool anySelected READ anySelected() NOTIFY selectionChanged)
     Q_PROPERTY(bool allSelected READ allSelected() NOTIFY selectionChanged)
 public:
+    static int SongIdRole;
     static int CheckRole;
     static int ExpandedRole;
     static int DepthRole;
     static int ChildCountRole;
+    static int RatingRole;
     static int UserRole;
 public:
 

@@ -15,8 +15,23 @@ LibraryTreeNode::LibraryTreeNode()
 
 }
 
-LibraryTreeNode::LibraryTreeNode(Database::uid_t uid, QString text, int depth, LibraryTreeNode* parent)
+LibraryTreeNode::LibraryTreeNode(QString text, int depth, LibraryTreeNode* parent)
+    : m_uid(0)
+    , m_rating(0)
+    , m_text(text)
+    , m_depth(depth)
+    , m_parent(parent)
+    , m_children()
+    , m_checkstate(Qt::Unchecked)
+    , m_expanded(false)
+{
+
+}
+
+
+LibraryTreeNode::LibraryTreeNode(Database::uid_t uid, QString text, int rating, int depth, LibraryTreeNode* parent)
     : m_uid(uid)
+    , m_rating(rating)
     , m_text(text)
     , m_depth(depth)
     , m_parent(parent)

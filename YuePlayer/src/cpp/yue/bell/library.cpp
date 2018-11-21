@@ -345,6 +345,23 @@ void Library::incrementPlaycount(Database::uid_t uid)
     return;
 }
 
+void Library::setRating(Database::uid_t uid, int rating)
+{
+    m_db->db().transaction();
+
+    QSqlQuery q(m_db->db());
+    q.prepare("UPDATE songs SET rating=? WHERE uid=?");
+    q.addBindValue(rating);
+    q.addBindValue(toQVariant(uid));
+
+    if (!q.exec()) {
+        qWarning() << "error executing query" << q.lastError();
+    }
+
+    m_db->db().commit();
+    return;
+}
+
 /**
  * @brief Library::exists
  * @param path to a local file on disk
@@ -473,12 +490,14 @@ QList<LibraryTreeNode*> Library::queryToForest(QString querystr)
     QList<yue::bell::LibraryTreeNode*> forest;
 
     typedef yue::core::Song Song;
-    QSqlQuery query = m_grammar.buildQuery(QStringList() << Song::artist
-                          << Song::album
-                          << Song::title
-                          << Song::uid
-                          << Song::artist_key
-                          << Song::album_index,
+    QSqlQuery query = m_grammar.buildQuery(QStringList()
+                          << Song::artist       // 0
+                          << Song::album        // 1
+                          << Song::title        // 2
+                          << Song::rating       // 3
+                          << Song::uid          // 4
+                          << Song::artist_key   // 5
+                          << Song::album_index, // 6
                           querystr,
                           "artist_key COLLATE NOCASE, "
                           "album COLLATE NOCASE, "
@@ -498,19 +517,20 @@ QList<LibraryTreeNode*> Library::queryToForest(QString querystr)
         QString artist = query.value(0).toString();
         QString album  = query.value(1).toString();
         QString title  = query.value(2).toString();
-        int uid  = query.value(3).toInt();
+        int rating = query.value(3).toInt();
+        Database::uid_t uid = query.value(4).toULongLong();
 
         if (nd_art == nullptr || nd_art->text() != artist) {
-            nd_art = new yue::bell::LibraryTreeNode(0,artist,0);
+            nd_art = new yue::bell::LibraryTreeNode(artist, 0);
             nd_alb = nullptr;
             forest.push_back(nd_art);
         }
         if (nd_alb == nullptr || nd_alb->text() != album) {
-            nd_alb = new yue::bell::LibraryTreeNode(0,album,1);
+            nd_alb = new yue::bell::LibraryTreeNode(album, 1);
             nd_art->addChild(nd_alb);
         }
 
-        yue::bell::LibraryTreeNode* child = new yue::bell::LibraryTreeNode(uid,title,2);
+        yue::bell::LibraryTreeNode* child = new yue::bell::LibraryTreeNode(uid, title, rating, 2);
         nd_alb->addChild(child);
     }
 

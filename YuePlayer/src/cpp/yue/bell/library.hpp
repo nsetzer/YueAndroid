@@ -50,6 +50,8 @@ public:
 
     void incrementPlaycount(Database::uid_t uid);
 
+    void setRating(Database::uid_t uid, int rating);
+
     bool exists(QString path);
 
     void remove(QMap<QString,QVariant> data);

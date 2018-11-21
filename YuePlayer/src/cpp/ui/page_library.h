@@ -64,11 +64,23 @@ protected:
 
         const QModelIndex index = indexAt(QPoint(x, y));
         const QSize size = sizeHintForIndex(index);
+
+        yue::bell::Database::uid_t songId = index.data(
+            yue::qtcommon::TreeListModelBase::SongIdRole).toULongLong();
         int depth = index.data(yue::qtcommon::TreeListModelBase::DepthRole).toInt();
         int count = index.data(yue::qtcommon::TreeListModelBase::ChildCountRole).toInt();
+        int rating = index.data(yue::qtcommon::TreeListModelBase::RatingRole).toInt();
 
-        if (count>0 && x < (1+depth)*size.height()) {
+        int x1 = (1+depth)*size.height();
+        int x2 = viewport()->width() - (3*size.height()/4);
+
+        if (count>0 && x < x1) {
             onDoubleClick(index);
+        } else if (depth == 2 && x > x2) {
+            int tmp = (rating>=8)?0:8;
+            m_model->setData(index, tmp, yue::qtcommon::TreeListModelBase::RatingRole);
+            yue::bell::Library::instance()->setRating(songId, tmp);
+            qDebug() << "new rating" << rating << tmp;
         } else {
             onClick(index);
         }

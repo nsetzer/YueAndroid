@@ -19,6 +19,9 @@ MediaCtrlBackend::MediaCtrlBackend(QObject *parent/* = nullptr*/)
     connect(m_pPlayer.data(),&MediaPlayerBase::stateChanged,
             this,&MediaCtrlBackend::onStateChanged);
 
+    connect(&m_scanner, &Scanner::update,
+            this, &MediaCtrlBackend::onScanUpdate);
+
     connect(&m_scanner, &Scanner::finished,
             this, &MediaCtrlBackend::onScanFinished);
 
@@ -168,12 +171,20 @@ void MediaCtrlBackend::scanStop()
 
 void MediaCtrlBackend::scanStatus()
 {
+    // emit the current status when the frontend queries the running state
+    emit scanUpdate(m_scanner.isRunning(), 0, 0, 0);
+}
+
+void MediaCtrlBackend::onScanUpdate()
+{
+    // allow the thread to update the ui periodically
     emit scanUpdate(m_scanner.isRunning(), 0, 0, 0);
 }
 
 void MediaCtrlBackend::onScanFinished()
 {
-    emit scanUpdate(m_scanner.isRunning(), 0, 0, 0);
+    // indicate the process is complete
+    emit scanUpdate(false, 0, 0, 0);
 }
 
 } // bell
