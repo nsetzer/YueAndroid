@@ -35,6 +35,9 @@ MediaCtrlRemoteServer::MediaCtrlRemoteServer()
     connect(m_pBackend.data(),&yue::bell::MediaCtrlBackend::statusChanged,
             this,&MediaCtrlRemoteServer::onStatusChanged);
 
+    connect(m_pBackend.data(),&yue::bell::MediaCtrlBackend::scanUpdate,
+            this,&MediaCtrlRemoteServer::onScanUpdate);
+
     try {
         m_pBackend->load();
     } catch (std::runtime_error& e) {
@@ -55,14 +58,12 @@ QSharedPointer<MediaCtrlRemoteServer> MediaCtrlRemoteServer::instance() {
 void MediaCtrlRemoteServer::onProgressChanged(float progress)
 {
     emit progressChanged(progress);
-    qDebug() << "server: progress" << progress;
 }
 
 void MediaCtrlRemoteServer::onCurrentIndexChanged(int index)
 {
     m_index = index;
     emit currentIndexChanged(index);
-    qDebug() << "server: index changed" << index;
 
     try {
         yue::bell::Database::uid_t uid = yue::bell::PlaylistManager::instance()->openCurrent()->current().first;

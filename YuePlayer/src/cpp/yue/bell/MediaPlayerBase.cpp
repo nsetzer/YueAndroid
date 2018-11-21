@@ -73,15 +73,16 @@ QDebug& operator << (QDebug& os, const yue::bell::MediaPlayerBase::Status& statu
     return os;
 }
 
-std::ostream& operator << (std::ostream& os, const yue::bell::MediaPlayerBase::State& state)
+/*
+std::ostream& operator << (std::ostream& os, yue::bell::MediaPlayerBase::State const & state)
 {
     os << yue::bell::MediaPlayerBase::stateToString(state).toStdString();
     return os;
 }
 
-std::ostream& operator << (std::ostream& os, const yue::bell::MediaPlayerBase::Status& status)
+std::ostream& operator << (std::ostream& os, yue::bell::MediaPlayerBase::Status const & status)
 {
     os << yue::bell::MediaPlayerBase::statusToString(status).toStdString();
     return os;
 }
-
+*/

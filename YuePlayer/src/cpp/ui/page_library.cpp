@@ -1,7 +1,7 @@
 
 #include "ui/page_library.h"
 #include "yue/qtcommon/iconbutton.h"
-#include "yue/bell/MediaCtrlBase.h"
+
 
 void LibraryTreeDelegate::paint(
     QPainter *painter,
@@ -46,17 +46,21 @@ void LibraryTreeDelegate::paint(
 
     painter->save();
 
+    int h = static_cast<int>(.75F * height);
+    int w = h - (h/3) - (h/3);
+    int s = (option.rect.height() - h) / 2;
+    QRect vrect(left + h/3 + (depth*height) + s, top + s, w, h);
+    QRect hrect(left + (depth*height) + s, top + h/3 + s, h, w);
+    QRect srect(left + ((depth - 1)*height) + s, top + s, h, h);
+
     if (count>0) {
         xoffset+=1;
-        int h = static_cast<int>(.75F * height);
-        int w = h - (h/3) - (h/3);
-        int s = (option.rect.height() - h) / 2;
+
         // draw the expansion state
         if (!expand) {
-            QRect vrect(left + h/3 + (depth*height) + s, top + s, w, h);
             painter->fillRect(vrect, QBrush(QColor(0,0,0)));
         }
-        QRect hrect(left + (depth*height) + s, top + h/3 + s, h, w);
+
         painter->fillRect(hrect, QBrush(QColor(0,0,0)));
 
         // paint the bounding box to check centering
@@ -66,12 +70,12 @@ void LibraryTreeDelegate::paint(
 
     QRect rect = option.rect;
     rect.setLeft(left + ((depth + xoffset)*height));
-    int w = 3 * rect.height() / 4;
-    rect.setRight(rect.right() - w);
+    int w2 = 3 * rect.height() / 4;
+    rect.setRight(rect.right() - w2);
 
-    QRect rectBtn(rect.right() + (1*w/10),
+    QRect rectBtn(rect.right() + (1*w2/10),
                   rect.top() + (2*rect.height()/10),
-                  (8*w/10),
+                  (8*w2/10),
                   (6*rect.height()/10));
     QString text = index.data(Qt::DisplayRole).toString();
 
@@ -82,11 +86,19 @@ void LibraryTreeDelegate::paint(
     if (depth == 2) {
         painter->save();
 
+        // the more button
         QPainterPath path;
         path.addRoundRect(rectBtn, w/2, w/2);
         painter->setPen(QPen(Qt::black, 2));
-        painter->fillPath(path, (rating>=8)?Qt::yellow:Qt::gray);
+        painter->fillPath(path, Qt::blue);
         painter->drawPath(path);
+
+        // a button, to the left of the text, for the rating
+        QPainterPath path2;
+        path2.addRoundRect(srect, w/2, w/2);
+        painter->setPen(QPen(Qt::black, 2));
+        painter->fillPath(path2, (rating>=8)?Qt::yellow:Qt::gray);
+        painter->drawPath(path2);
 
         painter->restore();
     }

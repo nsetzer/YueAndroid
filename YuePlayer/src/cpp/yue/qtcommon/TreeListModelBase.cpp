@@ -69,8 +69,10 @@ QVariant TreeListModelBase::data(const QModelIndex &index, int role/* = Qt::Disp
     if (index.row() < 0 || index.row() >= rowCount())
         return QVariant();
 
-    if (role == TreeListModelBase::SongIdRole)
-        return m_tabledata[index.row()]->getUid();
+    if (role == TreeListModelBase::SongIdRole) {
+        // TODO: fix types toQVariant is floating around somwhere
+        return static_cast<int>(m_tabledata[index.row()]->getUid());
+    }
 
     if (role == TreeListModelBase::CheckRole)
         return static_cast<int>(m_tabledata[index.row()]->getCheckState());
@@ -257,6 +259,7 @@ bool TreeListModelBase::allSelected()
 
 void TreeListModelBase::expandAll(bool bAll)
 {
+    Q_UNUSED(bAll);
     // TODO: this does not work because the model does
     // not get updated correctly.
     /*

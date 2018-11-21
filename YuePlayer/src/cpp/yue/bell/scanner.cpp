@@ -30,15 +30,10 @@ void ScannerThread::run()
     m_lib = QSharedPointer<Library>(new Library(db));
 
     try {
-        for (int i=0; i<100; i++) {
-            check();
-            msleep(500);
-            emit update();
 
-        }
-        //remove_missing();
+        remove_missing();
 
-        //scan();
+        scan();
     } catch (ScannerInterrupt& ex) {
         qDebug() << "scanner interrupted" << ex.what();
 

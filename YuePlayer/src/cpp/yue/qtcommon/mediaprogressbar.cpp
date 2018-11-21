@@ -50,6 +50,8 @@ float MediaProgressBar::getPosition() const
 
 void MediaProgressBar::paintEvent(QPaintEvent *event)
 {
+    Q_UNUSED(event);
+
     QPainter painter(this);
     int fh = m_fontMetrics.height();
 

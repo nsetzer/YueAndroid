@@ -60,6 +60,15 @@ protected:
     Status m_currentStatus;
     State m_currentState;
 
+public:
+    friend std::ostream& operator << (std::ostream& os, State const& type) {
+        os << yue::bell::MediaPlayerBase::stateToString(type).toStdString();
+        return os;
+    }
+    friend std::ostream& operator << (std::ostream& os, Status const& type) {
+        os << yue::bell::MediaPlayerBase::statusToString(type).toStdString();
+        return os;
+    }
 };
 
 
@@ -70,8 +79,8 @@ protected:
 QDebug& operator << (QDebug& os, const yue::bell::MediaPlayerBase::State& state);
 QDebug& operator << (QDebug& os, const yue::bell::MediaPlayerBase::Status& status);
 
-std::ostream& operator << (std::ostream& os, const yue::bell::MediaPlayerBase::State& type);
-std::ostream& operator << (std::ostream& os, const yue::bell::MediaPlayerBase::Status& type);
+//std::ostream& operator << (std::ostream& os, yue::bell::MediaPlayerBase::State const& type);
+//std::ostream& operator << (std::ostream& os, yue::bell::MediaPlayerBase::Status const& type);
 
 
 // declare outside the namespace, so that it will build on linux

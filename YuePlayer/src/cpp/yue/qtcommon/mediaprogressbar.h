@@ -1,5 +1,5 @@
 #ifndef YUE_QTCOMMON_MEDIAPROGRESSBAR_H
-#define MEDIAPROGRESSBAR_H
+#define YUE_QTCOMMON_MEDIAPROGRESSBAR_H
 
 #include <QScreen>
 #include <QApplication>

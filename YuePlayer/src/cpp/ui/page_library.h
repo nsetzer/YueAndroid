@@ -14,6 +14,7 @@
 #include "yue/qtcommon/TreeListModelBase.h"
 #include "yue/qtcommon/LibraryTreeListModel.h"
 #include "yue/qtcommon/gesture.h"
+#include "yue/bell/MediaCtrlBase.h"
 
 class LibraryTreeDelegate: public QStyledItemDelegate
 {
@@ -74,13 +75,16 @@ protected:
         int x1 = (1+depth)*size.height();
         int x2 = viewport()->width() - (3*size.height()/4);
 
-        if (count>0 && x < x1) {
+        if (depth < 2 && count>0 && x < x1) {
             onDoubleClick(index);
-        } else if (depth == 2 && x > x2) {
+        } else if (depth == 2 && x < x1) {
             int tmp = (rating>=8)?0:8;
             m_model->setData(index, tmp, yue::qtcommon::TreeListModelBase::RatingRole);
             yue::bell::Library::instance()->setRating(songId, tmp);
             qDebug() << "new rating" << rating << tmp;
+        } else if (depth == 2 && x > x2) {
+            auto inst = yue::bell::MediaCtrlBase::instance();
+            inst->playNext(songId);
         } else {
             onClick(index);
         }
