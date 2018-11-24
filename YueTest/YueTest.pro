@@ -29,6 +29,8 @@ SOURCES += \
     ../YuePlayer/src/cpp/yue/bell/playlist.cpp \
     ../YuePlayer/src/cpp/yue/bell/settings.cpp \
     ../YuePlayer/src/cpp/yue/bell/scanner.cpp \
+    ../YuePlayer/src/cpp/yue/bell/remote/client.cpp \
+    ../YuePlayer/src/cpp/yue/bell/remote/client_test.cpp \
     ../YuePlayer/src/cpp/yue/core/RandomArtExpressions.cpp \
     ../YuePlayer/src/cpp/yue/core/search/grammar.cpp \
     ../YuePlayer/src/cpp/yue/core/search/rules.cpp \
@@ -63,6 +65,8 @@ HEADERS += \
     ../YuePlayer/src/cpp/yue/bell/SongList.h \
     ../YuePlayer/src/cpp/yue/bell/settings.h \
     ../YuePlayer/src/cpp/yue/bell/scanner.h \
+    ../YuePlayer/src/cpp/yue/bell/remote/client.hpp \
+    ../YuePlayer/src/cpp/yue/bell/remote/client_test.hpp \
     ../YuePlayer/src/cpp/yue/core/lrucache.h \
     ../YuePlayer/src/cpp/yue/core/RandomArtExpressions.h \
     ../YuePlayer/src/cpp/yue/core/search/grammar.hpp \

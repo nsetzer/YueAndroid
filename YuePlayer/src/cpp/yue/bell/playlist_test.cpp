@@ -174,4 +174,6 @@ void TestPlaylist::_move_impl(playlist_t playlist, lst_t& expected, int src, int
     QCOMPARE(playlist->current().second, current_index);
 }
 
-QTEST_MAIN(TestPlaylist)
+// https://stackoverflow.com/questions/12194256/qt-how-to-organize-unit-test-with-more-than-one-class
+
+//QTEST_MAIN(TestPlaylist)

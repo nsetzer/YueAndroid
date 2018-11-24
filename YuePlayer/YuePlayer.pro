@@ -44,6 +44,7 @@ SOURCES += \
     src/cpp/yue/bell/playlist.cpp \
     src/cpp/yue/bell/scanner.cpp \
     src/cpp/yue/bell/settings.cpp \
+    src/cpp/yue/bell/remote/client.cpp \
     src/cpp/yue/core/RandomArtExpressions.cpp \
     src/cpp/yue/core/search/grammar.cpp \
     src/cpp/yue/core/search/rules.cpp \
@@ -92,6 +93,7 @@ HEADERS += \
     src/cpp/yue/bell/scanner.h \
     src/cpp/yue/bell/settings.h \
     src/cpp/yue/bell/SongList.h \
+    src/cpp/yue/bell/remote/client.hpp \
     src/cpp/yue/core/lrucache.h \
     src/cpp/yue/core/RandomArtExpressions.h \
     src/cpp/yue/core/search/grammar.hpp \
