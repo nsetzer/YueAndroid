@@ -7,22 +7,8 @@ namespace yue {
     namespace bell {
         namespace remote {
 
-RemoteClient::RemoteClient(QObject *parent)
-    : QObject(parent)
-    , m_manager(new QNetworkAccessManager(this))
-    , m_hostname()
-    , m_username()
-    , m_password()
-{
 
-}
-
-RemoteClient::~RemoteClient()
-{
-
-}
-
-void RemoteClient::wait(QNetworkReply* reply)
+void AbstractNetworkManager::wait(QNetworkReply* reply)
 {
     while (!reply->isFinished()) {
         QApplication::processEvents();
@@ -30,24 +16,49 @@ void RemoteClient::wait(QNetworkReply* reply)
     }
 }
 
+RemoteClient::RemoteClient(QObject *parent)
+    : QObject(parent)
+    , m_manager(new QtNetworkManager(this))
+    , m_hostname()
+{
+
+}
+
+RemoteClient::RemoteClient(AbstractNetworkManager *mgr, QObject *parent)
+    : QObject(parent)
+    , m_manager(mgr)
+    , m_hostname()
+{
+
+}
+
+
+RemoteClient::~RemoteClient()
+{
+
+}
+
+
 void RemoteClient::login(QString hostname, QString username, QString password)
 {
     m_hostname = hostname;
-    m_username = username;
-    m_password = password;
 
     QString url = m_hostname + "/api/user";
     QNetworkRequest request(url);
 
-    // HTTP Basic authentication header value: base64(username:password)
-    QString concatenated = username + ":" + password;
-    QByteArray data = concatenated.toLocal8Bit().toBase64();
-    QString headerData = "Basic " + data;
-    request.setRawHeader("Authorization", headerData.toLocal8Bit());
+    m_manager->setBasicAuth(username, password);
 
     QNetworkReply* reply = m_manager->get(request);
 
-    RemoteClient::wait(reply);
+    /*
+    connect(reply, SIGNAL(readyRead()), this, SLOT(slotReadyRead()));
+    connect(reply, SIGNAL(error(QNetworkReply::NetworkError)),
+            this, SLOT(slotError(QNetworkReply::NetworkError)));
+    connect(reply, SIGNAL(sslErrors(QList<QSslError>)),
+            this, SLOT(slotSslErrors(QList<QSslError>)));
+    */
+
+    AbstractNetworkManager::wait(reply);
 
 
     qDebug() << reply->url();
@@ -57,6 +68,7 @@ void RemoteClient::login(QString hostname, QString username, QString password)
     qDebug() << size;
     //QNetworkReply::NoError;
     qDebug() << reply->error();
+
 
     //reply->read()
 
