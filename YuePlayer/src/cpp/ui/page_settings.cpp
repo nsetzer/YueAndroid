@@ -29,6 +29,7 @@ public:
     QLineEdit *m_editRemotePassword;
     QLabel *m_lblRemoteStatus;
     QPushButton *m_btnConnect;
+    QPushButton *m_btnFetch;
 
     uiPageSettings(QWidget *parent = nullptr);
     ~uiPageSettings();
@@ -60,12 +61,14 @@ uiPageSettings::uiPageSettings(QWidget *parent)
     m_lblRemoteUsername = new QLabel("Username:", parent);
     m_lblRemotePassword = new QLabel("Password:", parent);
     m_editRemoteHostname = new QLineEdit(parent);
-    m_editRemoteHostname->setText("https://yueapp.duckdns.org");
+    m_editRemoteHostname->setText("http://localhost:4200");
     m_editRemoteUsername = new QLineEdit(parent);
     m_editRemoteUsername->setText("admin");
     m_editRemotePassword = new QLineEdit(parent);
     m_editRemotePassword->setText("admin");
+    m_editRemotePassword->setEchoMode(QLineEdit::PasswordEchoOnEdit);
     m_btnConnect = new QPushButton("Connect", parent);
+    m_btnFetch = new QPushButton("Fetch", parent);
     m_lblRemoteStatus = new QLabel("Status:", parent);
     {
         QVBoxLayout *vbox = new QVBoxLayout();
@@ -77,7 +80,9 @@ uiPageSettings::uiPageSettings(QWidget *parent)
         vbox->addWidget(m_lblRemotePassword);
         vbox->addWidget(m_editRemotePassword);
         vbox->addWidget(m_btnConnect);
+
         vbox->addWidget(m_lblRemoteStatus);
+        vbox->addWidget(m_btnFetch);
     }
     // -
     parent->setLayout(m_layoutCentral);
@@ -104,9 +109,38 @@ uiPageSettings::~uiPageSettings()
 PageSettings::PageSettings(QWidget *parent)
     : QWidget(parent)
     , m_ui(new UI::uiPageSettings(this))
+    , m_client()
 {
 
+    connect(m_ui->m_btnConnect, &QPushButton::clicked,
+            this, &PageSettings::onConnect);
+
+    m_ui->m_btnFetch->setEnabled(false);
+    connect(m_ui->m_btnFetch, &QPushButton::clicked,
+            this, &PageSettings::onFetch);
+
+    connect(&m_client, &yue::bell::remote::RemoteClient::connected,
+            this, &PageSettings::onConnected);
 }
 
 PageSettings::~PageSettings() {
+}
+
+void PageSettings::onConnect() {
+
+    QString hostname = m_ui->m_editRemoteHostname->text();
+    QString username = m_ui->m_editRemoteUsername->text();
+    QString password = m_ui->m_editRemotePassword->text();
+    m_client.login(hostname, username, password);
+}
+
+void PageSettings::onFetch() {
+
+    m_client.fetchLibrary();
+}
+
+void PageSettings::onConnected(bool success) {
+
+    qDebug() << "settings connected" <<  success;
+    m_ui->m_btnFetch->setEnabled(success);
 }

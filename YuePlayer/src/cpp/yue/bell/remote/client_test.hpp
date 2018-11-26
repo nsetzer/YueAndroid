@@ -18,7 +18,6 @@ public:
         , m_rawData()
         , m_offset(0)
     {
-        setFinished(true);
         open(QIODevice::ReadOnly);
     }
     TestNetworkReply(QUrl url, const QByteArray& data, QObject* parent = nullptr)
@@ -27,7 +26,6 @@ public:
         , m_offset(0)
     {
         setUrl(url);
-        setFinished(true);
         open(QIODevice::ReadOnly);
     }
     virtual ~TestNetworkReply() override {}
@@ -48,11 +46,15 @@ public:
         m_offset = 0;
     }
 
+    void setFinished() {
+        QNetworkReply::setFinished(true);
+        emit finished();
+    }
+
 public slots:
     void abort() override {
         return;
     }
-
 
     static TestNetworkReply* newError(QUrl url, QNetworkReply::NetworkError err, const QString& str) {
         TestNetworkReply* reply = new TestNetworkReply();

@@ -16,6 +16,8 @@
 #include <QLineEdit>
 #include <QPushButton>
 
+#include "yue/bell/remote/client.hpp"
+
 namespace UI {
 
 class uiPageSettings;
@@ -33,8 +35,14 @@ public:
     PageSettings(QWidget *parent = nullptr);
     ~PageSettings();
 
+private slots:
+    void onConnect();
+    void onConnected(bool success);
+
+    void onFetch();
 private:
     QScopedPointer<UI::uiPageSettings> m_ui;
+    yue::bell::remote::RemoteClient m_client;
 };
 
 #endif

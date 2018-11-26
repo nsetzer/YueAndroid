@@ -30,6 +30,7 @@ class YUECOMMON_EXPORT Database : public QObject
     Q_OBJECT
 public:
     typedef size_t uid_t;
+    typedef QMap<QString,QVariant> song_t;
 private:
 
     static Database* m_instance;
