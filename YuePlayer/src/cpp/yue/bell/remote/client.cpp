@@ -1,6 +1,9 @@
 
 #include "yue/bell/remote/client.hpp"
 
+#include "yue/bell/library.hpp"
+#include "yue/bell/database.hpp"
+#include "yue/core/song.hpp"
 
 namespace yue {
     namespace bell {
@@ -169,7 +172,16 @@ void RemoteClient::fetchFinished(QNetworkReply* reply)
 
 void RemoteClient::importSongRecords(const QJsonArray& arr)
 {
+    // each object in the array is made up of the following keys
+    // id, ref_id, user_id, data_id, file_path, art_path,
+    // static_path, artist, artist_key, composer, album, title,
+    // genre, year, country, language, comment, album_index, length,
+    // last_played, play_count, skip_count, rating, banished, blocked,
+    // equalizer, date_added, frequency, file_size
+
     qDebug() << "processing songs" << arr.size();
+
+    auto lib = yue::bell::Library::instance();
 
     for (auto iter = arr.constBegin(); iter != arr.constEnd(); iter++) {
         if (!iter->isObject()) {
@@ -177,10 +189,34 @@ void RemoteClient::importSongRecords(const QJsonArray& arr)
         }
         QJsonObject obj = iter->toObject();
 
-        for (auto iter2 = obj.constBegin(); iter2 != obj.constEnd(); iter2++) {
-            qDebug() << iter2.key() << iter2.value();
-        }
-        break;
+        Database::song_t song;
+
+        //song["id"] = obj.find("id").value().toString();
+        //song["static_path"] = obj.find("static_path").value().toString();
+
+        // str
+        song[yue::core::Song::artist] = obj.find("artist").value().toString();
+        song[yue::core::Song::composer] = obj.find("composer").value().toString();
+        song[yue::core::Song::album] = obj.find("album").value().toString();
+        song[yue::core::Song::title] = obj.find("title").value().toString();
+        song[yue::core::Song::comment] = obj.find("comment").value().toString();
+        song[yue::core::Song::genre] = obj.find("genre").value().toString();
+        song[yue::core::Song::country] = obj.find("genre").value().toString();
+        song[yue::core::Song::lang] = obj.find("language").value().toString();
+        // int
+        song[yue::core::Song::play_count] = obj.find("play_count").value().toInt();
+        song[yue::core::Song::rating] = obj.find("rating").value().toInt();
+        song[yue::core::Song::length] = obj.find("length").value().toInt();
+        song[yue::core::Song::year] = obj.find("year").value().toInt();
+        song[yue::core::Song::album_index] = obj.find("album_index").value().toInt();
+        song[yue::core::Song::last_played] = obj.find("last_played").value().toInt();
+
+        // if contains, update
+        // otherwise, add uid, and set remote=true in the song
+        // before inserting
+        //lib->contains(uid)
+        //lib->insert(song);
+        //lib->update(, data);
     }
 }
 

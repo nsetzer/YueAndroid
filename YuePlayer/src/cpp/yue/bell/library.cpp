@@ -362,6 +362,27 @@ void Library::setRating(Database::uid_t uid, int rating)
     return;
 }
 
+bool Library::contains(Database::uid_t uid)
+{
+    QSqlQuery query = m_grammar.buildQuery(QStringList() << yue::core::Song::uid,
+              std::unique_ptr<yue::core::SearchRule>(
+                  new yue::core::ExactSearchRule<int>(
+                      yue::core::Song::uid, static_cast<int>(uid))),
+              "",
+              m_db->db());
+
+    if (!query.exec()) {
+        qWarning() << "error executing query" << query.lastError();
+        return false;
+    }
+
+    while (query.next()) {
+        return true;
+    }
+
+    return false;
+}
+
 /**
  * @brief Library::exists
  * @param path to a local file on disk

@@ -46,12 +46,14 @@ public:
     size_t size();
 
     Database::uid_t insert(QMap<QString,QVariant> data);
+
     void update(Database::uid_t uid, QMap<QString,QVariant> data);
 
     void incrementPlaycount(Database::uid_t uid);
 
     void setRating(Database::uid_t uid, int rating);
 
+    bool contains(Database::uid_t uid);
     bool exists(QString path);
 
     void remove(QMap<QString,QVariant> data);

@@ -71,10 +71,10 @@ int app_main(QCoreApplication *app, bool isService)
 
     //QString dirPath =yue::qtcommon::Device::getDirectory(yue::qtcommon::Device::DIRECTORY_MUSIC);
     //QDir dirMusic(dirPath);
-    //qDebug() << "actual db path" << dirMusic.absoluteFilePath("yue-library.v1.sqlitedb");
+    //qDebug() << "actual db path" << dirMusic.absoluteFilePath("yue-library.v2.sqlitedb");
 
-    //QString libPath = dirMusic.absoluteFilePath("yue-library.v1.sqlitedb");
-    QString libPath = "/mnt/sdcard/Music/yue-library.v1.sqlitedb";
+    //QString libPath = dirMusic.absoluteFilePath("yue-library.v2.sqlitedb");
+    QString libPath = "/mnt/sdcard/Music/yue-library.v2.sqlitedb";
 
     //QString libPath = ":memory:";
     db->connect(libPath);
@@ -82,12 +82,8 @@ int app_main(QCoreApplication *app, bool isService)
 
 #else
 
-#ifdef Q_OS_LINUX
-    db->connect("/home/nsetzer/projects/android/YueMusicPlayer/yue.db");
-#else
-    db->connect("D:/git/YueMusicPlayer/yue.db");
+    db->connect("./yue-library.v2.sqlitedb");
 
-#endif
 #endif
 
     yue::bell::Settings::create();
