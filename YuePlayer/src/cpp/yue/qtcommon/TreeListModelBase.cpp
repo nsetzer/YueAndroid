@@ -71,7 +71,7 @@ QVariant TreeListModelBase::data(const QModelIndex &index, int role/* = Qt::Disp
 
     if (role == TreeListModelBase::SongIdRole) {
         // TODO: fix types toQVariant is floating around somwhere
-        return static_cast<int>(m_tabledata[index.row()]->getUid());
+        return m_tabledata[index.row()]->getUid();
     }
 
     if (role == TreeListModelBase::CheckRole)
@@ -224,7 +224,9 @@ void TreeListModelBase::toggleExpandItem(int idx)
 void TreeListModelBase::toggleCheckState(int idx)
 {
     yue::bell::LibraryTreeNode* nd = m_tabledata[idx];
-    nd->setCheckState((nd->getCheckState()==Qt::Unchecked)?Qt::Checked:Qt::Unchecked);
+    Qt::CheckState state = nd->getCheckState();
+    Qt::CheckState new_state = (state==Qt::Unchecked)?Qt::Checked:Qt::Unchecked;
+    nd->setCheckState(new_state);
     emit dataChanged(index(0), index(m_tabledata.size()-1), {TreeListModelBase::CheckRole});
     emit selectionChanged();
 }

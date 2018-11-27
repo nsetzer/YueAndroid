@@ -16,8 +16,8 @@ int AlbumArt::DEFAULT_WIDTH = 256;
 //static
 QImage AlbumArt::getAlbumArt(Library* lib, Database::uid_t songid, QSize size/* = QSize()*/)
 {
-    yue::bell::Database::uid_t artistid;
-    yue::bell::Database::uid_t albumid;
+    yue::bell::Database::artid_t artistid;
+    yue::bell::Database::abmid_t albumid;
     QString songPath;
 
     int width = (size.isValid() && size.width()>=16) ? size.width() : AlbumArt::DEFAULT_WIDTH;
@@ -68,7 +68,7 @@ QImage AlbumArt::loadAlbumArt(QString imagePath, int width)
 
 
 //static
-QImage AlbumArt::createDefaultAlbumArt(Database::uid_t albumid, int width)
+QImage AlbumArt::createDefaultAlbumArt(Database::abmid_t albumid, int width)
 {
 
     int size = width/2;

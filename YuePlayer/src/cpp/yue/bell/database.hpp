@@ -29,7 +29,10 @@ class YUECOMMON_EXPORT Database : public QObject
 {
     Q_OBJECT
 public:
-    typedef size_t uid_t;
+    typedef size_t plid_t;
+    typedef size_t abmid_t;
+    typedef size_t artid_t;
+    typedef QString uid_t;
     typedef QMap<QString,QVariant> song_t;
 private:
 

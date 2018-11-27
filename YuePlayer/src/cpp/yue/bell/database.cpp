@@ -155,7 +155,7 @@ void Database::create_v1_0( void )
     { // Table songs
         QSqlQuery q(m_db);
         r=q.exec("CREATE TABLE if not exists songs ( "
-                 "uid integer PRIMARY KEY AUTOINCREMENT, "
+                 "uid text PRIMARY KEY, "
                  "path text, "
                  "source_path text DEFAULT '', "
                  "artist INTEGER, "

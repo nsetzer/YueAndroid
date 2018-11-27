@@ -17,7 +17,7 @@ public:
     ~AlbumArt() = default;
 
     static QImage getAlbumArt(Library* lib, Database::uid_t songid, QSize size = QSize());
-    static QImage createDefaultAlbumArt(Database::uid_t albumid, int width);
+    static QImage createDefaultAlbumArt(Database::abmid_t albumid, int width);
 
 private:
     static QImage loadAlbumArtFromPath(QString imagePath, int width);

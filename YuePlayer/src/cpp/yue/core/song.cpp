@@ -49,12 +49,12 @@ const int Song::num_columns = 25;
 static const char* _strkeys[] = {
     Song::path,     Song::source_path, Song::artist,  Song::artist_key,
     Song::composer, Song::album,       Song::title,   Song::genre,
-    Song::country,  Song::lang,        Song::comment,
+    Song::country,  Song::lang,        Song::comment, Song::uid,
 };
 const Song::strset Song::StringKeys(_strkeys,_strkeys+sizeof(_strkeys)/sizeof(char*));
 
 static const char* _intkeys[] = {
-    Song::uid,         Song::year,       Song::album_index, Song::length,
+    Song::year,        Song::album_index, Song::length,
     Song::last_played, Song::play_count, Song::skip_count,  Song::rating,
     Song::blocked,     Song::opm,        Song::equalizer,   Song::date_added,
     Song::frequency,   Song::file_size,

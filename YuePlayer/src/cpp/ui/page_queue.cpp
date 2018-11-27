@@ -13,7 +13,7 @@ void PlaylistDelegate::paint(
 {
     painter->save();
 
-    //QSize song_id = index.data(yue::qtcommon::PlaylistModel::SongIdRole).toSize();
+    //QString song_id = index.data(yue::qtcommon::PlaylistModel::SongIdRole).toString();
     //int song_index = index.data(yue::qtcommon::PlaylistModel::IndexRole).toInt();
     QString song_artist = index.data(yue::qtcommon::PlaylistModel::ArtistRole).toString();
     QString song_album = index.data(yue::qtcommon::PlaylistModel::AlbumRole).toString();

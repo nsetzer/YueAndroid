@@ -1,5 +1,6 @@
 
 #include <QFileInfo>
+#include <QUuid>
 
 #include "yue/bell/library.hpp"
 #include "yue/bell/database.hpp"
@@ -41,37 +42,42 @@ Database::uid_t Library::insert(QMap<QString,QVariant> data)
 {
     if (!m_db->db().transaction()) {
         qCritical() << "unable to create a transaction" << m_db->db().lastError();
-        return 0;
+        return "";
     }
-    Database::uid_t uid;
+
+    if (data.find(yue::core::Song::uid).value().isNull()) {
+        data[yue::core::Song::uid] = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    }
+
     bool result;
     try {
-         result = _insert(data, uid);
+         result = _insert(data);
     } catch (DatabaseError& e) {
         qCritical() << e.what() << m_db->db().lastError();
         m_db->db().rollback();
-        return 0;
+        return "";
     } catch (std::exception& ex) {
         qCritical() << "unexpected exception during sql transaction"
                     << ex.what()
                     << m_db->db().lastError();
         m_db->db().rollback();
-        return 0;
+        return "";
     } catch (...) {
         qCritical() << "unhandled exception during sql transaction"
                     << m_db->db().lastError();
         m_db->db().rollback();
-        return 0;
+        return "";
     }
 
     if (result)
         m_db->db().commit();
     else
         m_db->db().rollback();
-    return uid;
+
+    return data.find(yue::core::Song::uid).value().toString();
 }
 
-bool Library::_insert(QMap<QString,QVariant> data, Database::uid_t& uid)
+bool Library::_insert(QMap<QString,QVariant> data)
 {
     if (!data.contains(yue::core::Song::path))
         throw std::runtime_error(std::string("missing key: ") +  yue::core::Song::path);
@@ -81,7 +87,8 @@ bool Library::_insert(QMap<QString,QVariant> data, Database::uid_t& uid)
         throw std::runtime_error(std::string("missing key: ") + yue::core::Song::album);
     if (!data.contains(yue::core::Song::title))
         throw std::runtime_error(std::string("missing key: ") + yue::core::Song::title);
-
+    if (!data.contains(yue::core::Song::uid))
+        throw std::runtime_error(std::string("missing key: ") + yue::core::Song::uid);
     // calculate the sort key if given
 
     QString artist = data[yue::core::Song::artist].toString();
@@ -98,14 +105,11 @@ bool Library::_insert(QMap<QString,QVariant> data, Database::uid_t& uid)
         data.remove(yue::core::Song::artist_key);
     }
 
-    Database::uid_t iArtistId = _get_or_create_artist_id(artist, sortkey);
-    Database::uid_t iAlbumId = _get_or_create_album_id(iArtistId,album);
+    Database::artid_t iArtistId = _get_or_create_artist_id(artist, sortkey);
+    Database::abmid_t iAlbumId = _get_or_create_album_id(iArtistId,album);
 
     data.remove(yue::core::Song::artist);
     data.remove(yue::core::Song::album);
-
-    if (data.contains(yue::core::Song::uid))
-        data.remove(yue::core::Song::uid);
 
     QSqlQuery q(m_db->db());
     q.prepare("UPDATE artists SET count=count+1 WHERE uid=?");
@@ -151,12 +155,11 @@ bool Library::_insert(QMap<QString,QVariant> data, Database::uid_t& uid)
     QString skeys = lstkeys.join(", ");
     QString svals = lsttmp.join(", ");
 
-    Database::uid_t new_uid = 0;
+
     q.prepare("INSERT INTO songs (" + skeys+ ") VALUES (" + svals + ")");
     for (QVariant& v : lstvals)
         q.addBindValue( v );
     if (q.exec()) {
-        new_uid = q.lastInsertId().toUInt();
         q.finish();
     } else {
         qWarning() << q.executedQuery();
@@ -164,7 +167,6 @@ bool Library::_insert(QMap<QString,QVariant> data, Database::uid_t& uid)
         q.finish();
     }
 
-    uid = new_uid;
     return true;
 }
 
@@ -202,10 +204,10 @@ bool Library::_update(Database::uid_t uid, QMap<QString,QVariant> data)
 {
     bool artist_updated=false;
     bool album_updated=false;
-    Database::uid_t old_artist_id=0;
-    Database::uid_t old_album_id=0;
-    Database::uid_t new_artist_id=0;
-    Database::uid_t new_album_id=0;
+    Database::artid_t old_artist_id=0;
+    Database::abmid_t old_album_id=0;
+    Database::artid_t new_artist_id=0;
+    Database::abmid_t new_album_id=0;
 
     bool result;
 
@@ -214,7 +216,7 @@ bool Library::_update(Database::uid_t uid, QMap<QString,QVariant> data)
 
     QSqlQuery q(m_db->db());
     q.prepare("SELECT artist,album FROM songs WHERE uid=?");
-    q.addBindValue(toQVariant(uid));
+    q.addBindValue(uid);
     result = q.exec();
     if (q.lastError().isValid())
         qWarning() << q.lastError();
@@ -320,7 +322,7 @@ bool Library::_update(Database::uid_t uid, QMap<QString,QVariant> data)
     q.prepare("UPDATE songs SET " + skeys+ " WHERE uid=?");
     for (QVariant& v : lstvals)
         q.addBindValue( v );
-    q.addBindValue(toQVariant(uid));
+    q.addBindValue(uid);
 
     result = q.exec();
     return result;
@@ -335,7 +337,7 @@ void Library::incrementPlaycount(Database::uid_t uid)
 
     QSqlQuery q(m_db->db());
     q.prepare("UPDATE songs SET playcount=playcount+1 WHERE uid=?");
-    q.addBindValue(toQVariant(uid));
+    q.addBindValue(uid);
 
     if (!q.exec()) {
         qWarning() << "error executing query" << q.lastError();
@@ -352,7 +354,7 @@ void Library::setRating(Database::uid_t uid, int rating)
     QSqlQuery q(m_db->db());
     q.prepare("UPDATE songs SET rating=? WHERE uid=?");
     q.addBindValue(rating);
-    q.addBindValue(toQVariant(uid));
+    q.addBindValue(uid);
 
     if (!q.exec()) {
         qWarning() << "error executing query" << q.lastError();
@@ -366,8 +368,8 @@ bool Library::contains(Database::uid_t uid)
 {
     QSqlQuery query = m_grammar.buildQuery(QStringList() << yue::core::Song::uid,
               std::unique_ptr<yue::core::SearchRule>(
-                  new yue::core::ExactSearchRule<int>(
-                      yue::core::Song::uid, static_cast<int>(uid))),
+                  new yue::core::ExactSearchRule<std::string>(
+                      yue::core::Song::uid, uid.toStdString())),
               "",
               m_db->db());
 
@@ -450,13 +452,13 @@ bool Library::_remove(QMap<QString,QVariant> data)
 
     QString artist = data[yue::core::Song::artist].toString();
     QString album = data[yue::core::Song::album].toString();
-    Database::uid_t iSongId = data[yue::core::Song::uid].toUInt();
+    Database::uid_t iSongId = data[yue::core::Song::uid].toString();
 
     // remove the song from the library
     QSqlQuery query = m_grammar.buildDelete(
               std::unique_ptr<yue::core::SearchRule>(
-                  new yue::core::ExactSearchRule<int>(
-                      yue::core::Song::uid, static_cast<int>(iSongId))),
+                  new yue::core::ExactSearchRule<std::string>(
+                      yue::core::Song::uid, iSongId.toStdString())),
               m_db->db());
 
     if (!query.exec()) {
@@ -464,8 +466,8 @@ bool Library::_remove(QMap<QString,QVariant> data)
         return false;
     }
 
-    Database::uid_t iArtistId = _get_or_create_artist_id(artist,artist);
-    Database::uid_t iAlbumId = _get_or_create_album_id(iArtistId,album);
+    Database::artid_t iArtistId = _get_or_create_artist_id(artist,artist);
+    Database::abmid_t iAlbumId = _get_or_create_album_id(iArtistId,album);
 
     // update the artist count
 
@@ -539,7 +541,7 @@ QList<LibraryTreeNode*> Library::queryToForest(QString querystr)
         QString album  = query.value(1).toString();
         QString title  = query.value(2).toString();
         int rating = query.value(3).toInt();
-        Database::uid_t uid = query.value(4).toULongLong();
+        Database::uid_t uid = query.value(4).toString();
 
         if (nd_art == nullptr || nd_art->text() != artist) {
             nd_art = new yue::bell::LibraryTreeNode(artist, 0);
@@ -602,7 +604,7 @@ QList<Database::uid_t> Library::createPlaylist(QString query, size_t size/* = 0*
 
     // unpack the query results
     while (q.next()) {
-        Database::uid_t uid = q.value(0).toUInt();
+        Database::uid_t uid = q.value(0).toString();
         QString group = q.value(1).toString();
         data.push_back( uid );
         groups[uid] = group;
@@ -643,7 +645,7 @@ void Library::sort(QList<Database::uid_t>& songs)
     if (q.lastError().isValid())
         qWarning() << q.lastError();
     while (q.next()) {
-        Database::uid_t uid = q.value(0).toUInt();
+        Database::uid_t uid = q.value(0).toString();
         int year = q.value(1).toInt();
         QString album = q.value(2).toString();
         int index = q.value(3).toInt();
@@ -674,21 +676,23 @@ QString Library::getPath(Database::uid_t uid)
 {
     QSqlQuery q(m_db->db());
     q.prepare("SELECT path FROM library WHERE uid=?");
-    q.addBindValue( toQVariant(uid) );
+    q.addBindValue(uid);
     bool result = q.exec();
     if (q.lastError().isValid())
         qWarning() << q.lastError();
     if (result && q.first()) {
         return q.value(0).toString();
     }
-    throw std::runtime_error("failed to find uid");
+    std::string msg("failed to find uid:");
+    msg += uid.toStdString();
+    throw std::runtime_error(msg);
 }
 
 void Library::getDisplayInfo(Database::uid_t uid,QString& artist, QString& album, QString& title)
 {
     QSqlQuery q(m_db->db());
     q.prepare("SELECT artist, album, title FROM library WHERE uid=?");
-    q.addBindValue( toQVariant(uid) );
+    q.addBindValue(uid);
     bool result = q.exec();
     if (q.lastError().isValid())
         qWarning() << q.lastError();
@@ -698,14 +702,16 @@ void Library::getDisplayInfo(Database::uid_t uid,QString& artist, QString& album
         title = q.value(2).toString();
         return;
     }
-    throw std::runtime_error("failed to find uid");
+    std::string msg("failed to find uid:");
+    msg += uid.toStdString();
+    throw std::runtime_error(msg);
 }
 
-void Library::getArtInfo(Database::uid_t uid, Database::uid_t& artist_id, Database::uid_t& album_id, QString& path)
+void Library::getArtInfo(Database::uid_t uid, Database::artid_t& artist_id, Database::abmid_t& album_id, QString& path)
 {
     QSqlQuery q(m_db->db());
     q.prepare("SELECT artist, album, path FROM songs WHERE uid=?");
-    q.addBindValue( toQVariant(uid) );
+    q.addBindValue(uid);
     bool result = q.exec();
     if (q.lastError().isValid())
         qWarning() << q.lastError();
@@ -715,11 +721,13 @@ void Library::getArtInfo(Database::uid_t uid, Database::uid_t& artist_id, Databa
         path = q.value(2).toString();
         return;
     }
-    throw std::runtime_error("failed to find uid");
+    std::string msg("failed to find uid:");
+    msg += uid.toStdString();
+    throw std::runtime_error(msg);
 }
 
 
-Database::uid_t Library::_get_or_create_artist_id(QString name, QString sortkey)
+Database::artid_t Library::_get_or_create_artist_id(QString name, QString sortkey)
 {
     bool result;
     QSqlQuery q(m_db->db());
@@ -748,12 +756,12 @@ Database::uid_t Library::_get_or_create_artist_id(QString name, QString sortkey)
         throw std::runtime_error("failed to insert artist name");
     }
 
-    Database::uid_t uid = q.lastInsertId().toUInt();
+    Database::artid_t uid = q.lastInsertId().toUInt();
     q.finish();
     return  uid;
 }
 
-Database::uid_t Library::_get_or_create_album_id(Database::uid_t artist, QString name)
+Database::abmid_t Library::_get_or_create_album_id(Database::artid_t artist, QString name)
 {
 
     bool result;
@@ -782,7 +790,7 @@ Database::uid_t Library::_get_or_create_album_id(Database::uid_t artist, QString
         throw std::runtime_error("failed to insert album name");
     }
 
-    Database::uid_t uid = q.lastInsertId().toUInt();
+    Database::abmid_t uid = q.lastInsertId().toUInt();
     q.finish();
     return  uid;
 }

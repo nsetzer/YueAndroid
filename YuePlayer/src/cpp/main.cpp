@@ -57,7 +57,6 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM* vm, void*)
 int app_main(QCoreApplication *app, bool isService)
 {
 
-
     QSharedPointer<MainWindow> window;
 
     QSharedPointer<QRemoteObjectHost> srcNode;

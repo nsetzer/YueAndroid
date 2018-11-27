@@ -22,12 +22,11 @@ std::string join(const std::vector<std::string> &items, const std::string &sep);
 
 // convert string to numerical type
 template<typename T>
-T fromString(const std::string &s){ (void) s; /*compiliation error if used*/}
+T fromString(const std::string &) {throw std::runtime_error("invalid conversion");}
 
 
 template<> std::string fromString<std::string>(const std::string &s);
 template<> int fromString<int>(const std::string &s);
-template<> unsigned long long fromString<unsigned long long>(const std::string &s);
 template<> float fromString<float>(const std::string &s);
 
 template<typename T>
@@ -225,7 +224,7 @@ class SearchRule : public Rule {
 
   public:
     SearchRule() {}
-    virtual ~SearchRule() {}
+    virtual ~SearchRule() override {}
 
     virtual bool check(const std::map<std::string, std::string> &elem,
                        bool ignoreCase = true) const = 0;
@@ -236,7 +235,7 @@ class SearchRule : public Rule {
 class BlankSearchRule : public SearchRule {
   public:
     BlankSearchRule() {}
-    virtual ~BlankSearchRule() {}
+    virtual ~BlankSearchRule() override {}
 
     virtual bool check(const std::map<std::string, std::string> &elem,
                        bool ignoreCase = true) const override {
@@ -259,7 +258,7 @@ class ColumnSearchRule : public SearchRule {
 
   public:
     ColumnSearchRule(const std::string &column) : m_sColumn(column) {}
-    virtual ~ColumnSearchRule() {}
+    virtual ~ColumnSearchRule() override {}
 };
 
 // TODO: RegExpSearchRule
@@ -270,7 +269,7 @@ class PartialStringSearchRule : public ColumnSearchRule {
   public:
     PartialStringSearchRule(const std::string &column, const std::string &value)
         : ColumnSearchRule(column), m_sValue(value) {}
-    virtual ~PartialStringSearchRule(){};
+    virtual ~PartialStringSearchRule() override {}
 
     virtual bool check(const std::map<std::string, std::string> &elem,
                        bool ignoreCase = true) const override;
@@ -284,7 +283,7 @@ class InvertedPartialStringSearchRule : public ColumnSearchRule {
     InvertedPartialStringSearchRule(const std::string &column,
                                     const std::string &value)
         : ColumnSearchRule(column), m_sValue(value) {}
-    virtual ~InvertedPartialStringSearchRule(){}
+    virtual ~InvertedPartialStringSearchRule() override {}
 
     virtual bool check(const std::map<std::string, std::string> &elem,
                        bool ignoreCase = true) const override;
@@ -298,23 +297,23 @@ class InvertedPartialStringSearchRule : public ColumnSearchRule {
       public:                                                                 \
         cls(const std::string &column, T value)                               \
             : ColumnSearchRule(column), m_tValue(value) {}                    \
-        virtual ~cls(){};                                                     \
+        virtual ~cls() override {}                                            \
         virtual bool check(const std::map<std::string, std::string> &elem,    \
                            bool ignoreCase = true) const override {           \
             return fn<T>(elem.find(m_sColumn)->second, m_tValue, ignoreCase); \
         }                                                                     \
         virtual std::string toSql(QueryValues &values) const override {       \
-            values.push_back(util::Variant::create<T>(m_tValue));                    \
+            values.push_back(util::Variant::create<T>(m_tValue));             \
             return m_sColumn + repr;                                          \
         }                                                                     \
     };
 
-ColumnSearchRuleDef(ExactSearchRule, util::compare_eq, " == ?");
-ColumnSearchRuleDef(InvertedExactSearchRule, util::compare_ne, " != ?");
-ColumnSearchRuleDef(LessThanSearchRule, util::compare_lt, " < ?");
-ColumnSearchRuleDef(LessThanEqualSearchRule, util::compare_le, " <= ?");
-ColumnSearchRuleDef(GreaterThanSearchRule, util::compare_gt, " > ?");
-ColumnSearchRuleDef(GreaterThanEqualSearchRule, util::compare_ge, " >= ?");
+ColumnSearchRuleDef(ExactSearchRule, util::compare_eq, " == ?")
+ColumnSearchRuleDef(InvertedExactSearchRule, util::compare_ne, " != ?")
+ColumnSearchRuleDef(LessThanSearchRule, util::compare_lt, " < ?")
+ColumnSearchRuleDef(LessThanEqualSearchRule, util::compare_le, " <= ?")
+ColumnSearchRuleDef(GreaterThanSearchRule, util::compare_gt, " > ?")
+ColumnSearchRuleDef(GreaterThanEqualSearchRule, util::compare_ge, " >= ?")
 
 #undef ColumnSearchRuleDef
 
@@ -329,7 +328,7 @@ template<typename T> class RangeSearchRule : public ColumnSearchRule {
         : ColumnSearchRule(column)
         , m_tValueLow(value_low)
         , m_tValueHigh(value_high) {}
-    virtual ~RangeSearchRule(){};
+    virtual ~RangeSearchRule() override {}
 
     virtual bool check(const std::map<std::string, std::string> &elem,
                        bool ignoreCase = true) const override;
@@ -345,7 +344,7 @@ template<typename T> class NotRangeSearchRule : public ColumnSearchRule {
         : ColumnSearchRule(column)
         , m_tValueLow(value_low)
         , m_tValueHigh(value_high) {}
-    virtual ~NotRangeSearchRule(){};
+    virtual ~NotRangeSearchRule() override {}
 
     virtual bool check(const std::map<std::string, std::string> &elem,
                        bool ignoreCase = true) const override;
@@ -357,7 +356,7 @@ template<typename T> class NotRangeSearchRule : public ColumnSearchRule {
 class MetaSearchRule : public SearchRule {
   public:
     MetaSearchRule() {}
-    virtual ~MetaSearchRule() {}
+    virtual ~MetaSearchRule() override {}
 };
 
 class AndSearchRule : public MetaSearchRule {
@@ -365,8 +364,8 @@ class AndSearchRule : public MetaSearchRule {
 
   public:
     AndSearchRule(SearchRule::SearchRuleList rules)
-        : MetaSearchRule(), m_vRules(std::move(rules)){};
-    virtual ~AndSearchRule() {}
+        : MetaSearchRule(), m_vRules(std::move(rules)){}
+    virtual ~AndSearchRule() override {}
 
     virtual bool check(const std::map<std::string, std::string> &elem,
                        bool ignoreCase = true) const override;
@@ -378,8 +377,8 @@ class OrSearchRule : public MetaSearchRule {
 
   public:
     OrSearchRule(SearchRule::SearchRuleList rules)
-        : MetaSearchRule(), m_vRules(std::move(rules)){};
-    virtual ~OrSearchRule() {}
+        : MetaSearchRule(), m_vRules(std::move(rules)){}
+    virtual ~OrSearchRule() override {}
 
     virtual bool check(const std::map<std::string, std::string> &elem,
                        bool ignoreCase = true) const override;
@@ -392,7 +391,7 @@ class NotSearchRule : public MetaSearchRule {
   public:
     NotSearchRule(SearchRulePtr rule)
         : MetaSearchRule(), m_pRule(std::move(rule)) {}
-    virtual ~NotSearchRule() {}
+    virtual ~NotSearchRule() override {}
 
     virtual bool check(const std::map<std::string, std::string> &elem,
                        bool ignoreCase = true) const override;
@@ -464,8 +463,8 @@ class MultiColumnSearchRule : public SearchRule {
             m_pRule = std::unique_ptr<SearchRule>(
                 new AndSearchRule(std::move(rules)));
         }
-    };
-    ~MultiColumnSearchRule(){};
+    }
+    virtual ~MultiColumnSearchRule() override {}
 
     virtual bool check(const std::map<std::string, std::string> &elem,
                        bool ignoreCase = true) const override {

@@ -72,14 +72,14 @@ signals:
     void stateChanged(MediaPlayerBase::State state);
     void scanUpdate(bool running, int ndirs, int nfiles, int nsongs);
 
-    void doPlaySong(int uid);
+    void doPlaySong(yue::bell::Database::uid_t uid);
     void doSetCurrentPlaylist(QList<yue::bell::Database::uid_t> lst, bool autoplay);
 
 public slots:
     // functions to call (and implement) on the server
 
-    Q_INVOKABLE void playNext(int uid);
-    Q_INVOKABLE void playSong(int uid);
+    Q_INVOKABLE void playNext(yue::bell::Database::uid_t uid);
+    Q_INVOKABLE void playSong(yue::bell::Database::uid_t uid);
     Q_INVOKABLE void setCurrentPlaylist(QList<yue::bell::Database::uid_t> lst, bool autoplay = false);
 
 

@@ -47,14 +47,6 @@ fromString<std::string>(const std::string &s) {
 }
 
 template<>
-unsigned long long
-fromString<unsigned long long>(const std::string &s) {
-
-    throw std::runtime_error("str to ull not implemented");
-    return 0;
-}
-
-template<>
 int
 fromString<int>(const std::string &s) {
     // std::stoi is not available on all platforms

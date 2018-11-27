@@ -50,6 +50,7 @@ public:
     {
         LOG_FUNCTION_TIME();
         m_playlist = playlist;
+        qDebug() << "fixme" << playlist->toList();
         QSqlQuery query = playlist->select();
         query.exec();
         if (query.lastError().isValid())

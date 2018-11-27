@@ -105,7 +105,7 @@ void SongListModel::setPlaylist(QSharedPointer<yue::bell::Playlist> playlist)
     m_lst.clear();
     while (query.next()) {
         SongData d;
-        d.uid = query.value(0).toULongLong();
+        d.uid = query.value(0).toString();
         d.artist = query.value(2).toString();
         d.album = query.value(3).toString();
         d.title = query.value(4).toString();
@@ -138,7 +138,7 @@ QVariant SongListModel::data(const QModelIndex &index, int role/* = Qt::DisplayR
         return QVariant();
 
     if (role == SongListModel::SongIdRole)
-        return bell::toQVariant(m_lst[index.row()].uid);
+        return m_lst[index.row()].uid;
 
     if (role == SongListModel::ArtistRole)
         return m_lst[index.row()].artist;

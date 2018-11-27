@@ -4,7 +4,7 @@ namespace yue {
 namespace bell {
 
 LibraryTreeNode::LibraryTreeNode()
-    : m_uid(0)
+    : m_uid()
     , m_text("")
     , m_depth(0)
     , m_parent(nullptr)
@@ -16,7 +16,7 @@ LibraryTreeNode::LibraryTreeNode()
 }
 
 LibraryTreeNode::LibraryTreeNode(QString text, int depth, LibraryTreeNode* parent)
-    : m_uid(0)
+    : m_uid()
     , m_rating(0)
     , m_text(text)
     , m_depth(depth)
@@ -53,8 +53,9 @@ LibraryTreeNode::~LibraryTreeNode()
 
 void LibraryTreeNode::setCheckState(Qt::CheckState state)
 {
-    if (m_uid==-1U) // null / dummy node
-        return;
+    //if (m_uid.isEmpty()) // null / dummy node
+    //    return;
+
     // setting true/false must toggle parent states as well
     m_checkstate = state;
 

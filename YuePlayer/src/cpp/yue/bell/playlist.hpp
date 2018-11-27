@@ -52,11 +52,11 @@ class YUECOMMON_EXPORT Playlist : public QObject
     Q_OBJECT
 
     Database* m_db;
-    Database::uid_t m_plid;
+    Database::plid_t m_plid;
     Library* m_library = nullptr;
     QString m_name;
 private:
-    Playlist(Library* library, Database::uid_t plid, QString name);
+    Playlist(Library* library, Database::plid_t plid, QString name);
 public:
 
     ~Playlist();

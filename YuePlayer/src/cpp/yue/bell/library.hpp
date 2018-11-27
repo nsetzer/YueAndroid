@@ -34,7 +34,7 @@ public:
     ~Library();
 
     static Library* create( Database* db=nullptr ) {
-        if (db == NULL)
+        if (db == nullptr)
             db = Database::instance();
         m_instance = new Library( db );
         return m_instance;
@@ -75,15 +75,15 @@ public:
 
     QString getPath(Database::uid_t uid);
     void getDisplayInfo(Database::uid_t uid,QString& artist, QString& album, QString& title);
-    void getArtInfo(Database::uid_t uid, Database::uid_t& artist_id, Database::uid_t& album_id, QString& path);
+    void getArtInfo(Database::uid_t uid, Database::artid_t& artist_id, Database::abmid_t& album_id, QString& path);
 
 private:
-    bool _insert(QMap<QString,QVariant> data, Database::uid_t& uid);
+    bool _insert(QMap<QString,QVariant> data);
     bool _update(Database::uid_t uid, QMap<QString,QVariant> data);
     bool _remove(QMap<QString,QVariant> data);
 
-    Database::uid_t _get_or_create_artist_id(QString name, QString sortkey);
-    Database::uid_t _get_or_create_album_id(Database::uid_t artist, QString name);
+    Database::abmid_t _get_or_create_artist_id(QString name, QString sortkey);
+    Database::abmid_t _get_or_create_album_id(Database::artid_t artist, QString name);
 };
 
 } // namespace bell

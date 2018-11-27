@@ -64,10 +64,14 @@ protected:
     virtual void onTap(int x, int y) {
 
         const QModelIndex index = indexAt(QPoint(x, y));
+
+        if (!index.isValid()) {
+            return;
+        }
         const QSize size = sizeHintForIndex(index);
 
         yue::bell::Database::uid_t songId = index.data(
-            yue::qtcommon::TreeListModelBase::SongIdRole).toULongLong();
+            yue::qtcommon::TreeListModelBase::SongIdRole).toString();
         int depth = index.data(yue::qtcommon::TreeListModelBase::DepthRole).toInt();
         int count = index.data(yue::qtcommon::TreeListModelBase::ChildCountRole).toInt();
         int rating = index.data(yue::qtcommon::TreeListModelBase::RatingRole).toInt();
@@ -84,6 +88,7 @@ protected:
             qDebug() << "new rating" << rating << tmp;
         } else if (depth == 2 && x > x2) {
             auto inst = yue::bell::MediaCtrlBase::instance();
+            qDebug() << "adding " << songId << "to playlist";
             inst->playNext(songId);
         } else {
             onClick(index);

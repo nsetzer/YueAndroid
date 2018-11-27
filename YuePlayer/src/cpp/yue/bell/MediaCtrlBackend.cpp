@@ -30,7 +30,7 @@ MediaCtrlBackend::MediaCtrlBackend(QObject *parent/* = nullptr*/)
 void MediaCtrlBackend::loadIndex(int index)
 {
     auto pl = PlaylistManager::instance()->openCurrent();
-    Database::uid_t uid = pl->setCurrent(static_cast<size_t>(index));
+    Database::uid_t uid = pl->setCurrent(index);
     load(uid);
 }
 
@@ -57,7 +57,7 @@ void MediaCtrlBackend::load()
 void MediaCtrlBackend::playIndex(int index)
 {
     try {
-        loadIndex(static_cast<size_t>(index));
+        loadIndex(index);
         m_pPlayer->play();
         emit currentIndexChanged(index);
     } catch (std::runtime_error& e) {

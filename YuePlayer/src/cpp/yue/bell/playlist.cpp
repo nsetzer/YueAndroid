@@ -26,7 +26,7 @@ QSharedPointer<Playlist> PlaylistManager::openCurrent()
 
 QSharedPointer<Playlist> PlaylistManager::open(QString name)
 {
-    Database::uid_t plid=0;
+    Database::plid_t plid=0;
     QSqlQuery q(m_library->db()->db());
     q.prepare("SELECT uid FROM playlists WHERE name=?");
     q.addBindValue(name);
@@ -58,7 +58,7 @@ QSharedPointer<Playlist> PlaylistManager::open(QString name)
 }
 
 
-Playlist::Playlist(Library* library, Database::uid_t plid, QString name)
+Playlist::Playlist(Library* library, Database::plid_t plid, QString name)
     : QObject(/*TODO thread safe parents*/)
     , m_db(library->db())
     , m_plid(plid)
@@ -90,7 +90,7 @@ void Playlist::set(QList<Database::uid_t> lst, size_t current_index) {
 
         q.addBindValue(toQVariant(m_plid));
         q.addBindValue(toQVariant(idx));
-        q.addBindValue(toQVariant(song_id));
+        q.addBindValue(song_id);
         q.exec();
         idx++;
     }
@@ -143,7 +143,7 @@ Database::uid_t Playlist::get(int idx)
     q.addBindValue(idx);
     q.exec();
     q.first();
-    uid = q.value(0).toULongLong();
+    uid = q.value(0).toString();
 
     return uid;
 }
@@ -164,7 +164,7 @@ Database::uid_t Playlist::setCurrent(int idx)
     q.addBindValue(idx);
     q.exec();
     q.first();
-    uid = q.value(0).toULongLong();
+    uid = q.value(0).toString();
 
     q.exec("end");
     return uid;
@@ -198,7 +198,7 @@ QPair<Database::uid_t,size_t> Playlist::current()
      if (!q.first()) {
          throw std::runtime_error("no current song");
      }
-     uid = q.value(0).toULongLong();
+     uid = q.value(0).toString();
 
      q.exec("end");
 
@@ -234,7 +234,7 @@ QPair<Database::uid_t,size_t> Playlist::current()
      q.addBindValue(toQVariant(index));
      q.exec();
      q.first();
-     uid = q.value(0).toULongLong();
+     uid = q.value(0).toString();
 
      q.exec("end");
 
@@ -270,7 +270,7 @@ QPair<Database::uid_t,size_t> Playlist::current()
      q.addBindValue(toQVariant(index));
      q.exec();
      q.first();
-     uid = q.value(0).toULongLong();
+     uid = q.value(0).toString();
 
      q.exec("end");
 
@@ -280,6 +280,10 @@ QPair<Database::uid_t,size_t> Playlist::current()
 void Playlist::insert(int idx, Database::uid_t uid)
 {
     LOG_FUNCTION_TIME();
+
+    if (uid.isEmpty()) {
+        throw std::runtime_error("cannot insert empty uid");
+    }
 
     m_db->db().transaction();
     bool result;
@@ -322,7 +326,7 @@ bool Playlist::_insert_uid(int idx, Database::uid_t uid)
     q.prepare("INSERT into playlist_songs (uid,idx,song_id) VALUES (?,?,?)");
     q.addBindValue(toQVariant(m_plid));
     q.addBindValue(toQVariant(static_cast<size_t>(idx)));
-    q.addBindValue(toQVariant(uid));
+    q.addBindValue(uid);
     q.exec();
 
     q.prepare("UPDATE playlists SET size=size+1 WHERE uid=?");
@@ -586,7 +590,7 @@ QList<Database::uid_t> Playlist::toList() const
     }
 
     while (q.next()) {
-        lst.append(q.value(1).toULongLong());
+        lst.append(q.value(1).toString());
     }
 
     return lst;

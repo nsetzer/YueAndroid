@@ -19,8 +19,8 @@ void TestPlaylist::cleanupTestCase()
 void TestPlaylist::move_down_2_5_0()
 {
     QSharedPointer<yue::bell::Playlist> playlist = yue::bell::PlaylistManager::instance()->open("TestPlaylist");
-    QList<yue::bell::Database::uid_t> initial({'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'});
-    QList<yue::bell::Database::uid_t> expected({'a', 'b', 'd', 'e', 'f', 'c', 'g', 'h'});
+    QList<yue::bell::Database::uid_t> initial({"a", "b", "c", "d", "e", "f", "g", "h"});
+    QList<yue::bell::Database::uid_t> expected({"a", "b", "d", "e", "f", "c", "g", "h"});
     playlist->set(initial);
     playlist->setCurrent(0);
     _move_impl(playlist, expected, 2, 5, 0) ;
@@ -31,8 +31,8 @@ void TestPlaylist::move_down_2_5_4()
 {
     QSharedPointer<yue::bell::Playlist> playlist = yue::bell::PlaylistManager::instance()->open("TestPlaylist");
     //                                           0    1    2    3    4    5    6    7
-    QList<yue::bell::Database::uid_t> initial( {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'});
-    QList<yue::bell::Database::uid_t> expected({'a', 'b', 'd', 'e', 'f', 'c', 'g', 'h'});
+    QList<yue::bell::Database::uid_t> initial( {"a", "b", "c", "d", "e", "f", "g", "h"});
+    QList<yue::bell::Database::uid_t> expected({"a", "b", "d", "e", "f", "c", "g", "h"});
     playlist->set(initial);
     playlist->setCurrent(4);
     _move_impl(playlist, expected, 2, 5, 3) ;
@@ -42,8 +42,8 @@ void TestPlaylist::move_down_2_5_4()
 void TestPlaylist::move_down_2_5_7()
 {
     QSharedPointer<yue::bell::Playlist> playlist = yue::bell::PlaylistManager::instance()->open("TestPlaylist");
-    QList<yue::bell::Database::uid_t> initial( {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'});
-    QList<yue::bell::Database::uid_t> expected({'a', 'b', 'd', 'e', 'f', 'c', 'g', 'h'});
+    QList<yue::bell::Database::uid_t> initial( {"a", "b", "c", "d", "e", "f", "g", "h"});
+    QList<yue::bell::Database::uid_t> expected({"a", "b", "d", "e", "f", "c", "g", "h"});
     playlist->set(initial);
     playlist->setCurrent(7);
     _move_impl(playlist, expected, 2, 5, 7) ;
@@ -53,8 +53,8 @@ void TestPlaylist::move_down_2_5_7()
 void TestPlaylist::move_down_3_5_4()
 {
     QSharedPointer<yue::bell::Playlist> playlist = yue::bell::PlaylistManager::instance()->open("TestPlaylist");
-    QList<yue::bell::Database::uid_t> initial( {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'});
-    QList<yue::bell::Database::uid_t> expected({'a', 'b', 'c', 'e', 'f', 'd', 'g', 'h'});
+    QList<yue::bell::Database::uid_t> initial( {"a", "b", "c", "d", "e", "f", "g", "h"});
+    QList<yue::bell::Database::uid_t> expected({"a", "b", "c", "e", "f", "d", "g", "h"});
     playlist->set(initial);
     playlist->setCurrent(4);
     _move_impl(playlist, expected, 3, 5, 3) ;
@@ -65,8 +65,8 @@ void TestPlaylist::move_up_5_2_0()
 {
     QSharedPointer<yue::bell::Playlist> playlist = yue::bell::PlaylistManager::instance()->open("TestPlaylist");
     //                                           0    1    2    3    4    5    6    7
-    QList<yue::bell::Database::uid_t> initial( {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'});
-    QList<yue::bell::Database::uid_t> expected({'a', 'b', 'c', 'f', 'd', 'e', 'g', 'h'});
+    QList<yue::bell::Database::uid_t> initial( {"a", "b", "c", "d", "e", "f", "g", "h"});
+    QList<yue::bell::Database::uid_t> expected({"a", "b", "c", "f", "d", "e", "g", "h"});
     playlist->set(initial);
     playlist->setCurrent(0);
     _move_impl(playlist, expected, 5, 2, 0) ;
@@ -77,8 +77,8 @@ void TestPlaylist::move_up_5_2_4()
 {
     QSharedPointer<yue::bell::Playlist> playlist = yue::bell::PlaylistManager::instance()->open("TestPlaylist");
     //                                           0    1    2    3    4    5    6    7
-    QList<yue::bell::Database::uid_t> initial( {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'});
-    QList<yue::bell::Database::uid_t> expected({'a', 'b', 'c', 'f', 'd', 'e', 'g', 'h'});
+    QList<yue::bell::Database::uid_t> initial( {"a", "b", "c", "d", "e", "f", "g", "h"});
+    QList<yue::bell::Database::uid_t> expected({"a", "b", "c", "f", "d", "e", "g", "h"});
     playlist->set(initial);
     playlist->setCurrent(4);
     _move_impl(playlist, expected, 5, 2, 5) ;
@@ -89,8 +89,8 @@ void TestPlaylist::move_up_5_2_7()
 {
     QSharedPointer<yue::bell::Playlist> playlist = yue::bell::PlaylistManager::instance()->open("TestPlaylist");
     //                                           0    1    2    3    4    5    6    7
-    QList<yue::bell::Database::uid_t> initial( {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'});
-    QList<yue::bell::Database::uid_t> expected({'a', 'b', 'c', 'f', 'd', 'e', 'g', 'h'});
+    QList<yue::bell::Database::uid_t> initial( {"a", "b", "c", "d", "e", "f", "g", "h"});
+    QList<yue::bell::Database::uid_t> expected({"a", "b", "c", "f", "d", "e", "g", "h"});
     playlist->set(initial);
     playlist->setCurrent(7);
     _move_impl(playlist, expected, 5, 2, 7) ;
@@ -100,8 +100,8 @@ void TestPlaylist::move_up_5_2_7()
 void TestPlaylist::move_up_5_3_4()
 {
     QSharedPointer<yue::bell::Playlist> playlist = yue::bell::PlaylistManager::instance()->open("TestPlaylist");
-    QList<yue::bell::Database::uid_t> initial({'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'});
-    QList<yue::bell::Database::uid_t> expected({'a', 'b', 'c', 'd', 'f', 'e', 'g', 'h'});
+    QList<yue::bell::Database::uid_t> initial({"a", "b", "c", "d", "e", "f", "g", "h"});
+    QList<yue::bell::Database::uid_t> expected({"a", "b", "c", "d", "f", "e", "g", "h"});
     playlist->set(initial);
     playlist->setCurrent(4);
     _move_impl(playlist, expected, 5, 3, 5) ;
@@ -111,8 +111,8 @@ void TestPlaylist::move_up_5_3_4()
 void TestPlaylist::move_up_5_u_0()
 {
     QSharedPointer<yue::bell::Playlist> playlist = yue::bell::PlaylistManager::instance()->open("TestPlaylist");
-    QList<yue::bell::Database::uid_t> initial({'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'});
-    QList<yue::bell::Database::uid_t> expected({'a', 'f', 'b', 'c', 'd', 'e', 'g', 'h'});
+    QList<yue::bell::Database::uid_t> initial({"a", "b", "c", "d", "e", "f", "g", "h"});
+    QList<yue::bell::Database::uid_t> expected({"a", "f", "b", "c", "d", "e", "g", "h"});
     playlist->set(initial);
     playlist->setCurrent(0);
     _move_impl(playlist, expected, 5, -1, 0) ;
@@ -157,12 +157,12 @@ void TestPlaylist::_move_impl(playlist_t playlist, lst_t& expected, int src, int
 
     // if they dont match print out the lists for debugging
     if (!success) {
-        char c1[2] = {0, 0,};
-        char c2[2] = {0, 0,};
+        QString c1;
+        QString c2;
         for (int i=0; i < expected.size(); i++) {
-            c1[0] = static_cast<char>(actual[i]);
-            c2[0] = static_cast<char>(expected[i]);
-            qDebug() << i << c1 << ((actual[i]==expected[i])?'=':'!') << c2
+            c1 = actual[i];
+            c2 = expected[i];
+            qDebug() << i << c1 << ((actual[i]==expected[i])?"=":"!") << c2
                      << ((i==initial_index)?"*":"_")
                      << ((i==final_index)?"*":"_")
                      << ((i==current_index)?"+":"_");

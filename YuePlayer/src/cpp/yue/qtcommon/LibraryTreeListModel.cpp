@@ -108,7 +108,7 @@ QVariant LibraryTreeListModel::data(const QModelIndex &index, int role/* = Qt::D
         return QVariant();
 
     if (role == LibraryTreeListModel::UniqueIdRole) {
-        return bell::toQVariant(m_tabledata[index.row()]->getUid());
+        return m_tabledata[index.row()]->getUid();
     }
 
     return TreeListModelBase::data(index,role);

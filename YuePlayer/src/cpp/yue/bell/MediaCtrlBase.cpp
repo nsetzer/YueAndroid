@@ -44,15 +44,15 @@ int MediaCtrlBase::currentIndex()
     return index;
 }
 
-void MediaCtrlBase::playNext(int uid)
+void MediaCtrlBase::playNext(Database::uid_t uid)
 {
     auto pl = PlaylistManager::instance()->openCurrent();
     auto pair = pl->current();
-    pl->insert(static_cast<int>(pair.second)+1,static_cast<Database::uid_t>(uid));
+    pl->insert(static_cast<int>(pair.second)+1, uid);
     emit playlistReset();
 }
 
-void MediaCtrlBase::playSong(int uid)
+void MediaCtrlBase::playSong(Database::uid_t uid)
 {
     playNext(uid);
     next();
@@ -69,7 +69,7 @@ void MediaCtrlBase::loadCurrentSongInfo()
         m_currentSong.m_artist="error";
         m_currentSong.m_album="error";
         m_currentSong.m_title="error";
-        m_currentSong.m_songid=0;
+        m_currentSong.m_songid="";
     }
 }
 
