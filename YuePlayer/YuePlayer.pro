@@ -30,6 +30,7 @@ SOURCES += \
     src/cpp/ui/page_library.cpp \
     src/cpp/ui/page_player.cpp \
     src/cpp/ui/page_queue.cpp \
+    src/cpp/ui/page_remote.cpp \
     src/cpp/ui/page_settings.cpp \
     src/cpp/yue/bell/AlbumArt.cpp \
     src/cpp/yue/bell/database.cpp \
@@ -75,6 +76,7 @@ HEADERS += \
     src/cpp/ui/page_player.h \
     src/cpp/ui/page_queue.h \
     src/cpp/ui/page_settings.h \
+    src/cpp/ui/page_remote.h \
     src/cpp/yue/alien/utf8/utf8.h \
     src/cpp/yue/alien/utf8/utf8/checked.h \
     src/cpp/yue/alien/utf8/utf8/core.h \

@@ -426,7 +426,7 @@ QList<LibraryTreeNode*> Library::remoteQueryToForest(Location location, QString 
     //     << Song::artist       // 0
     //     << Song::album        // 1
     //     << Song::title        // 2
-    //     << Song::rating       // 3
+    //     << Song::remote       // 3
     //     << Song::uid          // 4
     //     << Song::artist_key   // 5
     //     << Song::album_index; // 6
@@ -449,6 +449,7 @@ QList<LibraryTreeNode*> Library::remoteQueryToForest(Location location, QString 
         QString artist = query.value(0).toString();
         QString album  = query.value(1).toString();
         QString title  = query.value(2).toString();
+        int remote = query.value(3).toInt();
         Database::uid_t uid = query.value(4).toString();
 
         if (nd_art == nullptr || nd_art->text() != artist) {
@@ -461,7 +462,7 @@ QList<LibraryTreeNode*> Library::remoteQueryToForest(Location location, QString 
             nd_art->addChild(nd_alb);
         }
 
-        yue::bell::LibraryTreeNode* child = new yue::bell::LibraryTreeNode(uid, title, 0, 2);
+        yue::bell::LibraryTreeNode* child = new yue::bell::LibraryTreeNode(uid, title, remote, 2);
         nd_alb->addChild(child);
     }
 

@@ -99,7 +99,7 @@ SqlQuery LibrarySearchGrammar::buildRemoteQuery(std::unique_ptr<yue::core::Searc
     lst  << Song::artist       // 0
          << Song::album        // 1
          << Song::title        // 2
-         << Song::rating       // 3
+         << Song::remote       // 3
          << Song::uid          // 4
          << Song::artist_key   // 5
          << Song::album_index; // 6

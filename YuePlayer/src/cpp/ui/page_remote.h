@@ -1,5 +1,5 @@
-#ifndef UI_PAGE_LIBRARY_H
-#define UI_PAGE_LIBRARY_H
+#ifndef UI_PAGE_REMOTE_H
+#define UI_PAGE_REMOTE_H
 
 #include <QLineEdit>
 #include <QListView>
@@ -16,12 +16,12 @@
 #include "yue/qtcommon/gesture.h"
 #include "yue/bell/MediaCtrlBase.h"
 
-class LibraryTreeDelegate: public QStyledItemDelegate
+class RemoteTreeDelegate: public QStyledItemDelegate
 {
     Q_OBJECT
 
 public:
-    LibraryTreeDelegate(QObject *parent = nullptr) : QStyledItemDelegate(parent) {}
+    RemoteTreeDelegate(QObject *parent = nullptr) : QStyledItemDelegate(parent) {}
 
     void paint(QPainter *painter, const QStyleOptionViewItem &option,
         const QModelIndex &index) const override;
@@ -30,17 +30,17 @@ public:
 };
 
 
-class LibraryView : public QListView
+class RemoteView : public QListView
 {
     Q_OBJECT
 private:
     yue::qtcommon::Gesture m_gesture;
     yue::qtcommon::LibraryTreeListModel *m_model;
-    LibraryTreeDelegate *m_delegate;
+    RemoteTreeDelegate *m_delegate;
 
 public:
-    LibraryView(QWidget *parent = nullptr);
-    virtual ~LibraryView() override {}
+    RemoteView(QWidget *parent = nullptr);
+    virtual ~RemoteView() override {}
 
     void setQuery(QString query);
     void toggleChecked();
@@ -82,10 +82,8 @@ protected:
         if (depth < 2 && count>0 && x < x1) {
             onDoubleClick(index);
         } else if (depth == 2 && x < x1) {
-            int tmp = (rating>=8)?0:8;
+            int tmp = (rating>=0)?1:0;
             m_model->setData(index, tmp, yue::qtcommon::TreeListModelBase::RatingRole);
-            yue::bell::Library::instance()->setRating(songId, tmp);
-            qDebug() << "new rating" << rating << tmp;
         } else if (depth == 2 && x > x2) {
             auto inst = yue::bell::MediaCtrlBase::instance();
             qDebug() << "adding " << songId << "to playlist";
@@ -111,18 +109,18 @@ public slots:
 
 namespace UI {
 
-class uiPageLibrary;
+class uiPageRemote;
 
 } // namespace UI
 
-class PageLibrary : public QWidget
+class PageRemote : public QWidget
 {
     Q_OBJECT
 
 public:
 
-    PageLibrary(QWidget *parent = nullptr);
-    ~PageLibrary();
+    PageRemote(QWidget *parent = nullptr);
+    ~PageRemote();
 
 public slots:
     void setQuery(QString query);
@@ -137,8 +135,8 @@ private slots:
     void onSpeechClicked();
 
 private:
-    QScopedPointer<UI::uiPageLibrary> m_ui;
+    QScopedPointer<UI::uiPageRemote> m_ui;
     bool m_shuffle;
 };
 
-#endif // UI_PAGE_LIBRARY_H
+#endif

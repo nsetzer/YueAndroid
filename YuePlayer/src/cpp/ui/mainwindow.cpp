@@ -9,6 +9,7 @@
 #include "ui/page_explorer.h"
 #include "ui/page_settings.h"
 #include "ui/page_dynamic.h"
+#include "ui/page_remote.h"
 
 /**
 create a custom icon button
@@ -32,6 +33,7 @@ public:
     PageExplorer *m_pageExplorer;
     PageSettings *m_pageSettings;
     PageDynamic *m_pageDynamic;
+    PageRemote *m_pageRemote;
 
     explicit MainWindow(QMainWindow *parent = nullptr);
     ~MainWindow();
@@ -54,12 +56,14 @@ MainWindow::MainWindow(QMainWindow *parent)
     m_pageExplorer = new PageExplorer(parent);
     m_pageSettings = new PageSettings(parent);
     m_pageDynamic = new PageDynamic(parent);
+    m_pageRemote = new PageRemote(parent);
 
     m_tabPages->addTab(m_pageQueue, "queue");
     m_tabPages->addTab(m_pageLibrary, "library");
     m_tabPages->addTab(m_pageDynamic, "dynamic");
     m_tabPages->addTab(m_pageExplorer, "files");
     m_tabPages->addTab(m_pageSettings, "settings");
+    m_tabPages->addTab(m_pageRemote, "remote");
 
     m_centralLayout->addWidget(m_pagePlayer);
     m_centralLayout->addWidget(m_tabPages);
