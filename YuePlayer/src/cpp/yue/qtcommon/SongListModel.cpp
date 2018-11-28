@@ -98,7 +98,7 @@ void SongListModel::setPlaylist(QSharedPointer<yue::bell::Playlist> playlist)
     LOG_FUNCTION_TIME();
     m_playlist = playlist;
     //p.song_id, p.idx, l.artist, l.album, l.title, l.length
-    QSqlQuery query = playlist->select();
+    yue::bell::SqlQuery query = playlist->select();
     query.exec();
     if (query.lastError().isValid())
         qWarning() << query.lastError();

@@ -27,7 +27,7 @@ QSharedPointer<Playlist> PlaylistManager::openCurrent()
 QSharedPointer<Playlist> PlaylistManager::open(QString name)
 {
     Database::plid_t plid=0;
-    QSqlQuery q(m_library->db()->db());
+    SqlQuery q(m_library->db()->db());
     q.prepare("SELECT uid FROM playlists WHERE name=?");
     q.addBindValue(name);
     if (!q.exec()) {
@@ -76,7 +76,7 @@ void Playlist::set(QList<Database::uid_t> lst, size_t current_index) {
 
     LOG_FUNCTION_TIME();
 
-    QSqlQuery q(m_db->db());
+    SqlQuery q(m_db->db());
 
     q.exec("BEGIN");
 
@@ -109,7 +109,7 @@ void Playlist::set(QList<Database::uid_t> lst, size_t current_index) {
 void Playlist::clear()
 {
 
-    QSqlQuery q(m_db->db());
+    SqlQuery q(m_db->db());
     q.prepare("DELETE FROM playlist_songs WHERE uid=?");
     q.addBindValue(toQVariant(m_plid));
     q.exec();
@@ -121,7 +121,7 @@ void Playlist::clear()
 
 size_t Playlist::size() {
 
-    QSqlQuery q(m_db->db());
+    SqlQuery q(m_db->db());
     q.prepare("SELECT size FROM playlists WHERE uid=?");
     q.addBindValue(toQVariant(m_plid));
     q.exec();
@@ -136,7 +136,7 @@ size_t Playlist::size() {
 Database::uid_t Playlist::get(int idx)
 {
     Database::uid_t uid;
-    QSqlQuery q(m_db->db());
+    SqlQuery q(m_db->db());
 
     q.prepare("SELECT song_id FROM playlist_songs WHERE uid=? AND idx=?");
     q.addBindValue(toQVariant(m_plid));
@@ -150,7 +150,7 @@ Database::uid_t Playlist::get(int idx)
 Database::uid_t Playlist::setCurrent(int idx)
 {
     Database::uid_t uid;
-    QSqlQuery q(m_db->db());
+    SqlQuery q(m_db->db());
 
     q.exec("begin");
 
@@ -175,19 +175,21 @@ QPair<Database::uid_t,size_t> Playlist::current()
 {
      Database::uid_t uid;
      size_t index,size;
-     QSqlQuery q(m_db->db());
+     SqlQuery q(m_db->db());
 
-     q.exec("begin");
+     q.exec("begin"); // TODO: THIS IS SUSPECT
      q.prepare("SELECT idx,size FROM playlists WHERE uid=?");
      q.addBindValue(toQVariant(m_plid));
      q.exec();
      if (!q.first()) {
+         q.exec("end");
          throw std::runtime_error("no current song");
      }
      index = q.value(0).toULongLong();
      size = q.value(1).toULongLong();
 
      if (size<1 || index>=size) {
+         q.exec("end");
          throw std::runtime_error("no current song");
      }
 
@@ -196,6 +198,7 @@ QPair<Database::uid_t,size_t> Playlist::current()
      q.addBindValue(toQVariant(index));
      q.exec();
      if (!q.first()) {
+         q.exec("end");
          throw std::runtime_error("no current song");
      }
      uid = q.value(0).toString();
@@ -209,7 +212,7 @@ QPair<Database::uid_t,size_t> Playlist::current()
  {
      Database::uid_t uid;
      size_t index,size;
-     QSqlQuery q(m_db->db());
+     SqlQuery q(m_db->db());
 
      q.exec("begin");
      q.prepare("SELECT idx,size FROM playlists WHERE uid=?");
@@ -245,7 +248,7 @@ QPair<Database::uid_t,size_t> Playlist::current()
  {
      Database::uid_t uid;
      size_t index,size;
-     QSqlQuery q(m_db->db());
+     SqlQuery q(m_db->db());
 
      q.exec("begin");
      q.prepare("SELECT idx,size FROM playlists WHERE uid=?");
@@ -285,7 +288,7 @@ void Playlist::insert(int idx, Database::uid_t uid)
         throw std::runtime_error("cannot insert empty uid");
     }
 
-    m_db->db().transaction();
+    m_db->transaction();
     bool result;
     try {
          result = _insert_uid(idx,uid);
@@ -293,31 +296,31 @@ void Playlist::insert(int idx, Database::uid_t uid)
         qCritical() << "database error"
                     << e.what()
                     << m_db->db().lastError();
-        m_db->db().rollback();
+        m_db->rollback();
         return;
     } catch (std::exception& e) {
         qCritical() << "unexpected exception"
                     << e.what()
                     << m_db->db().lastError();
-        m_db->db().rollback();
+        m_db->rollback();
         return;
     } catch (...) {
         qCritical() << "unhandled exception during sql transaction"
                     << m_db->db().lastError();
-        m_db->db().rollback();
+        m_db->rollback();
         return;
     }
 
     if (result)
-        m_db->db().commit();
+        m_db->commit();
     else
-        m_db->db().rollback();
+        m_db->rollback();
     return;
 }
 
 bool Playlist::_insert_uid(int idx, Database::uid_t uid)
 {
-    QSqlQuery q(m_db->db());
+    SqlQuery q(m_db->db());
     q.prepare("UPDATE playlist_songs SET idx=idx+1 WHERE uid=? and idx>=?");
     q.addBindValue(toQVariant(m_plid));
     q.addBindValue(idx);
@@ -339,7 +342,7 @@ void Playlist::remove(int idx)
 {
     LOG_FUNCTION_TIME();
 
-    m_db->db().transaction();
+    m_db->transaction();
     bool result;
     try {
          result = _remove_one(idx);
@@ -347,31 +350,31 @@ void Playlist::remove(int idx)
         qCritical() << "database error"
                     << e.what()
                     << m_db->db().lastError();
-        m_db->db().rollback();
+        m_db->rollback();
         return;
     } catch (std::exception& e) {
         qCritical() << "unexpected exception"
                     << e.what()
                     << m_db->db().lastError();
-        m_db->db().rollback();
+        m_db->rollback();
         return;
     } catch (...) {
         qCritical() << "unhandled exception during sql transaction"
                     << m_db->db().lastError();
-        m_db->db().rollback();
+        m_db->rollback();
         return;
     }
 
     if (result)
-        m_db->db().commit();
+        m_db->commit();
     else
-        m_db->db().rollback();
+        m_db->rollback();
     return;
 }
 
 bool Playlist::_remove_one(int idx)
 {
-    QSqlQuery q(m_db->db());
+    SqlQuery q(m_db->db());
 
     q.prepare("DELETE FROM playlist_songs WHERE uid=? AND idx=?");
     q.addBindValue(toQVariant(m_plid));
@@ -394,7 +397,7 @@ void Playlist::move(int src, int tgt)
 {
     LOG_FUNCTION_TIME();
 
-    m_db->db().transaction();
+    m_db->transaction();
     bool result;
     try {
          result = _move_one(src,tgt);
@@ -402,25 +405,25 @@ void Playlist::move(int src, int tgt)
         qCritical() << "database error"
                     << e.what()
                     << m_db->db().lastError();
-        m_db->db().rollback();
+        m_db->rollback();
         return;
     } catch (std::exception& e) {
         qCritical() << "unexpected exception"
                     << e.what()
                     << m_db->db().lastError();
-        m_db->db().rollback();
+        m_db->rollback();
         return;
     } catch (...) {
         qCritical() << "unhandled exception during sql transaction"
                     << m_db->db().lastError();
-        m_db->db().rollback();
+        m_db->rollback();
         return;
     }
 
     if (result)
-        m_db->db().commit();
+        m_db->commit();
     else
-        m_db->db().rollback();
+        m_db->rollback();
     return;
 }
 
@@ -471,7 +474,7 @@ bool Playlist::_move_one(int src, int tgt)
     /*
     int current_index;
     Database::uid_t song_id;
-    QSqlQuery q(m_db->db());
+    SqlQuery q(m_db->db());
 
     // get the song id from the current playlist at the source index
     q.prepare("SELECT song_id FROM playlist_songs WHERE uid=? AND idx=?");
@@ -572,7 +575,7 @@ bool Playlist::_move_one(int src, int tgt)
 
 QList<Database::uid_t> Playlist::toList() const
 {
-    QSqlQuery q(m_db->db());
+    SqlQuery q(m_db->db());
     QList<Database::uid_t> lst;
 
     q.prepare("SELECT idx, song_id FROM playlist_songs WHERE uid=? ORDER BY idx ASC");
@@ -602,9 +605,9 @@ QList<Database::uid_t> Playlist::toList() const
  * the select statement returns the information necessary to display
  * the playlist to the user.
  */
-QSqlQuery Playlist::select() {
+SqlQuery Playlist::select() {
     //m_db->db()
-    QSqlQuery q;
+    SqlQuery q;
     QString s = "SELECT p.song_id, p.idx, l.artist, l.album, l.title, l.length "
             "FROM playlist_songs AS p "
             "INNER JOIN library AS l ON l.uid == p.song_id "

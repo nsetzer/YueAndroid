@@ -26,7 +26,7 @@ a song is independant of Qt, and contains only the
 data fields corresponding to the columns in the view.
 
 a SongList is a lazy object
-backed by an QSqlQuery
+backed by an SqlQuery
 it is a list of N elements
 when an element is accessed it is converted from aquery
 into a song object.
@@ -63,8 +63,8 @@ class Song {
     typedef std::string str_t; // provided for completeness
 
     static const char* uid;         //
-    static const char* path;        //
-    static const char* source_path; //
+    static const char* file_path;   //
+    static const char* art_path;    //
     static const char* artist;      //
     static const char* artist_key;  //
     static const char* composer;    //
@@ -73,7 +73,7 @@ class Song {
     static const char* genre;       //
     static const char* year;        //
     static const char* country;     //
-    static const char* lang;        //
+    static const char* language;    //
     static const char* comment;     //
     static const char* album_index; //
     static const char* length;      //
@@ -82,13 +82,11 @@ class Song {
     static const char* skip_count;  //
     static const char* rating;      //
     static const char* blocked;     //
-    static const char* opm;         //
-    static const char* equalizer;   //
     static const char* date_added;  //
-    static const char* frequency;   //
     static const char* file_size;   // in bytes
+    static const char* remote;
 
-    static const char* all_text; // in bytes
+    static const char* all_text;
 
     static const int num_columns;
 

@@ -191,7 +191,7 @@ void RemoteClient::importSongRecords(const QJsonArray& arr)
 
         Database::song_t song;
 
-        //song["id"] = obj.find("id").value().toString();
+        QString uid = obj.find("id").value().toString();
         //song["static_path"] = obj.find("static_path").value().toString();
 
         // str
@@ -201,8 +201,9 @@ void RemoteClient::importSongRecords(const QJsonArray& arr)
         song[yue::core::Song::title] = obj.find("title").value().toString();
         song[yue::core::Song::comment] = obj.find("comment").value().toString();
         song[yue::core::Song::genre] = obj.find("genre").value().toString();
-        song[yue::core::Song::country] = obj.find("genre").value().toString();
-        song[yue::core::Song::lang] = obj.find("language").value().toString();
+        song[yue::core::Song::country] = obj.find("country").value().toString();
+        song[yue::core::Song::language] = obj.find("language").value().toString();
+
         // int
         song[yue::core::Song::play_count] = obj.find("play_count").value().toInt();
         song[yue::core::Song::rating] = obj.find("rating").value().toInt();
@@ -211,12 +212,15 @@ void RemoteClient::importSongRecords(const QJsonArray& arr)
         song[yue::core::Song::album_index] = obj.find("album_index").value().toInt();
         song[yue::core::Song::last_played] = obj.find("last_played").value().toInt();
 
-        // if contains, update
-        // otherwise, add uid, and set remote=true in the song
-        // before inserting
-        //lib->contains(uid)
-        //lib->insert(song);
-        //lib->update(, data);
+        if (lib->contains(uid)) {
+            lib->update(uid, song);
+        } else {
+            song[yue::core::Song::uid] = uid;
+            song[yue::core::Song::remote] = 1;
+            song[yue::core::Song::file_path] = ""; // required for insert
+            lib->insert(song);
+        }
+
     }
 }
 

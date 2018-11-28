@@ -48,11 +48,11 @@ void ScannerThread::remove_missing()
 
     LibrarySearchGrammar grammar;
     typedef yue::core::Song Song;
-    QSqlQuery query = grammar.buildQuery(QStringList()
+    SqlQuery query = grammar.buildQuery(QStringList()
                           << Song::artist
                           << Song::album
                           << Song::uid
-                          << Song::path,
+                          << Song::file_path,
                           "","", m_db->db());
 
     if (!query.exec()) {
@@ -142,16 +142,16 @@ void ScannerThread::scan_file(const QFileInfo& info)
 
     QMap<QString,QVariant> data;
 
-    data[yue::core::Song::path] = info.absoluteFilePath();
+    data[yue::core::Song::file_path] = info.absoluteFilePath();
     data[yue::core::Song::artist] = artist;
     data[yue::core::Song::album] = album;
     data[yue::core::Song::title] = title;
     data[yue::core::Song::genre] = genre;
     data[yue::core::Song::length] = length;
 
-    qDebug() << "inserting" << data[yue::core::Song::path].toString();
+    qDebug() << "inserting" << data[yue::core::Song::file_path].toString();
     Database::uid_t uid = m_lib->insert(data);
-    if (uid == 0) {
+    if (uid.isEmpty()) {
         qDebug() << "failed to insert song";
         throw ScannerInterrupt();
     }

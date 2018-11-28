@@ -8,6 +8,8 @@
 #include <QtConcurrent>
 #include <QDebug>
 
+#include <functional>
+
 namespace yue {
 namespace bell {
 
@@ -16,18 +18,18 @@ int AlbumArt::DEFAULT_WIDTH = 256;
 //static
 QImage AlbumArt::getAlbumArt(Library* lib, Database::uid_t songid, QSize size/* = QSize()*/)
 {
-    yue::bell::Database::artid_t artistid;
-    yue::bell::Database::abmid_t albumid;
+    QString artist;
+    QString album;
     QString songPath;
 
     int width = (size.isValid() && size.width()>=16) ? size.width() : AlbumArt::DEFAULT_WIDTH;
 
-    lib->getArtInfo(songid,artistid,albumid,songPath);
+    lib->getArtInfo(songid, artist, album, songPath);
 
     QImage image = AlbumArt::loadAlbumArtFromPath(songPath, width);
 
     if (image.isNull())
-        image = AlbumArt::createDefaultAlbumArt(albumid, width);
+        image = AlbumArt::createDefaultAlbumArt(album, width);
 
     return image;
 }
@@ -68,14 +70,14 @@ QImage AlbumArt::loadAlbumArt(QString imagePath, int width)
 
 
 //static
-QImage AlbumArt::createDefaultAlbumArt(Database::abmid_t albumid, int width)
+QImage AlbumArt::createDefaultAlbumArt(QString album, int width)
 {
 
     int size = width/2;
 
     yue::core::Random rnd;
-    // TODO: hash the value (int64, or str) into int32
-    rnd.seed(static_cast<unsigned int>(albumid));
+    // TODO: use an integer hash function...
+    rnd.seed(std::hash<std::string>()(album.toStdString()));
     yue::core::art::Expr* expr_r = yue::core::art::Expr::create(rnd);
     yue::core::art::Expr* expr_g = yue::core::art::Expr::create(rnd);
     yue::core::art::Expr* expr_b = yue::core::art::Expr::create(rnd);

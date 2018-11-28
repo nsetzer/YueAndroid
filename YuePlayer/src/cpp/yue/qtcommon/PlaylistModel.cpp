@@ -24,7 +24,7 @@ void PlaylistModel::refresh()
         throw std::runtime_error("playlist is null");
     }
 
-    QSqlQuery query = m_playlist->select();
+    yue::bell::SqlQuery query = m_playlist->select();
     query.exec();
     if (query.lastError().isValid())
         qWarning() << query.lastError();

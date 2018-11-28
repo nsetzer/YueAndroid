@@ -16,6 +16,27 @@
 namespace yue {
 namespace bell {
 
+class SqlQuery : public QSqlQuery
+{
+public:
+
+    SqlQuery()
+        : QSqlQuery()
+    {}
+
+    SqlQuery(QSqlDatabase db)
+        : QSqlQuery(db)
+    {}
+
+    bool exec() {
+        return QSqlQuery::exec();
+    }
+
+    bool exec(const QString &query) {
+        return QSqlQuery::exec(query);
+    }
+};
+
 class DatabaseError : public std::runtime_error
 {
 public:
@@ -30,8 +51,6 @@ class YUECOMMON_EXPORT Database : public QObject
     Q_OBJECT
 public:
     typedef size_t plid_t;
-    typedef size_t abmid_t;
-    typedef size_t artid_t;
     typedef QString uid_t;
     typedef QMap<QString,QVariant> song_t;
 private:
@@ -57,7 +76,11 @@ public:
 
     void connect(QString path, QString connectionName="");
 
-    static bool checked_select(QSqlQuery& query);
+    static bool checked_select(SqlQuery& query);
+
+    bool transaction();
+    bool commit();
+    bool rollback();
 
 private:
     void create_v1_0( void );

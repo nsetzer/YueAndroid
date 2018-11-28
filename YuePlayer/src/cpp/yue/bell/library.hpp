@@ -28,10 +28,19 @@ public:
 
     Database* m_db = nullptr;
     LibrarySearchGrammar m_grammar;
+
+
 public:
 
     Library(Database *db=nullptr);
     ~Library();
+
+    enum class Location {
+        Unknown = 0,
+        Local = 1,
+        Remote = 2,
+        Both = 3
+    };
 
     static Library* create( Database* db=nullptr ) {
         if (db == nullptr)
@@ -59,6 +68,7 @@ public:
     void remove(QMap<QString,QVariant> data);
 
     QList<LibraryTreeNode*> queryToForest(QString querystr);
+    QList<LibraryTreeNode*> remoteQueryToForest(Location location, QString querystr);
 
     QList<Database::uid_t> createPlaylist(QString query, size_t size = 0);
 
@@ -74,16 +84,14 @@ public:
     void sort(QList<Database::uid_t>& songs);
 
     QString getPath(Database::uid_t uid);
-    void getDisplayInfo(Database::uid_t uid,QString& artist, QString& album, QString& title);
-    void getArtInfo(Database::uid_t uid, Database::artid_t& artist_id, Database::abmid_t& album_id, QString& path);
+    void getDisplayInfo(Database::uid_t uid, QString& artist, QString& album, QString& title);
+    void getArtInfo(Database::uid_t uid, QString& artist, QString& album, QString& path);
 
 private:
     bool _insert(QMap<QString,QVariant> data);
     bool _update(Database::uid_t uid, QMap<QString,QVariant> data);
     bool _remove(QMap<QString,QVariant> data);
 
-    Database::abmid_t _get_or_create_artist_id(QString name, QString sortkey);
-    Database::abmid_t _get_or_create_album_id(Database::artid_t artist, QString name);
 };
 
 } // namespace bell

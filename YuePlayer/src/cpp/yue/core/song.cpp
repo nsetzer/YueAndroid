@@ -13,8 +13,8 @@ namespace core {
 
 // names of columns in the library view of the database
 const char* Song::uid = "uid";
-const char* Song::path = "path";
-const char* Song::source_path = "source_path";
+const char* Song::file_path = "file_path";
+const char* Song::art_path = "art_path";
 const char* Song::artist = "artist";
 const char* Song::artist_key = "artist_key";
 const char* Song::composer = "composer";
@@ -24,21 +24,20 @@ const char* Song::genre = "genre";
 const char* Song::year = "year";
 
 const char* Song::country = "country";
-const char* Song::lang = "lang";
+const char* Song::language = "language";
 const char* Song::comment = "comment";
 const char* Song::album_index = "album_index";
 const char* Song::length = "length";
 const char* Song::last_played = "last_played";
-const char* Song::play_count = "playcount";
+const char* Song::play_count = "play_count";
 const char* Song::skip_count = "skip_count";
 const char* Song::rating = "rating";
 const char* Song::blocked = "blocked";
 
-const char* Song::opm = "opm";
-const char* Song::equalizer = "equalizer";
 const char* Song::date_added = "date_added";
-const char* Song::frequency = "frequency";
 const char* Song::file_size = "file_size";
+
+const char* Song::remote = "remote";
 
 const char* Song::all_text = "all_text";
 
@@ -47,26 +46,25 @@ const int Song::num_columns = 25;
 // The static vector contains all string keys for a song.
 
 static const char* _strkeys[] = {
-    Song::path,     Song::source_path, Song::artist,  Song::artist_key,
-    Song::composer, Song::album,       Song::title,   Song::genre,
-    Song::country,  Song::lang,        Song::comment, Song::uid,
+    Song::file_path, Song::art_path, Song::artist,  Song::artist_key,
+    Song::composer,  Song::album,    Song::title,   Song::genre,
+    Song::country,   Song::language, Song::comment, Song::uid,
 };
 const Song::strset Song::StringKeys(_strkeys,_strkeys+sizeof(_strkeys)/sizeof(char*));
 
 static const char* _intkeys[] = {
     Song::year,        Song::album_index, Song::length,
     Song::last_played, Song::play_count, Song::skip_count,  Song::rating,
-    Song::blocked,     Song::opm,        Song::equalizer,   Song::date_added,
-    Song::frequency,   Song::file_size,
+    Song::blocked,     Song::date_added, Song::file_size, Song::remote
 };
 const Song::strset Song::IntegerKeys(_intkeys,_intkeys+sizeof(_intkeys)/sizeof(char*));
 
 const Song::strmap Song::abbreviations = {
     {"id", Song::uid},
     {"uid", Song::uid},
-    {"path", Song::path},
-    {"src", Song::source_path},
-    {"source_path", Song::source_path},
+    {"path", Song::file_path},
+    {"file_path", Song::file_path},
+    {"art_path", Song::art_path},
     {"art", Song::artist},
     {"artist", Song::artist},
     {"composer", Song::composer},
@@ -80,7 +78,8 @@ const Song::strmap Song::abbreviations = {
     {"genre", Song::genre},
     {"year", Song::year},
     {"country", Song::country},
-    {"lang", Song::lang},
+    {"lang", Song::language},
+    {"language", Song::language},
     {"com", Song::comment},
     {"comm", Song::comment},
     {"comment", Song::comment},
@@ -106,14 +105,10 @@ const Song::strmap Song::abbreviations = {
     {"banned", Song::blocked},
     {"blocked", Song::blocked},
     {"deleted", Song::blocked},
-    {"opm", Song::opm},
-    {"eq", Song::equalizer},
-    {"equalizer", Song::equalizer},
     {"added", Song::date_added},
-    {"freq", Song::frequency},
-    {"frequency", Song::frequency},
     {"size", Song::file_size},
     {"file_size", Song::file_size},
+    {"remote", Song::remote},
 };
 
 //-----------------------------------------------

@@ -1,7 +1,7 @@
 
 #include "yue/bell/database.hpp"
 /*
-QSqlQuery testQuery(QString("INSERT INTO test(testcol) VALUES(?)"));
+SqlQuery testQuery(QString("INSERT INTO test(testcol) VALUES(?)"));
 testQuery.bindValue(0, someQStringObg);
 testQuery.exec();
 */
@@ -91,7 +91,7 @@ void Database::connect(QString path, QString connectionName)
 
     for (const QString& pragma : db_pragma) {
         QString sql = QString("PRAGMA %1;").arg(pragma);
-        QSqlQuery query(m_db);
+        SqlQuery query(m_db);
         query.prepare(sql);
         query.exec();
 
@@ -101,6 +101,7 @@ void Database::connect(QString path, QString connectionName)
         {
            qDebug() << query.lastQuery() << query.lastError();
         }
+        query.finish();
     }
 
     create_v1_0();
@@ -119,66 +120,35 @@ void Database::create_v1_0( void )
 {
     bool r;
 
-    m_db.transaction();
+    transaction();
 
-    { // Table artists
-        QSqlQuery q(m_db);
-        r=q.exec("CREATE TABLE if not exists artists ( "
-                 "uid INTEGER PRIMARY KEY AUTOINCREMENT, "
-                 "artist text, "
-                 "sortkey text, "
-                 "count INTEGER DEFAULT 0 "
-                 ")");
-        if (q.lastError().isValid())
-            qWarning() << q.lastError();
-        QString e1 = q.lastError().databaseText();
-        if (!r)
-            throw std::runtime_error("failed to create table: artists");
-    }
-
-    { // Table albums
-        QSqlQuery q(m_db);
-        r=q.exec("CREATE TABLE if not exists albums ( "
-                 "uid INTEGER PRIMARY KEY AUTOINCREMENT, "
-                 "artist INTEGER, "
-                 "album text, "
-                 "sortkey text, "
-                 "count INTEGER DEFAULT 0, "
-                 "FOREIGN KEY(artist) REFERENCES artists(uid)"
-                 ")");
-        if (q.lastError().isValid())
-            qWarning() << q.lastError();
-        if (!r)
-            throw std::runtime_error("failed to create table: albums");
-    }
 
     { // Table songs
-        QSqlQuery q(m_db);
+        SqlQuery q(m_db);
         r=q.exec("CREATE TABLE if not exists songs ( "
                  "uid text PRIMARY KEY, "
-                 "path text, "
-                 "source_path text DEFAULT '', "
-                 "artist INTEGER, "
+                 "file_path text, "
+                 "art_path text DEFAULT '', "
+                 "artist text, "
+                 "artist_key text, "
                  "composer text DEFAULT '', "
-                 "album INTEGER, "
+                 "album text, "
                  "title text, "
                  "genre text DEFAULT '', "
                  "year integer DEFAULT 0, "
                  "country text DEFAULT '', "
-                 "lang text DEFAULT '', "
+                 "language text DEFAULT '', "
                  "comment text DEFAULT '', "
                  "album_index integer DEFAULT 0, "
                  "length integer DEFAULT 0, "
                  "last_played integer DEFAULT 0, "
                  "date_added integer DEFAULT 0, "
-                 "playcount integer DEFAULT 0, "
+                 "play_count integer DEFAULT 0, "
                  "skip_count integer DEFAULT 0, "
                  "rating integer DEFAULT 0, "
                  "blocked integer DEFAULT 0, "
-                 "equalizer integer DEFAULT 0, "
-                 "opm integer DEFAULT 0, "
-                 "frequency integer DEFAULT 0, "
                  "file_size integer DEFAULT 0, "
+                 "remote integer DEFAULT 0, "
                  "FOREIGN KEY(artist) REFERENCES artists(uid), "
                  "FOREIGN KEY(album) REFERENCES albums(uid)"
                  ")");
@@ -189,7 +159,7 @@ void Database::create_v1_0( void )
     }
 
     { // Table playlists
-        QSqlQuery q(m_db);
+        SqlQuery q(m_db);
         r=q.exec("CREATE TABLE if not exists playlists ( "
                  "uid integer PRIMARY KEY AUTOINCREMENT, "
                  "name text UNIQUE, "
@@ -203,7 +173,7 @@ void Database::create_v1_0( void )
     }
 
     { // Table playlist_songs
-        QSqlQuery q(m_db);
+        SqlQuery q(m_db);
         r=q.exec("CREATE TABLE if not exists playlist_songs ( "
                  "uid integer, "
                  "idx integer, "
@@ -216,30 +186,24 @@ void Database::create_v1_0( void )
     }
 
     { // View library
-        QSqlQuery q(m_db);
+        SqlQuery q(m_db);
         r=q.exec("CREATE VIEW IF NOT EXISTS library as "
-                 "SELECT s.uid, s.path, s.source_path, "
-                 "a.artist, a.sortkey as artist_key, "
-                 "s.composer, "
-                 "b.album, "
-                 "s.title, s.genre, s.year, "
-                 "s.country, s.lang, s.comment, "
-                 "s.album_index, s.length, s.last_played, "
-                 "s.date_added, s.playcount, s.skip_count, "
-                 "s.rating, s.blocked, s.equalizer, s.opm, "
-                 "s.frequency, s.file_size "
-                 "FROM songs s, artists a, albums b "
-                 "WHERE s.artist=a.uid AND s.album=b.uid");
+                 "SELECT uid, file_path, art_path, artist, artist_key, composer,"
+                 "album, title, genre, year, country, language, comment, album_index, "
+                 "length, last_played, date_added, play_count, skip_count, rating, "
+                 "blocked, file_size, remote "
+                 "FROM songs "
+                 "WHERE remote = 0");
         if (q.lastError().isValid())
-            qWarning() << q.lastError();
+            qWarning() << q.lastError() << q.executedQuery();
         if (!r)
             throw std::runtime_error("failed to create view: library");
     }
 
-    m_db.commit();
+    commit();
 }
 
-bool Database::checked_select(QSqlQuery& query)
+bool Database::checked_select(SqlQuery& query)
 {
     bool result = query.exec();
     if (query.lastError().isValid()) {
@@ -251,7 +215,18 @@ bool Database::checked_select(QSqlQuery& query)
     return false;
 }
 
-
+bool Database::transaction()
+{
+    return m_db.transaction();
+}
+bool Database::commit()
+{
+    return m_db.commit();
+}
+bool Database::rollback()
+{
+   return  m_db.rollback();
+}
 
 } // namespace bell
 } // namespace yue

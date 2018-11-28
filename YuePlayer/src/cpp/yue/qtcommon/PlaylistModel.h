@@ -5,7 +5,7 @@
 
 #include <QSqlQueryModel>
 #include "yue/bell/playlist.hpp"
-
+#include "yue/bell/database.hpp"
 namespace yue {
 namespace qtcommon {
 
@@ -51,7 +51,7 @@ public:
         LOG_FUNCTION_TIME();
         m_playlist = playlist;
         qDebug() << "fixme" << playlist->toList();
-        QSqlQuery query = playlist->select();
+        yue::bell::SqlQuery query = playlist->select();
         query.exec();
         if (query.lastError().isValid())
             qWarning() << query.lastError();

@@ -19,10 +19,14 @@ DirectoryListModel::DirectoryListModel(QObject *parent)
     // add user data roles, roleNAmes for Icon
     //if (QOperatingSystemVersion.type() == QOperatingSystemVersion::Windows)
 
-    if (QOperatingSystemVersion::current().type() == QOperatingSystemVersion::Windows)
-        changeDirectory("C:\\");
-    else
+    if (QOperatingSystemVersion::current().type() == QOperatingSystemVersion::Windows) {
+        // TODO: FIX ME
+        //changeDirectory("C:\\");
+        changeDirectory("C:\\Users\\nicks\\Music");
+
+    } else {
         changeDirectory("/");
+    }
 }
 
 int DirectoryListModel::rowCount(const QModelIndex &parent/* = QModelIndex()*/) const

@@ -76,7 +76,7 @@ public:
     void remove(int idx);
     void move(int src, int tgt);
 
-    QSqlQuery select();
+    SqlQuery select();
 
     QList<Database::uid_t> toList() const;
 
