@@ -35,7 +35,7 @@ class RemoteView : public QListView
     Q_OBJECT
 private:
     yue::qtcommon::Gesture m_gesture;
-    yue::qtcommon::LibraryTreeListModel *m_model;
+    yue::qtcommon::RemoteTreeListModel *m_model;
     RemoteTreeDelegate *m_delegate;
 
 public:

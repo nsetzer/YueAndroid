@@ -129,5 +129,32 @@ void LibraryTreeListModel::onDefaultQueryChanged()
     search(m_defaultQuery);
 }
 
+RemoteTreeListModel::RemoteTreeListModel(QObject *parent)
+    : LibraryTreeListModel(parent)
+{
+}
+
+void RemoteTreeListModel::searchImpl(QString query) {
+    try {
+
+        QList<yue::bell::LibraryTreeNode*> forest = yue::bell::Library::instance()->remoteQueryToForest(
+                    yue::bell::Library::Location::Both, query);
+        emit searchResult( forest );
+        m_lastError = "";
+    } catch (yue::core::ParseError& e) {
+        m_lastError = e.what();
+        qWarning() << m_lastError;
+
+    } catch (...) {
+        m_lastError = "Unhandled exception";
+        qWarning() << m_lastError;
+
+    }
+
+    // error status changes wheter an error occured or not.
+    emit errorStatusChanged();
+}
+
+
 } // qtcommon
 } // yue

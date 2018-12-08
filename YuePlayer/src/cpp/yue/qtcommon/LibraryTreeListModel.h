@@ -42,14 +42,23 @@ signals:
     void defaultQueryChanged();
     void searchResult(QList<yue::bell::LibraryTreeNode*> forest);
 
-private:
-    void searchImpl(QString query);
+protected:
     QString m_lastError;
+    QString m_defaultQuery="";
+private:
+    virtual void searchImpl(QString query);
+
     void collectSelectedSongs(QMap<yue::bell::Database::uid_t, QString>& groups, yue::bell::LibraryTreeNode* node );
     void onDefaultQueryChanged();
+};
 
-    QString m_defaultQuery="";
+class RemoteTreeListModel : public LibraryTreeListModel
+{
+public:
+    explicit RemoteTreeListModel(QObject *parent = nullptr);
 
+private:
+    virtual void searchImpl(QString query) override;
 };
 
 } // qtcommon

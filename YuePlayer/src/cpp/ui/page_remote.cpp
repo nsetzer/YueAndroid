@@ -20,20 +20,6 @@ void RemoteTreeDelegate::paint(
     int count = index.data(yue::qtcommon::TreeListModelBase::ChildCountRole).toInt();
     int rating = index.data(yue::qtcommon::TreeListModelBase::RatingRole).toInt();
 
-    if (check/*option.state & QStyle::State_Selected*/) {
-        QBrush color = option.palette.highlight();
-        if (check == Qt::CheckState::PartiallyChecked)
-            color = option.palette.highlight().color().lighter();
-        painter->fillRect(option.rect, color);
-        painter->setPen(Qt::white);
-        painter->setBrush(option.palette.highlightedText());
-    }
-    else
-    {
-        painter->setPen(QPen(option.palette.foreground(), 0));
-        painter->setBrush(qvariant_cast<QBrush>(index.data(Qt::ForegroundRole)));
-    }
-
     int height = option.rect.height();
     if (height%2 == 0) {
         height -= 1;
@@ -46,22 +32,36 @@ void RemoteTreeDelegate::paint(
 
     painter->save();
 
+    // construct the 2 rectangles for a plus sign
     int h = static_cast<int>(.75F * height);
-    int w = h - (h/3) - (h/3);
+    h -= h%2;
+    int w = h - (2*h/3);
     int s = (option.rect.height() - h) / 2;
     QRect vrect(left + h/3 + (depth*height) + s, top + s, w, h);
     QRect hrect(left + (depth*height) + s, top + h/3 + s, h, w);
     QRect srect(left + ((depth - 1)*height) + s, top + s, h, h);
+    // construct a smaller, inner plus sign
+    h -= static_cast<int>(0.25F * h);
+    h -= h%2;
+    w = h - (2*h/3);
+    s = (option.rect.height() - h) / 2;
+    QRect vrect2(left + h/3 + (depth*height) + s, top + s, w, h);
+    QRect hrect2(left + (depth*height) + s, top + h/3 + s, h, w);
 
     if (count>0) {
         xoffset+=1;
 
         // draw the expansion state
-        if (!expand) {
-            painter->fillRect(vrect, QBrush(QColor(0,0,0)));
-        }
-
+        if (!expand) {painter->fillRect(vrect, QBrush(QColor(0,0,0)));}
         painter->fillRect(hrect, QBrush(QColor(0,0,0)));
+
+        if (check == Qt::CheckState::PartiallyChecked) {
+            if (!expand) {painter->fillRect(vrect2, QBrush(QColor(0x99,0x99,0x99)));}
+            painter->fillRect(hrect2, QBrush(QColor(0x99,0x99,0x99)));
+        } else if (check == Qt::CheckState::Unchecked) {
+            if (!expand) {painter->fillRect(vrect2, QBrush(QColor(0xEE,0xEE,0xEE)));}
+            painter->fillRect(hrect2, QBrush(QColor(0xEE,0xEE,0xEE)));
+        }
 
         // paint the bounding box to check centering
         //painter->drawRect(option.rect.left(), option.rect.top(),
@@ -97,7 +97,7 @@ void RemoteTreeDelegate::paint(
         QPainterPath path2;
         path2.addRoundRect(srect, w/2, w/2);
         painter->setPen(QPen(Qt::black, 2));
-        painter->fillPath(path2, (rating>=8)?Qt::yellow:Qt::gray);
+        painter->fillPath(path2, (check != Qt::CheckState::Unchecked)?Qt::yellow:Qt::gray);
         painter->drawPath(path2);
 
         painter->restore();
@@ -137,7 +137,7 @@ RemoteView::RemoteView(QWidget *parent)
             this, &RemoteView::onTap);
 
     m_delegate = new RemoteTreeDelegate(this);
-    m_model = new yue::qtcommon::LibraryTreeListModel(this);
+    m_model = new yue::qtcommon::RemoteTreeListModel(this);
 
     this->setModel(m_model);
     this->setItemDelegate(m_delegate);
